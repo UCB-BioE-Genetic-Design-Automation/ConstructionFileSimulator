@@ -66,25 +66,22 @@ public class Digest {
         List<Polynucleotide> out = new ArrayList<>();
         RestrictionData data = RestrictionData.getFor(enz);
         Pattern p = Pattern.compile(data.site);
-        Matcher m = p.matcher(sub.sequence);
+        Matcher m = p.matcher(sub.getSequence());
         
-        Polynucleotide remaining = new Polynucleotide(sub.sequence);
-        remaining.ext3 = sub.ext3;
-        remaining.ext5 = sub.ext5;
+        Polynucleotide remaining = new Polynucleotide(sub.getSequence(), sub.getExt5(), sub.getExt3());
         
         while(m.find()) {
             int start = m.start();
             int end = m.end();
             
             //Construct the 3' remaining fragment
-            remaining.sequence = sub.sequence.substring(m.start() + data.cut3);
-            remaining.ext5 = sub.sequence.substring(start + data.cut5, start + data.cut3);
+            String remainingSequence = sub.getSequence().substring(m.start() + data.cut3);
+            String remainingExt5 = sub.getSequence().substring(start + data.cut5, start + data.cut3);
             
-            String newfrag = sub.sequence.substring(0, start + data.cut5);
+            String newfrag = sub.getSequence().substring(0, start + data.cut5);
             
-            Polynucleotide frag = new Polynucleotide(newfrag);
-            frag.ext5 = sub.ext5;
-            frag.ext3 = sub.sequence.substring(start + data.cut5, start + data.cut3);
+            String fragExt3 = sub.getSequence().substring(start + data.cut5, start + data.cut3);
+            Polynucleotide frag = new Polynucleotide(newfrag, sub.getExt5(), fragExt3);
             out.add(frag);
         }
         out.add(remaining);
@@ -92,14 +89,15 @@ public class Digest {
     }
 
     private Polynucleotide revcomp(Polynucleotide frag) {
-        String rc = SequenceUtils.reverseComplement(frag.sequence);
-        Polynucleotide out = new Polynucleotide(rc);
+        String rc = SequenceUtils.reverseComplement(frag.getSequence());
+        
         
         //Transfer the 3' end
-        String new5 = SequenceUtils.reverseComplement(frag.ext3);
-        out.ext3 = SequenceUtils.reverseComplement(frag.ext5);
-        out.ext5 = new5;
-       
+        String new5 = SequenceUtils.reverseComplement(frag.getExt3());
+        String outext3 = SequenceUtils.reverseComplement(frag.getExt5());
+        String outext5 = new5;
+        
+        Polynucleotide out = new Polynucleotide(rc, outext5, outext3);
         return out;
     }
     

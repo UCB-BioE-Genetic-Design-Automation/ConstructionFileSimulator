@@ -29,24 +29,26 @@ public class Ligate {
         StringBuilder seq = new StringBuilder();
         for(int i=1; i<polys.size(); i++) {
             Polynucleotide poly =  polys.get(i);
-            seq.append(poly.ext5);
-            seq.append(poly.sequence);
+            seq.append(poly.getExt5());
+            seq.append(poly.getSequence());
         }
         
         Polynucleotide poly =  polys.get(0);
-        seq.append(poly.ext5);
-        seq.append(poly.sequence);
+        seq.append(poly.getExt5());
+        seq.append(poly.getSequence());
         
         Polynucleotide out = new Polynucleotide(seq.toString());
         return out;
     }
     
     public static void main(String[] args) throws Exception {
-        Polynucleotide poly1 = new Polynucleotide("tttttG");
-        poly1.ext3 = "GATC";
+        String BamHIExt = "-GATC";
         
-        Polynucleotide poly2 = new Polynucleotide("Caaaaaa");
-        poly1.ext5 = "GATC";
+        Polynucleotide poly1 = new Polynucleotide("gatccaaaaaa", BamHIExt, "");
+        Polynucleotide poly2 = new Polynucleotide("ccccccggatc", "", BamHIExt);
+
+        System.out.println("poly1:\n" + poly1);
+        System.out.println("poly2:\n" + poly2);
         
         List<Polynucleotide> listy = new ArrayList<>();
         listy.add(poly1);

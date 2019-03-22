@@ -20,15 +20,34 @@ import org.twentyn.c4.utils.SequenceUtils;
  * @author jca20n
  */
 public class Polynucleotide {
-    public String sequence;
-    public String ext5;
-    public String ext3;
-    public boolean isDoubleStranded = true;
-    public boolean isRNA = false;
-    public boolean isCircular = false;
+    private final String sequence;
+    private final String ext5;
+    private final String ext3;
+    private final boolean isDoubleStranded;
+    private final boolean isRNA;
+    private final boolean isCircular;
+
+    /**
+     * Full Constructor
+     * 
+     * @param sequence
+     * @param ext5
+     * @param ext3
+     * @param isDoubleStranded
+     * @param isRNA
+     * @param isCircular 
+     */
+    public Polynucleotide(String sequence, String ext5, String ext3, boolean isDoubleStranded, boolean isRNA, boolean isCircular) {
+        this.sequence = sequence;
+        this.ext5 = ext5;
+        this.ext3 = ext3;
+        this.isDoubleStranded = isDoubleStranded;
+        this.isRNA = isRNA;
+        this.isCircular = isCircular;
+    }
     
     /**
-     * The constructor defaults to blunt, double stranded DNA, which can then be edited
+     * Convenience constructor defaults to blunt, double stranded DNA, which can then be edited
      * @param dnaseq 
      */
     public Polynucleotide(String dnaseq) {
@@ -39,62 +58,108 @@ public class Polynucleotide {
         isRNA = false;
         isCircular = false;
     }
+
+    /**
+     * Convenience constructor for fragment with sticky ends
+     * @param sequence
+     * @param ext5
+     * @param ext3 
+     */
+    public Polynucleotide(String sequence, String ext5, String ext3) {
+        this.sequence = sequence;
+        this.ext5 = ext5;
+        this.ext3 = ext3;
+        isDoubleStranded = true;
+        isRNA = false;
+        isCircular = false;
+    }
+
+    public String getSequence() {
+        return sequence;
+    }
+
+    public String getExt5() {
+        return ext5;
+    }
+
+    public String getExt3() {
+        return ext3;
+    }
+
+    public boolean isIsDoubleStranded() {
+        return isDoubleStranded;
+    }
+
+    public boolean isIsRNA() {
+        return isRNA;
+    }
+
+    public boolean isIsCircular() {
+        return isCircular;
+    }
     
     public String toString() {
         String out = "";
         out += "5'-";
+        if(this.ext5.startsWith("-")) {
+            for(int i=0; i<this.ext5.length(); i++) {
+                out += " ";
+            }
+        } else {
+            out+= this.ext5;
+        }
+        
+        out += this.sequence;
+        
+        if(!this.ext3.startsWith("-")) {
+            for(int i=0; i<this.ext3.length(); i++) {
+                out += " ";
+            }
+        } else {
+            out+= this.ext3;
+        }
+        
+        out += "-3'\n";
+        
+        //Do the other strand
+        out += "3'-";
         if(!this.ext5.startsWith("-")) {
             for(int i=0; i<this.ext5.length(); i++) {
                 out += " ";
             }
+        } else {
+            out+= SequenceUtils.complement(this.ext5);
         }
-        out += this.sequence;
-        out += "-3'\n";
         
-        out += "3'-";
-        if(this.ext5.startsWith("-")) {
-            for(int i=0; i<this.ext5.length()-1; i++) {
+        out += SequenceUtils.complement(this.sequence);
+        
+        if(this.ext3.startsWith("-")) {
+            for(int i=0; i<this.ext3.length(); i++) {
                 out += " ";
             }
+        } else {
+            out+= SequenceUtils.complement(this.ext3);
         }
         
-        //Do the start
-        int start = 0;
-        if(this.ext5.startsWith("-")) {
-            int offset = this.ext3.length();
-            for(int i=0; i<offset; i++) {
-                out += "";
-                start = offset;
-            }
-        } else {
-            out += this.ext5;
-            start = 0;
-        }
+        out += "-5'\n";
         
-        //do the end
-        int end = -1;
-
-        if(ext3.startsWith("-")) {
-            end = this.sequence.length() - this.ext3.length() -1;
-            out += SequenceUtils.reverseComplement(sequence.substring(start,end));
-        } else {
-            out += SequenceUtils.complement(sequence.substring(start));
-            out += this.ext3;
-        }
-        return out + "-5'\n";
+        return out;
     }
     
     public static void main(String[] args) {
+        System.out.println("Demo a blunt DNA, like a PCR product");
         Polynucleotide poly = new Polynucleotide("CTAGTttgacggctagcG");
+        System.out.println(poly.toString());
         
         //This is an edge case that fails
 //        poly.ext5 = "-CTAG";
 //        poly.ext3 = "-AATT";
         
-        //This works
-        poly.ext5 = "-CTAG";
-        poly.ext3 = "AATT";
-        
-        System.out.println(poly.toString());
+        System.out.println("Demo a BamHI/EcoRI digested DNA with sticky ends");
+        String ext5 = "GATC";
+        String ext3 = "AATT";
+        Polynucleotide poly2 = new Polynucleotide("caaacccg", ext5, ext3);
+
+        System.out.println(poly2.toString());
     }
 }
