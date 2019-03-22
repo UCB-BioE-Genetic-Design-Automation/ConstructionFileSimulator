@@ -6,12 +6,12 @@
 
 package org.twentyn.c5.construction;
 
-import org.twentyn.c5.construction.model.RestrictionData;
+import org.twentyn.c5.construction.model.RestrictionEnzyme;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.twentyn.c5.construction.EnzymeFactory.Enzyme;
+import org.twentyn.c5.construction.RestrictionEnzymeFactory.Enzyme;
 import org.twentyn.c5.construction.model.Polynucleotide;
 import org.twentyn.c5.utils.SequenceUtils;
 
@@ -21,13 +21,13 @@ import org.twentyn.c5.utils.SequenceUtils;
  */
 public class Digest {
 
-    public List<Polynucleotide> run(Polynucleotide substrate, List<RestrictionData> enzymes) throws Exception {
+    public List<Polynucleotide> run(Polynucleotide substrate, List<RestrictionEnzyme> enzymes) throws Exception {
         List<Polynucleotide> out = new ArrayList<>();
         
         out.add(substrate);
         
         //Iteratively cut the substrate with each enzyme
-        for(RestrictionData enz : enzymes) {
+        for(RestrictionEnzyme enz : enzymes) {
             //Move all fragments into temp
             List<Polynucleotide> temp = new ArrayList<>();
             temp.addAll(out);
@@ -53,7 +53,7 @@ public class Digest {
      * @param enz
      * @return 
      */
-    private List<Polynucleotide> cutOneSide(Polynucleotide sub, RestrictionData data) {
+    private List<Polynucleotide> cutOneSide(Polynucleotide sub, RestrictionEnzyme data) {
         List<Polynucleotide> out = new ArrayList<>();
         Pattern p = Pattern.compile(data.getSite());
         Matcher m = p.matcher(sub.getSequence().toUpperCase());
@@ -89,10 +89,10 @@ public class Digest {
     }
     
     public static void main(String[] args) throws Exception {
-        List<RestrictionData> enz = new ArrayList<>();
+        List<RestrictionEnzyme> enz = new ArrayList<>();
         Polynucleotide poly = new Polynucleotide("aaaaGGTCTCtCCCCttCAATTGccccc");
         
-        EnzymeFactory factory = new EnzymeFactory();
+        RestrictionEnzymeFactory factory = new RestrictionEnzymeFactory();
         factory.initiate();
         
         enz.add(factory.run(Enzyme.BsaI));
