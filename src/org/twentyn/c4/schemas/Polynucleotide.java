@@ -21,6 +21,16 @@ import org.twentyn.c4.utils.SequenceUtils;
  */
 public class Polynucleotide {
     private final String sequence;
+    
+    /*
+    The ext5 variable corresponds to the lefthand side
+    It does not imply that the extension is a 5' overhang
+    but simply that it is the 5' side of current coding strand
+    
+    To indicate a 5' overhang, you use "GATC" like with BamHI
+    To indicate a 3' overhang on the 5' end of the coding strand,
+    you would sqy "-CTAG", as for PstI
+    */
     private final String ext5;
     private final String ext3;
     private final boolean isDoubleStranded;
@@ -102,7 +112,7 @@ public class Polynucleotide {
         String out = "";
         out += "5'-";
         if(this.ext5.startsWith("-")) {
-            for(int i=0; i<this.ext5.length(); i++) {
+            for(int i=0; i<this.ext5.length() - 1; i++) {
                 out += " ";
             }
         } else {
@@ -116,7 +126,7 @@ public class Polynucleotide {
                 out += " ";
             }
         } else {
-            out+= this.ext3;
+            out+= this.ext3.substring(1);
         }
         
         out += "-3'\n";
@@ -134,7 +144,7 @@ public class Polynucleotide {
         out += SequenceUtils.complement(this.sequence);
         
         if(this.ext3.startsWith("-")) {
-            for(int i=0; i<this.ext3.length(); i++) {
+            for(int i=0; i<this.ext3.length() - 1; i++) {
                 out += " ";
             }
         } else {
@@ -155,11 +165,22 @@ public class Polynucleotide {
 //        poly.ext5 = "-CTAG";
 //        poly.ext3 = "-AATT";
         
+        {
         System.out.println("Demo a BamHI/EcoRI digested DNA with sticky ends");
         String ext5 = "GATC";
         String ext3 = "AATT";
         Polynucleotide poly2 = new Polynucleotide("caaacccg", ext5, ext3);
-
         System.out.println(poly2.toString());
+        }
+        
+        {
+        System.out.println("Demo a PstI/BseRI digested DNA with 3' overhangs");
+        String ext5 = "-CTAG";
+        String ext3 = "-CC";
+        Polynucleotide poly3 = new Polynucleotide("gaaacccGAGGAGaaaaaaaa", ext5, ext3);
+        System.out.println(poly3.toString());
+        }
+
+        
     }
 }
