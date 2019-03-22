@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package org.twentyn.c4.construction;
+package org.twentyn.c5.construction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,11 +12,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.twentyn.c4.schemas.Polynucleotide;
+import org.twentyn.c5.construction.model.Polynucleotide;
 
 /**
  *
- * @author jca20n
+ * @author J. Christopher Anderson
  */
 public class Ligate {
     List<Polynucleotide> polys;

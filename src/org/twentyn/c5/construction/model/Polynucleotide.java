@@ -4,9 +4,9 @@
  * and open the template in the editor.
  */
 
-package org.twentyn.c4.schemas;
+package org.twentyn.c5.construction.model;
 
-import org.twentyn.c4.utils.SequenceUtils;
+import org.twentyn.c5.utils.SequenceUtils;
 
 /**
  * A Polynucleotide models the chemical entity described by that term.  It is adapted
@@ -17,7 +17,7 @@ import org.twentyn.c4.utils.SequenceUtils;
  * to describe a DNA or RNA molecule as a chemical entity in all its glory, including modified
  * bases, sticky ends, circularity, strandedness and the like.
  * 
- * @author jca20n
+ * @author J. Christopher Anderson
  */
 public class Polynucleotide {
     private final String sequence;
@@ -169,7 +169,7 @@ public class Polynucleotide {
         
         {
         System.out.println("Demo a PstI/BseRI digested DNA with 3' overhangs");
-        String ext5 = "-CTAG";
+        String ext5 = "-TGCA";
         String ext3 = "-CC";
         Polynucleotide poly3 = new Polynucleotide("gaaacccGAGGAGaaaaaaaa", ext5, ext3);
         System.out.println(poly3.toString());

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package org.twentyn.c4.schemas;
+package org.twentyn.c5.construction.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,8 +17,17 @@ import java.util.Set;
  *
  * @author jca20n
  */
-public class Oligo {
+public class Vector {
     public String name;
-    public String sequence;
-    public String description;
+    public String tp;
+    public String bin;
+    public String strength;
+    public String preamble;
+    public String bsa5;
+    public String tpseq;
+    public String stuffer;
+    public String tail;
+    public String bsa3;
+    public String post;
+    
 }
