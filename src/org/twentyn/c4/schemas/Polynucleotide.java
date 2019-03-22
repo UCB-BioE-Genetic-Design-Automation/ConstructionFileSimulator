@@ -61,12 +61,7 @@ public class Polynucleotide {
      * @param dnaseq 
      */
     public Polynucleotide(String dnaseq) {
-        this.sequence = dnaseq.toUpperCase();
-        this.ext5 = "";
-        this.ext3 = "";
-        isDoubleStranded = true;
-        isRNA = false;
-        isCircular = false;
+        this(dnaseq, "", "");
     }
 
     /**
@@ -76,12 +71,11 @@ public class Polynucleotide {
      * @param ext3 
      */
     public Polynucleotide(String sequence, String ext5, String ext3) {
-        this.sequence = sequence;
-        this.ext5 = ext5;
-        this.ext3 = ext3;
-        isDoubleStranded = true;
-        isRNA = false;
-        isCircular = false;
+        this(sequence, ext5, ext3, true, false, true);
+//        isDoubleStranded = true;
+//        isRNA = false;
+//        isCircular = false;
+        
     }
 
     public String getSequence() {

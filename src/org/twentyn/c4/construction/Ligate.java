@@ -21,11 +21,16 @@ import org.twentyn.c4.schemas.Polynucleotide;
 public class Ligate {
     List<Polynucleotide> polys;
     
-    public Ligate(List<Polynucleotide> polys) {
-        this.polys = polys;
-    }
+    public void initiate() throws Exception {}
     
-    public Polynucleotide getProduct() throws Exception {
+    public Polynucleotide run(List<Polynucleotide> polys) throws Exception {
+        //This needs to relay to an internal private function
+        //Needs to check ends
+        //Needs to keep track of current ends
+        //Needs to throw exception if not all frags collapse to one
+        //Needs to handle the - for 3' products
+        
+        
         StringBuilder seq = new StringBuilder();
         for(int i=1; i<polys.size(); i++) {
             Polynucleotide poly =  polys.get(i);
@@ -42,22 +47,71 @@ public class Ligate {
     }
     
     public static void main(String[] args) throws Exception {
-        String BamHIExt = "-GATC";
+        {
+        System.out.println("Two BamHI-digested DNAs:");
+        String BamHIExt = "GATC";
         
-        Polynucleotide poly1 = new Polynucleotide("gatccaaaaaa", BamHIExt, "");
-        Polynucleotide poly2 = new Polynucleotide("ccccccggatc", "", BamHIExt);
+        Polynucleotide poly1 = new Polynucleotide("Caaaaaa", BamHIExt, "");
+        Polynucleotide poly2 = new Polynucleotide("ccccccG", "", BamHIExt);
 
         System.out.println("poly1:\n" + poly1);
         System.out.println("poly2:\n" + poly2);
         
-        List<Polynucleotide> listy = new ArrayList<>();
-        listy.add(poly1);
-        listy.add(poly2);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
         
-        Ligate lig = new Ligate(listy);
-        Polynucleotide pdt = lig.getProduct();
+        Ligate lig = new Ligate();
+        lig.initiate();
+        Polynucleotide pdt = lig.run(frags);
         
+        System.out.println("Ligation product:");
         System.out.println(pdt.toString());
+        }
+        
+        {
+        System.out.println("Two BamHI-digested DNAs in other orientation:");
+        String BamHIExt = "GATC";
+        
+        Polynucleotide poly1 = new Polynucleotide("ttttttG", "", BamHIExt);
+        Polynucleotide poly2 = new Polynucleotide("ccccccG", "", BamHIExt);
+
+        System.out.println("poly1:\n" + poly1);
+        System.out.println("poly2:\n" + poly2);
+        
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+        
+        Ligate lig = new Ligate();
+        lig.initiate();
+        Polynucleotide pdt = lig.run(frags);
+        
+        System.out.println("Ligation product:");
+        System.out.println(pdt.toString());
+        }
+        
+        {
+        System.out.println("Two PstI-digested DNAs:");
+        String PstIExt = "-TGCA";
+        
+        Polynucleotide poly1 = new Polynucleotide("Gaaaaaa", PstIExt, "");
+        Polynucleotide poly2 = new Polynucleotide("ccccccC", "", PstIExt);
+
+        System.out.println("poly1:\n" + poly1);
+        System.out.println("poly2:\n" + poly2);
+        
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+        
+        Ligate lig = new Ligate();
+        lig.initiate();
+        Polynucleotide pdt = lig.run(frags);
+        
+        System.out.println("Ligation product:");
+        System.out.println(pdt.toString());
+        }
         
     }
 }
