@@ -16,7 +16,11 @@ import org.twentyn.c5.construction.model.Polynucleotide;
 import org.twentyn.c5.utils.SequenceUtils;
 
 /**
- *
+ * 
+ * A Function that inputs a DNA sequence and a List of restriction enzymes
+ * and computes all the fragments that will be present upon digestion
+ * to completion
+ * 
  * @author J. Christopher Anderson
  */
 public class Digest {
