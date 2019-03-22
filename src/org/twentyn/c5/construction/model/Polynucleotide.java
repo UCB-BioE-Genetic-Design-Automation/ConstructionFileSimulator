@@ -155,12 +155,8 @@ public class Polynucleotide {
         Polynucleotide poly = new Polynucleotide("CTAGTttgacggctagcG");
         System.out.println(poly.toString());
         
-        //This is an edge case that fails
-//        poly.ext5 = "-CTAG";
-//        poly.ext3 = "-AATT";
-        
         {
-        System.out.println("Demo a BamHI/EcoRI digested DNA with sticky ends");
+        System.out.println("Demo a BamHI/EcoRI digested DNA with 5' sticky ends");
         String ext5 = "GATC";
         String ext3 = "AATT";
         Polynucleotide poly2 = new Polynucleotide("caaacccg", ext5, ext3);
@@ -174,7 +170,5 @@ public class Polynucleotide {
         Polynucleotide poly3 = new Polynucleotide("gaaacccGAGGAGaaaaaaaa", ext5, ext3);
         System.out.println(poly3.toString());
         }
-
-        
     }
 }
