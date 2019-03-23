@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.twentyn.c5.construction.RestrictionEnzymeFactory.Enzyme;
 import org.twentyn.c5.construction.model.Polynucleotide;
-import org.twentyn.c5.utils.SequenceUtils;
 
 /**
  *
