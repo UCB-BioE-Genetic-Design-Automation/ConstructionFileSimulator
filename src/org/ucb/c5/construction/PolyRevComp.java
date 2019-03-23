@@ -4,7 +4,8 @@ import org.ucb.c5.construction.model.Polynucleotide;
 import org.ucb.c5.utils.SequenceUtils;
 
 /**
- *
+ * Reverse complement Function for a Polynucleotide
+ * 
  * @author J. Christopher Anderson
  */
 public class PolyRevComp {
