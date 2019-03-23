@@ -28,7 +28,7 @@ Polynucleotide poly = new Polynucleotide("gaaacccGAGGAGaaaaaaaa", "-TGCA", "-CC"
 
 5'-    gaaacccGAGGAGaaaaaaaaCC-3'
 3'-ACGTctttgggCTCCTCtttttttt  -5'
-<\pre>
+</pre>
 
 A circular DNA is indicated by a boolean, and the sticky end fields are ignored in algorithms:
 
