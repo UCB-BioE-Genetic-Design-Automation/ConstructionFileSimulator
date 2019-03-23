@@ -17,9 +17,11 @@ import org.twentyn.c5.utils.SequenceUtils;
  * @author J. Christopher Anderson
  */
 public class Digest {
-
+    private PolyRevComp revcomp;
+    
     public void initiate() throws Exception {
-
+        revcomp = new PolyRevComp();
+        revcomp.initiate();
     }
 
     public List<Polynucleotide> run(Polynucleotide substrate, List<RestrictionEnzyme> enzymes) throws Exception {
@@ -38,7 +40,7 @@ public class Digest {
             for (Polynucleotide poly : temp) {
                 List<Polynucleotide> result = cutOnce(poly, enzymes);
                 if (result == null) {
-                    Polynucleotide rc = revcomp(poly);
+                    Polynucleotide rc = revcomp.run(poly);
                     result = cutOnce(rc, enzymes);
                 }
                 if (result == null) {
@@ -129,17 +131,6 @@ public class Digest {
 
         //Returns null if nothing is found
         return null;
-    }
-
-    private Polynucleotide revcomp(Polynucleotide frag) {
-        String rc = SequenceUtils.reverseComplement(frag.getSequence());
-
-        //Transfer the 3' end
-        String outext3 = SequenceUtils.reverseComplement(frag.getExt5());
-        String outext5 = SequenceUtils.reverseComplement(frag.getExt3());
-
-        Polynucleotide out = new Polynucleotide(rc, outext5, outext3);
-        return out;
     }
 
     public static void main(String[] args) throws Exception {
