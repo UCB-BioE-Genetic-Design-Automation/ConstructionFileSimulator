@@ -10,9 +10,9 @@ public class RestrictionEnzymeFactory {
 
     public void initiate() {
     }
-    
 
     public enum Enzyme {
+
         BamHI,
         BglII,
         MfeI,
@@ -44,22 +44,25 @@ public class RestrictionEnzymeFactory {
 
             case SpeI:
                 return new RestrictionEnzyme("ACTAGT", 1, 5);
-            
+
             case XbaI:
                 return new RestrictionEnzyme("TCTAGA", 1, 5);
-            
+
             case XhoI:
                 return new RestrictionEnzyme("CTCGAG", 1, 5);
-            
+
             case HindIII:
                 return new RestrictionEnzyme("AAGCTT", 1, 5);
+
+            case PstI:
+                return new RestrictionEnzyme("CTGCAG", 5, 1);
 
             case BsaI:
                 return new RestrictionEnzyme("GGTCTC[ATCG][ATCG][ATCG][ATCG][ATCG]", 7, 11);
 
             case BseRI:
-                return new RestrictionEnzyme("GAGGAG[ATCG][ATCG][ATCG][ATCG][ATCG][ATCG][ATCG][ATCG][ATCG][ATCG]", 14, 16);
-            
+                return new RestrictionEnzyme("GAGGAG[ATCG][ATCG][ATCG][ATCG][ATCG][ATCG][ATCG][ATCG][ATCG][ATCG]", 16, 14);
+
             case BsmBI:
                 return new RestrictionEnzyme("CGTCTC[ATCG][ATCG][ATCG][ATCG][ATCG]", 7, 11);
 
