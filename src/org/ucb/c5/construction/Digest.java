@@ -148,10 +148,10 @@ public class Digest {
 
     private Polynucleotide createLinFrag(Polynucleotide sub, boolean threeover, int start, RestrictionEnzyme enz) {
         String newseq = null;
-                if (threeover) {
-         newseq = sub.getSequence().substring(start + enz.getCut5()) + sub.getSequence().substring(0, start + enz.getCut3());
+        if (threeover) {
+            newseq = sub.getSequence().substring(start + enz.getCut5()) + sub.getSequence().substring(0, start + enz.getCut3());
         } else {
-         newseq = sub.getSequence().substring(start + enz.getCut3()) + sub.getSequence().substring(0, start + enz.getCut5());
+            newseq = sub.getSequence().substring(start + enz.getCut3()) + sub.getSequence().substring(0, start + enz.getCut5());
         }
 
         String ext5 = null;
@@ -169,7 +169,7 @@ public class Digest {
         }
         return new Polynucleotide(newseq, ext5, ext3);
     }
-    
+
     public static void main(String[] args) throws Exception {
         RestrictionEnzymeFactory factory = new RestrictionEnzymeFactory();
         factory.initiate();
@@ -311,12 +311,12 @@ public class Digest {
             System.out.println("number of products: " + pdts.size());
             System.out.println("-----\n");
         }
-        
+
         {
             System.out.println("A circular 3' ext substrate:");
 
             //Last true in the constructor indicates that it is circular
-            Polynucleotide poly = new Polynucleotide("aaaGAGGAGaaaaaaaaGAaaa",true);
+            Polynucleotide poly = new Polynucleotide("aaaGAGGAGaaaaaaaaGAaaa", true);
             System.out.println(poly);
             System.out.println("fragments:");
 

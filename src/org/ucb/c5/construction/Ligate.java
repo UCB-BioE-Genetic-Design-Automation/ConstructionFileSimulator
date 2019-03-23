@@ -252,7 +252,7 @@ public class Ligate {
             System.out.println("Ligation product:");
             System.out.println(pdt.toString());
         }
-        
+
         {
             System.out.println("Cicularizaing two digested DNAs:");
 

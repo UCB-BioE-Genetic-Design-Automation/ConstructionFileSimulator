@@ -12,7 +12,6 @@ public class RestrictionEnzymeFactory {
     }
 
     public enum Enzyme {
-
         BamHI,
         BglII,
         MfeI,
