@@ -23,11 +23,12 @@ Polynucleotide poly = new Polynucleotide("CtttG", "GATC", "GATC");
 
 The first argument, the "sequence" corresponds to the region of duplexed DNA. The second two strings are the 5' and 3' sticky ends.  If "" it is a blunt end.  All sticky ends are represented in the 5' to 3' direction referring to the top strand.  Thus both arguments here are "GATC".  A 3' extension is represented by the symbol "-" such as:
 
-
+<pre>
 Polynucleotide poly = new Polynucleotide("gaaacccGAGGAGaaaaaaaa", "-TGCA", "-CC");
 
 5'-    gaaacccGAGGAGaaaaaaaaCC-3'
 3'-ACGTctttgggCTCCTCtttttttt  -5'
+<\pre>
 
 A circular DNA is indicated by a boolean, and the sticky end fields are ignored in algorithms:
 
