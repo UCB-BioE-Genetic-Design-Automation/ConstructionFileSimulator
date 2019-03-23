@@ -10,7 +10,7 @@ The code has been reworked, and is now functional on all examples considered, wh
 Models:
 *******
 
-Polynucleotide:  This is an immutable Model encoding the structure of a nucleic acid molecule. It is needed to simulate the enzymatic reactions occuring during digestion and ligation. The complex it describes can be DNA or RNA (not used here), single stranded or double stranded, have sticky ends on either side, or can be circular. It contains a toString() method that gives a visual representation of the molecule showing the duplex with its ends:
+'''Polynucleotide''':  This is an immutable Model encoding the structure of a nucleic acid molecule. It is needed to simulate the enzymatic reactions occuring during digestion and ligation. The complex it describes can be DNA or RNA (not used here), single stranded or double stranded, have sticky ends on either side, or can be circular. It contains a toString() method that gives a visual representation of the molecule showing the duplex with its ends:
 
 A linear DNA with BamHI sticky ends on both sides:
 
@@ -47,3 +47,5 @@ Polynucleotide poly = new Polynucleotide("aaaaaaaa", true);
 *******
 Functions:
 *******
+
+'''PolyRevComp''' Reverse complement Function for a Polynucleotide
