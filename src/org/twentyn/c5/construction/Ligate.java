@@ -24,19 +24,20 @@ public class Ligate {
     public Polynucleotide run(List<Polynucleotide> polys) throws Exception {
         List<Polynucleotide> worklist = new ArrayList<>();
         List<Polynucleotide> temp = new ArrayList<>(polys);
-        
-        outer: while(true) { 
+
+        outer:
+        while (true) {
             worklist.clear();
             worklist.addAll(temp);
-            
+
             //Start iterating through all pairwise joins
-            for(int i=0; i<worklist.size() - 1; i++) {
+            for (int i = 0; i < worklist.size() - 1; i++) {
                 Polynucleotide p1 = worklist.get(i);
-                for(int j=i+1; j<worklist.size(); j++) {
+                for (int j = i + 1; j < worklist.size(); j++) {
                     Polynucleotide p2 = worklist.get(j);
                     Polynucleotide result = join(p1, p2);
-                    if(result != null) {
-                        
+                    if (result != null) {
+
                         temp.remove(p1);
                         temp.remove(p2);
                         temp.add(result);
@@ -44,14 +45,14 @@ public class Ligate {
                     }
                 }
             }
-            
+
             break outer;
         }
-        
-        if(temp.size() != 1) {
+
+        if (temp.size() != 1) {
             throw new Exception("Fragments to not ligate into a single product");
         }
-        
+
         return temp.get(0);
     }
 
@@ -103,10 +104,10 @@ public class Ligate {
     }
 
     public static void main(String[] args) throws Exception {
-        
-            Ligate lig = new Ligate();
-            lig.initiate();
-            
+
+        Ligate lig = new Ligate();
+        lig.initiate();
+
         {
             System.out.println("Two BamHI-digested DNAs:");
             String BamHIExt = "GATC";
@@ -166,8 +167,8 @@ public class Ligate {
             System.out.println("Ligation product:");
             System.out.println(pdt.toString());
         }
-        
-                {
+
+        {
             System.out.println("Two BsaI-digested DNAs:");
             String ext = "GTTT";
 
@@ -186,7 +187,7 @@ public class Ligate {
             System.out.println("Ligation product:");
             System.out.println(pdt.toString());
         }
-        
+
         {
             System.out.println("Two frags can't ligate:");
             Polynucleotide poly1 = new Polynucleotide("Gaaaaaa", "aa", "c");
@@ -201,7 +202,7 @@ public class Ligate {
 
             try {
                 Polynucleotide pdt = lig.run(frags);
-            } catch(Exception err) {
+            } catch (Exception err) {
                 System.out.println("Expect exception thrown");
             }
         }

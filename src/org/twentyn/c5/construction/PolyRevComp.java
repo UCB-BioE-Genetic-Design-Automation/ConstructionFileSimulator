@@ -25,18 +25,18 @@ public class PolyRevComp {
 
     public Polynucleotide run(Polynucleotide frag) throws Exception {
         String rc = SequenceUtils.reverseComplement(frag.getSequence());
-        
+
         String new5 = null;
         String new3 = null;
-        
-        if(frag.getExt3().startsWith("-")) {
+
+        if (frag.getExt3().startsWith("-")) {
             String old3 = frag.getExt3().substring(1);
             new5 = "-" + SequenceUtils.reverseComplement(old3);
         } else {
             new5 = SequenceUtils.reverseComplement(frag.getExt3());
         }
-        
-                if(frag.getExt5().startsWith("-")) {
+
+        if (frag.getExt5().startsWith("-")) {
             String old5 = frag.getExt5().substring(1);
             new3 = "-" + SequenceUtils.reverseComplement(old5);
         } else {
@@ -71,7 +71,7 @@ public class PolyRevComp {
             Polynucleotide rc = revcomp.run(poly);
             System.out.println(rc.toString());
         }
-        
+
         {
             System.out.println("Demo a BsaI digested DNA with 5' overhangs");
             String ext5 = "CCCT";
