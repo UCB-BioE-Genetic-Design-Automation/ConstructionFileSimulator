@@ -1,4 +1,4 @@
-package org.twentyn.c5.utils;
+package org.ucb.c5.utils;
 
 /**
  * Utility methods for common molecular biology operations

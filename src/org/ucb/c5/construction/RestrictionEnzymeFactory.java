@@ -1,6 +1,6 @@
-package org.twentyn.c5.construction;
+package org.ucb.c5.construction;
 
-import org.twentyn.c5.construction.model.RestrictionEnzyme;
+import org.ucb.c5.construction.model.RestrictionEnzyme;
 
 /**
  *

@@ -1,6 +1,6 @@
-package org.twentyn.c5.construction.model;
+package org.ucb.c5.construction.model;
 
-import org.twentyn.c5.utils.SequenceUtils;
+import org.ucb.c5.utils.SequenceUtils;
 
 /**
  * A Polynucleotide models the chemical entity described by that term. It is

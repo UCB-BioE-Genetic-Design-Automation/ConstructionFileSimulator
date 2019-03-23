@@ -1,4 +1,4 @@
-package org.twentyn.c5.construction.model;
+package org.ucb.c5.construction.model;
 
 /**
  *

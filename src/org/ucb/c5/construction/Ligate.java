@@ -1,8 +1,8 @@
-package org.twentyn.c5.construction;
+package org.ucb.c5.construction;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.twentyn.c5.construction.model.Polynucleotide;
+import org.ucb.c5.construction.model.Polynucleotide;
 
 /**
  *

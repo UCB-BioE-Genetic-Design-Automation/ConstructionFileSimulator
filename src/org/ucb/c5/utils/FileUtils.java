@@ -1,5 +1,5 @@
 
-package org.twentyn.c5.utils;
+package org.ucb.c5.utils;
 
 import java.io.File;
 import java.io.FileInputStream;

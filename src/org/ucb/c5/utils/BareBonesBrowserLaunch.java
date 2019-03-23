@@ -1,4 +1,4 @@
-package org.twentyn.c5.utils;
+package org.ucb.c5.utils;
 
 import javax.swing.JOptionPane;
 import java.util.Arrays;
