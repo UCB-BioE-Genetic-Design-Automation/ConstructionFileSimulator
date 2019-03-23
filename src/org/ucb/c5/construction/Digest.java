@@ -16,8 +16,9 @@ import org.ucb.c5.construction.model.Polynucleotide;
  * @author J. Christopher Anderson
  */
 public class Digest {
+
     private PolyRevComp revcomp;
-    
+
     public void initiate() throws Exception {
         revcomp = new PolyRevComp();
         revcomp.initiate();
@@ -84,44 +85,18 @@ public class Digest {
                 int start = m.start();
                 int end = m.end();
 
-                //Construct the 5' remaining fragment
-                {
-                    String remaining = null;
-                    if (threeover) {
-                        remaining = sub.getSequence().substring(0, start + enz.getCut3());
-                    } else {
-                        remaining = sub.getSequence().substring(0, start + enz.getCut5());
-                    }
-                    String ext5 = sub.getExt5();
-                    String ext3 = null;
-                    if (threeover) {
-                        ext3 = "-" + sub.getSequence().substring(start + enz.getCut3(), start + enz.getCut5());
-                    } else {
-                        ext3 = sub.getSequence().substring(start + enz.getCut5(), start + enz.getCut3());
-                    }
-
-                    Polynucleotide frag = new Polynucleotide(remaining, ext5, ext3);
+                if (sub.isIsCircular()) {
+                    //Construct the linearized fragment
+                    Polynucleotide frag = createLinFrag(sub, threeover, start, enz);
                     out.add(frag);
-                }
+                } else {
+                    //Construct the 5' remaining fragment
+                    Polynucleotide frag5 = create5Frag(sub, threeover, start, enz);
+                    out.add(frag5);
 
-                //Construct the 3' remaining fragment
-                {
-                    String remaining = null;
-                    if(threeover) {
-                        remaining = sub.getSequence().substring(start + enz.getCut5());
-                    } else {
-                        remaining = sub.getSequence().substring(start + enz.getCut3());
-                    }
-                    String ext5 = null;
-                    if (threeover) {
-                        ext5 = "-" + sub.getSequence().substring(start + enz.getCut3(), start + enz.getCut5());
-                    } else {
-                        ext5 = sub.getSequence().substring(start + enz.getCut5(), start + enz.getCut3());
-                    }
-                    String ext3 = sub.getExt3();
-
-                    Polynucleotide frag = new Polynucleotide(remaining, ext5, ext3);
-                    out.add(frag);
+                    //Construct the 3' remaining fragment
+                    Polynucleotide frag3 = create3Frag(sub, threeover, start, enz);
+                    out.add(frag3);
                 }
 
                 return out;
@@ -132,6 +107,69 @@ public class Digest {
         return null;
     }
 
+    private Polynucleotide create5Frag(Polynucleotide sub, boolean threeover, int start, RestrictionEnzyme enz) {
+        String remaining = null;
+        if (threeover) {
+            remaining = sub.getSequence().substring(0, start + enz.getCut3());
+        } else {
+            remaining = sub.getSequence().substring(0, start + enz.getCut5());
+        }
+        String ext5 = sub.getExt5();
+        String ext3 = null;
+        if (threeover) {
+            ext3 = "-" + sub.getSequence().substring(start + enz.getCut3(), start + enz.getCut5());
+        } else {
+            ext3 = sub.getSequence().substring(start + enz.getCut5(), start + enz.getCut3());
+        }
+
+        Polynucleotide frag = new Polynucleotide(remaining, ext5, ext3);
+        return frag;
+    }
+
+    private Polynucleotide create3Frag(Polynucleotide sub, boolean threeover, int start, RestrictionEnzyme enz) {
+
+        String remaining = null;
+        if (threeover) {
+            remaining = sub.getSequence().substring(start + enz.getCut5());
+        } else {
+            remaining = sub.getSequence().substring(start + enz.getCut3());
+        }
+        String ext5 = null;
+        if (threeover) {
+            ext5 = "-" + sub.getSequence().substring(start + enz.getCut3(), start + enz.getCut5());
+        } else {
+            ext5 = sub.getSequence().substring(start + enz.getCut5(), start + enz.getCut3());
+        }
+        String ext3 = sub.getExt3();
+
+        Polynucleotide frag = new Polynucleotide(remaining, ext5, ext3);
+        return frag;
+    }
+
+    private Polynucleotide createLinFrag(Polynucleotide sub, boolean threeover, int start, RestrictionEnzyme enz) {
+        String newseq = null;
+                if (threeover) {
+         newseq = sub.getSequence().substring(start + enz.getCut5()) + sub.getSequence().substring(0, start + enz.getCut3());
+        } else {
+         newseq = sub.getSequence().substring(start + enz.getCut3()) + sub.getSequence().substring(0, start + enz.getCut5());
+        }
+
+        String ext5 = null;
+        if (threeover) {
+            ext5 = "-" + sub.getSequence().substring(start + enz.getCut3(), start + enz.getCut5());
+        } else {
+            ext5 = sub.getSequence().substring(start + enz.getCut5(), start + enz.getCut3());
+        }
+
+        String ext3 = null;
+        if (threeover) {
+            ext3 = "-" + sub.getSequence().substring(start + enz.getCut3(), start + enz.getCut5());
+        } else {
+            ext3 = sub.getSequence().substring(start + enz.getCut5(), start + enz.getCut3());
+        }
+        return new Polynucleotide(newseq, ext5, ext3);
+    }
+    
     public static void main(String[] args) throws Exception {
         RestrictionEnzymeFactory factory = new RestrictionEnzymeFactory();
         factory.initiate();
@@ -214,7 +252,7 @@ public class Digest {
             System.out.println("number of products: " + pdts.size());
             System.out.println("-----\n");
         }
-        
+
         {
             System.out.println("Forward BseRI Site substrate:");
             Polynucleotide poly = new Polynucleotide("aaaGAGGAGaaaaaaaaGAaaa");
@@ -233,7 +271,7 @@ public class Digest {
             System.out.println("number of products: " + pdts.size());
             System.out.println("-----\n");
         }
-        
+
         {
             System.out.println("Reverse BseRI Site substrate:");
             Polynucleotide poly = new Polynucleotide("aaaTCttttttttCTCCTCaaa");
@@ -252,6 +290,47 @@ public class Digest {
             System.out.println("number of products: " + pdts.size());
             System.out.println("-----\n");
         }
-    }
 
+        {
+            System.out.println("A circular 5' ext substrate:");
+
+            //Last true in the constructor indicates that it is circular
+            Polynucleotide poly = new Polynucleotide("aaaGGATCCaaa", true);
+            System.out.println(poly);
+            System.out.println("fragments:");
+
+            List<RestrictionEnzyme> enz = new ArrayList<>();
+            enz.add(factory.run(Enzyme.BamHI));
+
+            List<Polynucleotide> pdts = dig.run(poly, enz);
+
+            for (Polynucleotide pol : pdts) {
+                System.out.println(pol.toString());
+            }
+
+            System.out.println("number of products: " + pdts.size());
+            System.out.println("-----\n");
+        }
+        
+        {
+            System.out.println("A circular 3' ext substrate:");
+
+            //Last true in the constructor indicates that it is circular
+            Polynucleotide poly = new Polynucleotide("aaaGAGGAGaaaaaaaaGAaaa",true);
+            System.out.println(poly);
+            System.out.println("fragments:");
+
+            List<RestrictionEnzyme> enz = new ArrayList<>();
+            enz.add(factory.run(Enzyme.BseRI));
+
+            List<Polynucleotide> pdts = dig.run(poly, enz);
+
+            for (Polynucleotide pol : pdts) {
+                System.out.println(pol.toString());
+            }
+
+            System.out.println("number of products: " + pdts.size());
+            System.out.println("-----\n");
+        }
+    }
 }

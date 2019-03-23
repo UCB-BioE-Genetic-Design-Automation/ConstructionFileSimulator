@@ -52,6 +52,16 @@ public class Polynucleotide {
         this.isCircular = isCircular;
     }
 
+        /**
+         * Convenience constructor for a circular DNA
+         * 
+         * @param dnaseq
+         * @param iscircular irrelevant what is supplied, will be circular
+         */
+    public Polynucleotide(String dnaseq, boolean iscircular) {
+        this(dnaseq, "", "", true, false, true);
+    }
+    
     /**
      * Convenience constructor defaults to blunt, double stranded DNA, which can
      * then be edited
@@ -70,7 +80,7 @@ public class Polynucleotide {
      * @param ext3
      */
     public Polynucleotide(String sequence, String ext5, String ext3) {
-        this(sequence, ext5, ext3, true, false, true);
+        this(sequence, ext5, ext3, true, false, false);
 //        isDoubleStranded = true;
 //        isRNA = false;
 //        isCircular = false;
@@ -102,8 +112,13 @@ public class Polynucleotide {
     }
 
     public String toString() {
+        String separator = "-";
+        if(this.isCircular) {
+            separator = "...";
+        }
+        
         String out = "";
-        out += "5'-";
+        out += "5'" + separator;
         if (this.ext5.startsWith("-")) {
             for (int i = 0; i < this.ext5.length() - 1; i++) {
                 out += " ";
@@ -122,10 +137,10 @@ public class Polynucleotide {
             out += this.ext3.substring(1);
         }
 
-        out += "-3'\n";
+        out += separator + "3'\n";
 
         //Do the other strand
-        out += "3'-";
+        out += "3'" + separator;
         if (!this.ext5.startsWith("-")) {
             for (int i = 0; i < this.ext5.length(); i++) {
                 out += " ";
@@ -144,7 +159,7 @@ public class Polynucleotide {
             out += SequenceUtils.complement(this.ext3);
         }
 
-        out += "-5'\n";
+        out += separator + "5'\n";
 
         return out;
     }
@@ -167,6 +182,12 @@ public class Polynucleotide {
             String ext5 = "-TGCA";
             String ext3 = "-CC";
             Polynucleotide poly3 = new Polynucleotide("gaaacccGAGGAGaaaaaaaa", ext5, ext3);
+            System.out.println(poly3.toString());
+        }
+        
+        {
+            System.out.println("A Circular DNA");
+            Polynucleotide poly3 = new Polynucleotide("aaaaaaaa", true);
             System.out.println(poly3.toString());
         }
     }
