@@ -3,6 +3,7 @@ package org.ucb.c5.construction;
 import java.util.ArrayList;
 import java.util.List;
 import org.ucb.c5.construction.model.Polynucleotide;
+import org.ucb.c5.utils.SequenceUtils;
 
 /**
  *
@@ -45,11 +46,32 @@ public class Ligate {
             break outer;
         }
 
+        //If the frags condense to one sequence, that should happen by here
         if (temp.size() != 1) {
             throw new Exception("Fragments to not ligate into a single product");
         }
 
-        return temp.get(0);
+        //Try circularizing the returned DNA
+        Polynucleotide result = ligateEnds(temp.get(0));
+        if (result == null) {
+            return temp.get(0);
+        }
+        return result;
+    }
+
+    private Polynucleotide ligateEnds(Polynucleotide poly) throws Exception {
+        if (!poly.getExt3().equals(poly.getExt5())) {
+            return null;
+        }
+
+        String newseq = null;
+        if (poly.getExt5().startsWith("-")) {
+            newseq = poly.getSequence() + poly.getExt3().replaceAll("-", "");
+        } else {
+            newseq = poly.getExt5() + poly.getSequence();
+        }
+
+        return new Polynucleotide(newseq, true);
     }
 
     /**
@@ -199,9 +221,55 @@ public class Ligate {
             try {
                 Polynucleotide pdt = lig.run(frags);
             } catch (Exception err) {
-                System.out.println("Expect exception thrown");
+                System.out.println("(Expected exception thrown)\n");
             }
         }
 
+        {
+            System.out.println("Circularizing 5' ext aDNA:");
+            Polynucleotide poly1 = new Polynucleotide("aaaaaa", "CCCC", "CCCC");
+            System.out.println("poly1:\n" + poly1);
+
+            List<Polynucleotide> frags = new ArrayList<>();
+            frags.add(poly1);
+
+            Polynucleotide pdt = lig.run(frags);
+
+            System.out.println("Ligation product:");
+            System.out.println(pdt.toString());
+        }
+
+        {
+            System.out.println("Circularizing 3' ext aDNA:");
+            Polynucleotide poly1 = new Polynucleotide("aaaaaa", "-CCCC", "-CCCC");
+            System.out.println("poly1:\n" + poly1);
+
+            List<Polynucleotide> frags = new ArrayList<>();
+            frags.add(poly1);
+
+            Polynucleotide pdt = lig.run(frags);
+
+            System.out.println("Ligation product:");
+            System.out.println(pdt.toString());
+        }
+        
+        {
+            System.out.println("Cicularizaing two digested DNAs:");
+
+            Polynucleotide poly1 = new Polynucleotide("aaaaaaG", "-CC", "GATC");
+            Polynucleotide poly2 = new Polynucleotide("Ctttttt", "GATC", "-CC");
+
+            System.out.println("poly1:\n" + poly1);
+            System.out.println("poly2:\n" + poly2);
+
+            List<Polynucleotide> frags = new ArrayList<>();
+            frags.add(poly1);
+            frags.add(poly2);
+
+            Polynucleotide pdt = lig.run(frags);
+
+            System.out.println("Ligation product:");
+            System.out.println(pdt.toString());
+        }
     }
 }
