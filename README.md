@@ -108,7 +108,7 @@ Digestion fragments:
 </pre>
 
 #### LigateSimulator:  Simulates ligation to completion
-Inputs a List of Polynucleotide representing the DNA fragments, and returns a single Polynucleotide.  It will throw an Exception if the sequences do not assemble into a single product.  It will also circularize a DNA able to do so.  Here is the second portion of DemoDigAndLig, where the digestion fragments generated with DigestSimulator are reassembled with LigateSimulator:
+Inputs a List of Polynucleotide representing the DNA fragments, and returns a single Polynucleotide.  It will throw an Exception if the sequences do not assemble into a single product.  It will also circularize a DNA able to do so.  Here is the second portion of DemoDigAndLig, where the digestion fragments generated with DigestSimulator (digfrags) are reassembled with LigateSimulator:
 
 <pre>
 LigateSimulator lig = new LigateSimulator();
