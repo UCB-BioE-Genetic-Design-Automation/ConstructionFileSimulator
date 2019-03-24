@@ -127,7 +127,6 @@ public class Digest {
     }
 
     private Polynucleotide create3Frag(Polynucleotide sub, boolean threeover, int start, RestrictionEnzyme enz) {
-
         String remaining = null;
         if (threeover) {
             remaining = sub.getSequence().substring(start + enz.getCut5());

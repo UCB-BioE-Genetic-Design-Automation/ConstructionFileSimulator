@@ -105,13 +105,13 @@ public class Ligate {
                 poly1 = p2rc;
                 poly2 = p1;
 
-                //Otherwise they do not ligate, so return null
+            //Otherwise they do not ligate, so return null
             } else {
                 return null;
             }
         }
 
-        //If got this far, they match
+        //If got this far, they match, so ligate them
         String newseq = "";
         newseq += poly1.getSequence();
         newseq += poly1.getExt3().replaceAll("-", "");
