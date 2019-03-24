@@ -115,7 +115,7 @@ LigateSimulator lig = new LigateSimulator();
 lig.initiate();
 Polynucleotide pdt = lig.run(digfrags);
 
-ReLigateSimulatord product:
+ReLigated product:
 5'...agagagagagatatatatGGATCCacacacacacGAGGAGaaaaaaaaCC...3'
 3'...tctctctctctatatataCCTAGGtgtgtgtgtgCTCCTCttttttttGG...5'
 </pre>
