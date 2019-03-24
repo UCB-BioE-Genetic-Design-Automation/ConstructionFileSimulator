@@ -1,6 +1,6 @@
 # ConstructionFileSimulator
 
-
+This project is for simulating recombinant DNA experiments.  Other algorithms not included here are design algorithms that generate ConstructionFile models describing the individual molecular biology steps such as PCR, digestion, ligation, and assembly reactions. This project has reverse algorithms for simulating ConstructionFile models and predicting their product.
 
 *******
 Models:
