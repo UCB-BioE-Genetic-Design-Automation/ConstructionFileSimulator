@@ -60,7 +60,7 @@ The Functions below are in the org.ucb.c5.construction package.  Initialize them
 Inputs a Polynucleotide and returns a new Polynucleotide that is 'flipped around'.
 
 <pre>
-Demo a PstI/BseRI DigestSimulatored DNA with 3' overhangs
+Demo a PstI/BseRI digested DNA with 3' overhangs
 
 Polynucleotide poly = new Polynucleotide("gaaacccGAGGAGaaaaaaaa", "-TGCA", "-CC");
 Polynucleotide rc = func.run(poly);
