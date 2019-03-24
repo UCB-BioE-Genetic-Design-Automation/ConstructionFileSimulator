@@ -124,7 +124,7 @@ ReLigateSimulatord product:
 History:
 *******
 
-The Polynucleotide code was begun from 20n project C4, and minimally altered to enable extraction from the larger codebase.  The direct copy-over is in the first committ.  The original code was not complete and had many errors.  It was also not in rebuild-the-world style of Functions and Models.
+The Polynucleotide code was begun from 20n project C4, and minimally altered to enable extraction from the larger codebase.  The direct copy-over is in the first commit.  The original code was not complete and had many errors.  It was also not in rebuild-the-world style of Functions and Models.
 It also has no tests.
 
 2019_03_23
