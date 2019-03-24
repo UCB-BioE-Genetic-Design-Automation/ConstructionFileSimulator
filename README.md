@@ -31,7 +31,7 @@ Polynucleotide poly = new Polynucleotide("gaaacccGAGGAGaaaaaaaa", "-TGCA", "-CC"
 3'-ACGTctttgggCTCCTCtttttttt  -5'
 </pre>
 
-A circular DNA is indicated by a boolean, and the sticky end fields are ignored in algorithms: They are instantiated with a different convenience constructor requiring the sequence and a boolean. The toString() method illustrates circularity with "..." symbols:
+A circular DNA is indicated by a boolean, and the sticky end fields are ignored in algorithms. They are instantiated with a different convenience constructor requiring the sequence and a boolean. The toString() method illustrates circularity with "..." symbols:
 
 <pre>
 Polynucleotide poly = new Polynucleotide("aaaaaaaa", true);
