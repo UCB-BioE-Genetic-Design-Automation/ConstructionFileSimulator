@@ -54,7 +54,7 @@ All Functions contain initiate and run methods, and follow rebuild-the-world con
 ExampleFunction func = new ExampleFunction();
 func.initiate();
 for(ini i=0; i<1000000; i++) {
-    func.run(<args>);
+    func.run(...);
 }
 </pre>
 
