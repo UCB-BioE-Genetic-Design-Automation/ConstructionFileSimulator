@@ -57,7 +57,7 @@ for(ini i=0; i<1000000; i++) {
 The Functions below are in the org.ucb.c5.construction package.  Initialize them as above, then run them with examples provided.  More examples are present in each class's main method.
 
 #### PolyRevComp: Reverse complement Function for a Polynucleotide
-Inputs a Polynucleotide and returns a new Polynucleotide that is "flipped around".
+Inputs a Polynucleotide and returns a new Polynucleotide that is 'flipped around'.
 
 <pre>
 Demo a PstI/BseRI DigestSimulatored DNA with 3' overhangs
