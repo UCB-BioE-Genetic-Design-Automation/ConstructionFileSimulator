@@ -9,7 +9,7 @@ import org.ucb.c5.utils.SequenceUtils;
  *
  * @author J. Christopher Anderson
  */
-public class Ligate {
+public class LigateSimulator {
 
     private PolyRevComp revcomp;
 
@@ -123,7 +123,7 @@ public class Ligate {
 
     public static void main(String[] args) throws Exception {
 
-        Ligate lig = new Ligate();
+        LigateSimulator lig = new LigateSimulator();
         lig.initiate();
 
         {

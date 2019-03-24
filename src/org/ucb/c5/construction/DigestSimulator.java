@@ -15,7 +15,7 @@ import org.ucb.c5.construction.model.Polynucleotide;
  *
  * @author J. Christopher Anderson
  */
-public class Digest {
+public class DigestSimulator {
 
     private PolyRevComp revcomp;
 
@@ -172,7 +172,7 @@ public class Digest {
     public static void main(String[] args) throws Exception {
         RestrictionEnzymeFactory factory = new RestrictionEnzymeFactory();
         factory.initiate();
-        Digest dig = new Digest();
+        DigestSimulator dig = new DigestSimulator();
         dig.initiate();
 
         {

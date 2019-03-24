@@ -6,8 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.ucb.c5.construction.Digest;
-import org.ucb.c5.construction.Ligate;
+import org.ucb.c5.construction.DigestSimulator;
+import org.ucb.c5.construction.LigateSimulator;
 import org.ucb.c5.construction.RestrictionEnzymeFactory;
 import org.ucb.c5.construction.RestrictionEnzymeFactory.Enzyme;
 import org.ucb.c5.construction.model.Polynucleotide;
@@ -22,7 +22,7 @@ public class DemoDigAndLig {
         //Initialize the functions
         RestrictionEnzymeFactory factory = new RestrictionEnzymeFactory();
         factory.initiate();
-        Digest dig = new Digest();
+        DigestSimulator dig = new DigestSimulator();
         dig.initiate();
 
         //Construct the polynucleotide and restriction enzymes
@@ -43,7 +43,7 @@ public class DemoDigAndLig {
         }
 
         //Religate the fragments
-        Ligate lig = new Ligate();
+        LigateSimulator lig = new LigateSimulator();
         lig.initiate();
         
         //Run the Ligate Function
