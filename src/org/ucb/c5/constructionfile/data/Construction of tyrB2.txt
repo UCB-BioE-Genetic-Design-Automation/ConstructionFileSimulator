@@ -1,0 +1,9 @@
+>Construction of pTarget-tyrB2
+acquire oligo tyrB2,pTargRev
+acquire plasmid pTargetF
+pcr tyrB2,pTargRev on pTargetF	(3927 bp, ipcr)
+cleanup ipcr	(pcrpdt)
+digest pcrpdt with SpeI,DpnI	(spedig)
+cleanup spedig	(dig)
+ligate dig	(lig)
+transform lig	(Mach1, Spec)

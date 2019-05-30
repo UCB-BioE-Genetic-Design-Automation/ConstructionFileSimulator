@@ -1,0 +1,9 @@
+>Construction of pTarget-cscR3
+acquire oligo cscR3,pTargRev
+acquire plasmid pTargetF
+pcr cscR3,pTargRev on pTargetF	(3927 bp, ipcr)
+cleanup ipcr	(pcrpdt)
+digest pcrpdt with SpeI,DpnI	(spedig)
+cleanup spedig	(dig)
+ligate dig	(lig)
+transform lig	(Mach1, Spec)

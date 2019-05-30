@@ -1,13 +1,27 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 
 package org.ucb.c5.utils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.Writer;
+import java.net.URL;
+import java.net.URLConnection;
+import org.ucb.c5.C5;
 
 
 /**
@@ -62,28 +76,6 @@ public class FileUtils {
         return fileName.endsWith( "." + extension );
     }
 
-    public static String readFile(String path) {
-        File f = new File(path);
-        if (!f.isFile())
-            return "";
-
-        FileInputStream s;
-        try {
-            s = new FileInputStream(f);
-        } catch (FileNotFoundException e) {
-            return "";
-        }
-
-        byte[] content;
-        try {
-            content = dumpInputStream(s);
-        } catch (IOException e) {
-            return "";
-        }
-
-        return new String(content);
-    }
-
     public static void writeFile(String datafile, String filePath) {
         try {
             Writer output = null;
@@ -98,7 +90,7 @@ public class FileUtils {
 
    /**
     * Convenience method to determine the filepath of the persisted data.
-    * @param feature
+    * @param fileName
     * @return 
     */
     public static String getFilePath(String fileName, String DBName) {
@@ -125,10 +117,10 @@ public class FileUtils {
         }
     }
 
-    public static String readFile2(String path) throws Exception {
+    public static String readFile(String path) throws Exception {
         File f = new File(path);
         if (!f.isFile()) {
-            System.err.println("path is not a file: " + path);
+            System.err.println("Path is not a file: " + path);
             throw new Exception();
         }
 
@@ -149,4 +141,26 @@ public class FileUtils {
         }
 
         return new String(content);    }
+
+    public static String readResourceFile(String relPath) throws Exception {
+        URL url = new C5().getClass().getResource(relPath);
+        
+        BufferedReader in = new BufferedReader(
+        new InputStreamReader(url.openStream()));
+
+        StringBuilder sb = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null)
+            sb.append(inputLine).append("\n");
+        in.close();
+        
+        return sb.toString();
+    }
+    
+    public static void writeResourceFile(String datafile, String relPath) throws Exception {
+        OutputStream os = new FileOutputStream(relPath);
+        final PrintStream printStream = new PrintStream(os);
+        printStream.println(datafile);
+        printStream.close();
+    }
 }
