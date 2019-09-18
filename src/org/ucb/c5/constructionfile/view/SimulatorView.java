@@ -156,6 +156,7 @@ public class SimulatorView extends javax.swing.JFrame {
         }
         catch (Exception e){
             resultArea.setText(e.toString());
+            e.printStackTrace();
         }
 
     }//GEN-LAST:event_runBtnActionPerformed

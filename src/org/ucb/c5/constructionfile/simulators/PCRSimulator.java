@@ -154,7 +154,7 @@ public class PCRSimulator {
 
         // Check if the oligos will anneal in the same directions
         if (oligo1Forward == oligo2Forward) {
-            throw new Exception("The provided oligos will both anneal in the same direction");
+            throw new Exception("The provided oligos will both anneal in the same direction for:\n" + pcr.toString());
         }
 
         String flankedRegion = templateSeq.substring(endIndexOligo1, startIndexOligo2); // Region between the two oligos that does not contain bp from either

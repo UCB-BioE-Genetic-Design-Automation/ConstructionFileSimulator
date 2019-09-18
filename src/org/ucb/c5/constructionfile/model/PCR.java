@@ -46,4 +46,13 @@ public class PCR extends Step {
     public Operation getOperation() {
         return Operation.pcr;
     }
+    
+    @Override
+    public String toString() {
+        String out = "Oligo1: " + this.oligo1;
+        out += "\nOligo2: " + this.oligo2;
+        out += "\ntemplate: " + this.template;
+        out += "\nproduct: " + this.product;
+        return out;
+    }
 }
