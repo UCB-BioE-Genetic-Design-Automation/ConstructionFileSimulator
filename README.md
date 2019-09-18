@@ -142,4 +142,4 @@ It also has no tests.
 The code was reworked, and is now functional on all examples considered for ligation and digestion, which is complete (until we find out it's not).
 
 2019_05_29
-In 140L, Zachary Scheftel flushed this all out in a separate repo.  To keep his repo original, I moved his code back into this project.
+In 140L, Zachary Scheftel flushed this all out in a separate repo.  To keep his repo original, I moved his code back into this project. The new code includes a GUI that inputs a ConstructionFile and simulates the product.  That includes a PCR prediction Function, ConstructionFile parsers, and simulator Functions.
