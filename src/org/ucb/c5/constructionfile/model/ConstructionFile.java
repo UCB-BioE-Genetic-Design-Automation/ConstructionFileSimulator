@@ -54,7 +54,7 @@ public class ConstructionFile {
         steps.add(new PCR("ca4238", "ca4239", "pTargetF", "ipcr"));
         
         //cleanup ipcr	(pcr)
-        steps.add(new Cleanup("ipcr", "pcr"));
+//        steps.add(new Cleanup("ipcr", "pcr"));
         
         //digest pcr with SpeI,DpnI	(spedig)
         List<Enzyme> enzymes = new ArrayList<>();
@@ -63,7 +63,7 @@ public class ConstructionFile {
         steps.add(new Digestion("pcr", enzymes, "spedig"));
         
         //cleanup spedig	(dig)
-        steps.add(new Cleanup("spedig", "dig"));
+//        steps.add(new Cleanup("spedig", "dig"));
         
         //ligate dig	(lig)
         List<String> digs = new ArrayList<>();

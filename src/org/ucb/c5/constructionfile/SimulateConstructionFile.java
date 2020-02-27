@@ -58,18 +58,18 @@ public class SimulateConstructionFile {
             case assemble:
                 simulateAssemble((Assembly) step, fragments);
                 break;
-            case cleanup:
-                simulateCleanup((Cleanup) step, fragments);
-                break;
+//            case cleanup:
+//                simulateCleanup((Cleanup) step, fragments);
+//                break;
             case transform:
                 simulateTransform((Transformation) step, fragments, pdtName);
                 break;
-            case miniprep:
-                break; // simulateMiniprep(step, CFMap, fragments);
-            case sequence:
-                break; // simulateSequence(step, CFMap, fragments);
-            case inoculate:
-                break; // simulateInoculate(step, CFMap, fragments);
+//            case miniprep:
+//                break; // simulateMiniprep(step, CFMap, fragments);
+//            case sequence:
+//                break; // simulateSequence(step, CFMap, fragments);
+//            case inoculate:
+//                break; // simulateInoculate(step, CFMap, fragments);
             default:
                 throw new RuntimeException("Not implemented " + step.getOperation());
         }
@@ -146,9 +146,9 @@ public class SimulateConstructionFile {
     }
 
     // This is not implemented completely, right now it will just transfer the sequence to the product name in the map
-    private void simulateCleanup(Cleanup cleanup, Map<String, Polynucleotide> fragments) {
-        fragments.put(cleanup.getProduct(), fragments.get(cleanup.getSubstrate()));
-    }
+//    private void simulateCleanup(Cleanup cleanup, Map<String, Polynucleotide> fragments) {
+//        fragments.put(cleanup.getProduct(), fragments.get(cleanup.getSubstrate()));
+//    }
 
     private void simulateTransform(Transformation transformation, Map<String, Polynucleotide> fragments, String pdtName) {
         fragments.put(pdtName, fragments.get(transformation.getDna()));

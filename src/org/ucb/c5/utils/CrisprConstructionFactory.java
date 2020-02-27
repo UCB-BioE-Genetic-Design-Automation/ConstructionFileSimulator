@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.ucb.c5.constructionfile.model.Acquisition;
 import org.ucb.c5.constructionfile.model.Antibiotic;
-import org.ucb.c5.constructionfile.model.Cleanup;
+//import org.ucb.c5.constructionfile.model.Cleanup;
 import org.ucb.c5.constructionfile.model.ConstructionFile;
 import org.ucb.c5.constructionfile.model.Digestion;
 import org.ucb.c5.constructionfile.model.Enzyme;
@@ -37,7 +37,7 @@ public class CrisprConstructionFactory {
         steps.add(new PCR(oligo1name, oligo2name, template, "ipcr"));
         
         //cleanup ipcr	(pcr)
-        steps.add(new Cleanup("ipcr", "pcr"));
+//        steps.add(new Cleanup("ipcr", "pcr"));
         
         //digest pcr with SpeI,DpnI	(spedig)
         List<Enzyme> enzymes = new ArrayList<>();
@@ -46,7 +46,7 @@ public class CrisprConstructionFactory {
         steps.add(new Digestion("pcr", enzymes, "spedig"));
         
         //cleanup spedig	(dig)
-        steps.add(new Cleanup("spedig", "dig"));
+//        steps.add(new Cleanup("spedig", "dig"));
         
         //ligate dig	(lig)
         List<String> digs = new ArrayList<>();

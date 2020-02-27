@@ -88,10 +88,10 @@ public class SerializeConstructionFile {
                     sb.append(op.toString()).append(" ").append(trans.getDna());
                     sb.append("\t(").append(trans.getStrain()).append(", ").append(trans.getAntibiotic()).append(")").append("\n");
                     break;
-                case cleanup:
-                    Cleanup cleanup = (Cleanup) astep;
-                    sb.append(op.toString()).append(" ").append(cleanup.getSubstrate()).append("\t(").append(cleanup.getProduct()).append(")").append("\n");
-                    break;
+//                case cleanup:
+//                    Cleanup cleanup = (Cleanup) astep;
+//                    sb.append(op.toString()).append(" ").append(cleanup.getSubstrate()).append("\t(").append(cleanup.getProduct()).append(")").append("\n");
+//                    break;
                 case assemble:
                     Assembly assem = (Assembly) astep;
                     sb.append(op.toString()).append(" ");

@@ -15,6 +15,7 @@ import java.util.List;
  *
  * @author J. Christopher Anderson
  * @rewritten by Connor Tou, Zexuan Zhao
+ * @rewritten by Zihang Shao
  * New thing for steps: after instantiate a step...
  * 1. set previous step, which is the direct previous step in CF in a linear order
  * 2. populate parental steps, which generate a tree relationship of steps in a CF (not visualizable)
@@ -22,6 +23,35 @@ import java.util.List;
  *
  */
 public class ParseConstructionFile {
+//    public void initiate() {
+//    }
+//    public ConstructionFile run(String rawText) throws Exception {
+//        // Create a map to store given sequences and a list to store the steps
+//        HashMap<String, String> sequences = new HashMap<>();
+//        List<Step> steps = new ArrayList<>();
+//        // Initiate CFID and plasmidName
+//        ChangeableString plasmidName = new ChangeableString("");
+//        ChangeableString CFID = new ChangeableString("");
+//        // Split the raw text into the steps and sequences section
+//        String[] sections = rawText.split("((?<=>)|(?=>))");       
+//        
+//        
+//        String stepSection = sections[0].concat(sections[1]);        
+//        
+//        
+//        
+//        String seqSection = "";
+//        for (int i = 2; i < sections.length; i++){
+//            
+//            
+//            seqSection = seqSection.concat(sections[i]);
+//        }
+//        processSteps(stepSection, CFID, plasmidName, steps);
+//        processSequences(seqSection, sequences);
+//        return new ConstructionFile(CFID.toString(), steps, plasmidName.toString(), sequences);
+//    }
+    
+    
     public void initiate() {
     }
     public ConstructionFile run(String rawText) throws Exception {
@@ -32,16 +62,34 @@ public class ParseConstructionFile {
         ChangeableString plasmidName = new ChangeableString("");
         ChangeableString CFID = new ChangeableString("");
         // Split the raw text into the steps and sequences section
-        String[] sections = rawText.split("((?<=>)|(?=>))");
-        String stepSection = sections[0].concat(sections[1]);
-        String seqSection = "";
-        for (int i = 2; i < sections.length; i++){
-            seqSection = seqSection.concat(sections[i]);
-        }
+        
+        int stepSym = rawText.indexOf(">");
+        String rawText1 = rawText.substring(stepSym+1,rawText.length());
+        int seqSym = rawText1.indexOf(">");
+        //String[] sections = rawText.split("\\>");
+        
+        
+        //step section without starting >
+        String stepSection = rawText1.substring(0,seqSym-1);
+        //seq section with all >
+        String seqSection = rawText1.substring(seqSym,rawText.length()-1);
+        
+        
+        
         processSteps(stepSection, CFID, plasmidName, steps);
         processSequences(seqSection, sequences);
         return new ConstructionFile(CFID.toString(), steps, plasmidName.toString(), sequences);
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     private void processSteps(String rawText, ChangeableString CFID, ChangeableString plasmidName, List<Step> steps) throws Exception {
         //Replace common unnessary words
@@ -111,30 +159,85 @@ public class ParseConstructionFile {
         } */
     }
 
-    private void processSequences(String rawText, HashMap<String, String> sequences){
+    private void processSequences(String seqSection, HashMap<String, String> sequences){
         //Break it into lines
-        String[] seqSections = rawText.split(">");
+//        String[] seqSections = rawText.split(">");        
+//        
+//
+//        
+//        for (int i = 1; i < seqSections.length; i++) {        
+//        
+//    
+//            String currSection = seqSections[i];
+//            
+//            // Ignore blank lines
+//            if (currSection.trim().isEmpty()) {                
+//            
+//                
+//                continue;
+//            }
+//            // Ignore commented-out lines
+//            if (currSection.startsWith("//")) {
+//                continue;
+//            }
+//            // Split the sequence section by the newline character
+//            currSection = currSection.replaceAll("\r", "\n");
+//            currSection = currSection.replaceAll("\t", "");
+//            String[] splitSection = currSection.split("\n");
+//            String seqName = splitSection[0].split(" ")[0];
+//            String seqContents = "";
+//            for (int j = 1; j < splitSection.length; j++) {
+//                seqContents = seqContents.concat(splitSection[j]);
+//            }
+//            // Save to the sequences dictionary
+//            sequences.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContents.replaceAll("(\\r|\\n|\\s)", ""));
+//        }
+
+
+
+
+        String[] seqSections = seqSection.split(">");
+
         for (int i = 1; i < seqSections.length; i++) {
+    
             String currSection = seqSections[i];
-            // Ignore blank lines
-            if (currSection.trim().isEmpty()) {
-                continue;
-            }
-            // Ignore commented-out lines
-            if (currSection.startsWith("//")) {
-                continue;
-            }
-            // Split the sequence section by the newline character
-            currSection = currSection.replaceAll("\r", "\n");
-            currSection = currSection.replaceAll("\t", "");
-            String[] splitSection = currSection.split("\n");
-            String seqName = splitSection[0].split(" ")[0];
-            String seqContents = "";
-            for (int j = 1; j < splitSection.length; j++) {
-                seqContents = seqContents.concat(splitSection[j]);
-            }
-            // Save to the sequences dictionary
+            
+            String[] currSecLn = currSection.split("\n");
+            
+//            
+//            
+//            for (int i1 = 0; i<currSecLn.length; i1++){
+//                // Ignore blank lines
+//                if (currSecLn[i1].trim().isEmpty() == true) {
+//                //currSecLn[i1] = null;
+//                continue;
+//                }
+//                // Ignore commented-out lines
+//                if (currSecLn[i1].startsWith("//") == true) {
+//                //currSecLn[i1] = null;
+//                continue;
+//                }
+//                
+//            }
+            
+           
+            String seqName = currSecLn[0];
+            String seqContents = currSecLn[1];
             sequences.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContents.replaceAll("(\\r|\\n|\\s)", ""));
+
+            
+            // Split the sequence section by the newline character
+//            currSection = currSection.replaceAll("\r", "\n");
+//            currSection = currSection.replaceAll("\t", "");
+//            String[] splitSection = currSection.split("\n");
+//            String seqName = splitSection[0].split(" ")[0];
+//            String seqContents = "";
+//            for (int j = 1; j < splitSection.length; j++) {
+//                seqContents = seqContents.concat(splitSection[j]);
+//            }
+//            // Save to the sequences dictionary
+//            sequences.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContents.replaceAll("(\\r|\\n|\\s)", ""));
+//        
         }
     }
 
@@ -151,10 +254,10 @@ public class ParseConstructionFile {
                 return createPCA(
                         spaces[1].split(","),
                         spaces[3]);
-            case cleanup:
-                return createCleanup(
-                        spaces[1],
-                        spaces[2]);
+//            case cleanup:
+//                return createCleanup(
+//                        spaces[1],
+//                        spaces[2]);
             case digest:
                 return createDigest(
                         spaces[1],
@@ -195,9 +298,9 @@ public class ParseConstructionFile {
         return new PCA(frags, product);
     }
     
-    private Step createCleanup(String substrate, String product) {
-        return new Cleanup(substrate, product);
-    }
+//    private Step createCleanup(String substrate, String product) {
+//        return new Cleanup(substrate, product);
+//    }
 
     private Step createDigest(String substrate, String[] enzymes, String product) {
         List<Enzyme> enzList = new ArrayList<>();

@@ -17,10 +17,10 @@ public enum Operation {
     digest,
     ligate,
     assemble,
-    cleanup,
+//    cleanup,
     transform,
-    miniprep,
-    sequence,
-    inoculate,
+//    miniprep,
+//    sequence,
+//    inoculate,
 //    GelPurify  Not implemented, but belongs here
 }
