@@ -24,15 +24,38 @@ import org.ucb.c5.constructionfile.model.ConstructionFile;
  */
 public class ParseFolderConstructionFile {
     
-    public void run(String dirpath) throws Exception{
-        String dirPath = "";
+    public void initiate(){
+    
+}
+    
+    public void run(String dirPath, List<ConstructionFile> cfs, Map<String,String> nameToSequencing) throws Exception{
+        
         File dir = new File(dirPath);
         
-        Map<String,String> nameToSequencing = new HashMap<>();
-        List<ConstructionFile> cfs = new ArrayList<>();
+//        Map<String,String> nameToSequencing = new HashMap<>();
+//        List<ConstructionFile> cfs = new ArrayList<>();
         
-        parseDirectory(dir, nameToSequencing, cfs);
+        List<File> files = parseDirectory(dir, nameToSequencing, cfs);
         
+        for(File file:files){
+            
+            if (file.getName().toLowerCase().startsWith("construction") ){
+
+                cfs.add(runCF(file));
+
+            }
+            else{
+
+                nameToSequencing.putAll(runSeq(file));
+
+
+            }
+            
+            
+            
+        }
+        
+
         
 
 //        FilenameFilter txtFilter = new FilenameFilter() {
@@ -118,63 +141,123 @@ public class ParseFolderConstructionFile {
 //    }
     
     
-    private void parseDirectory(File dir, Map<String, String> nameToSequencing, List<ConstructionFile> cfs) throws IOException {
+    private List<File> parseDirectory(File dir, Map<String, String> nameToSequencing, List<ConstructionFile> cfs) throws IOException {
         
-//        FilenameFilter cfFilter = new FilenameFilter(){
-//            @Override
-//            public boolean accept(File file, String name){
-//                return name.toLowerCase().startsWith("construction");
-//            }
-//        };
+        List<File> files = new ArrayList<>();
         
-        
-        List<File> allFiles = new ArrayList<>();
         for(File afile : dir.listFiles()) {
             //Handle nested directories
             if(afile.isDirectory()) {
                 parseDirectory(afile, nameToSequencing, cfs);
             }
-            if (afile.getName().toLowerCase().startsWith("construction") ){
-                
-                String cfContent = readFile(afile);
-                //Question: String or ConstructionFile
-                ParseConstructionFile parseConstruction = new ParseConstructionFile();
-                parseConstruction.initiate();
-                try {
-                    ConstructionFile cf = parseConstruction.run(cfContent);
-                    cfs.add(cf);
-
-                }
-                catch (Exception e){
-                    e.printStackTrace();
-                }
-                
-                
-                
-            }else{
-                
-                //read txt
-                if (afile.getName().endsWith(".txt")){
-                    
-                    String fileContent = readFile(afile);
-                    
-                    String[] byLine = fileContent.split("\n");
-                    for (String str: byLine){
-                        String[] str2 = str.split("\\W+");
-                        String seqName = str2[0];
-                        String seqContent = str2[1];
-                        nameToSequencing.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContent.replaceAll("(\\r|\\n|\\s)", ""));
-
-                    }
-                                        
-                    
-                }
-                
-                
+            else{
+            files.add(afile);
             }
+        }
+        return files;
+    }
+
+    private ConstructionFile runCF(File afile) throws IOException, Exception{
         
+ 
+        String cfContent = readFile(afile);
+        ParseConstructionFile parseConstruction = new ParseConstructionFile();
+        parseConstruction.initiate();
+        try {
+            ConstructionFile cf = parseConstruction.run(cfContent);
+            return cf;
+
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw new Exception("Not a valid Construction File");
         }
             
+        
+       
+    }            
+                
+
+    
+    private Map<String,String> runSeq(File afile) throws IOException {
+        
+        Map<String,String> nameToSequencing = new HashMap<>();
+        
+//        String ext = afile.getName().substring(afile.getName().length() - 3);
+//        
+//        switch(ext){
+//            case "txt":
+//                
+//            
+        //read txt
+        if (afile.getName().endsWith(".txt") || afile.getName().endsWith(".tsv") || afile.getName().endsWith(".csv")){
+
+            String fileContent = readFile(afile);
+
+            String[] byLine = fileContent.split("\n");
+            for (String str: byLine){
+                String[] str2 = str.split("\\W+");
+                String seqName = str2[0];
+                String seqContent = str2[1];
+                nameToSequencing.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContent.replaceAll("(\\r|\\n|\\s)", ""));
+
+            }
+
+        }
+
+        if (afile.getName().endsWith(".ape") || afile.getName().endsWith(".seq") || afile.getName().endsWith(".str") || afile.getName().endsWith(".gb")){
+
+            String fileContent = readFile(afile);
+
+//                    int locus = fileContent.indexOf("LOCUS");
+//                    int def = fileContent.indexOf("DEFINITION");
+//                    String seqName = fileContent.substring(locus + 5, def);
+//                    
+
+            String seqName =  afile.getName();
+
+            int origin = fileContent.lastIndexOf("ORIGIN");
+
+
+            String rawSeq = fileContent.substring(origin + 6);
+            String seqContent = rawSeq.replaceAll("[^A-za-z ]", "");
+
+
+            nameToSequencing.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContent.replaceAll("(\\r|\\n|\\s)", ""));
+
+
+        }
+        return nameToSequencing;
+
+    }
+
+            
+        
+        
+    
+    
+    
+    public static void main(String args[]) throws Exception  {
+        
+        String dirPath = "/Users/Star/Downloads/2020_01_20-Lycopene5/Construction Files";
+        
+        
+        ParseFolderConstructionFile parseFolder = new ParseFolderConstructionFile();
+        parseFolder.initiate();
+        
+        Map<String,String> NtoS = new HashMap<>();
+        List<ConstructionFile> CFiles = new ArrayList<>();
+        
+        parseFolder.run(dirPath, CFiles, NtoS);
+        
+        System.out.print(CFiles);
+    }
+
+    
+        
+}        
+        
+        
             
             
 //            
@@ -215,8 +298,7 @@ public class ParseFolderConstructionFile {
 //        
 //        String cfile = CF.toString();
 //        }
-    }
-}
+
 
 
     
