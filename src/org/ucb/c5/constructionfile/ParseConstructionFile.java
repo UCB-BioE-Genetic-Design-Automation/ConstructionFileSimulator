@@ -54,6 +54,8 @@ public class ParseConstructionFile {
     
     public void initiate() {
     }
+    
+    
     public ConstructionFile run(String rawText) throws Exception {
         // Create a map to store given sequences and a list to store the steps
         HashMap<String, String> sequences = new HashMap<>();

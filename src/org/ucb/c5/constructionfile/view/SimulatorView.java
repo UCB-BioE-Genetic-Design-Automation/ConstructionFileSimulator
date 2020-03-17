@@ -18,6 +18,7 @@ import javax.swing.text.TabStop;
 /**
  *
  * @author jcaucb
+ * @edit Zihang Shao
  */
 public class SimulatorView extends javax.swing.JFrame {
 

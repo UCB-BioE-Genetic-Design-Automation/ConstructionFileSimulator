@@ -8,6 +8,7 @@ import java.util.Map;
 /**
  *
  * @author J. Christopher Anderson
+ * @edit Zihang Shao
  */
 public class ConstructionFile {
     private final List<Step> steps;
