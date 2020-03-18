@@ -32,8 +32,6 @@ public class ParseFolderConstructionFile {
         
         File dir = new File(dirPath);
         
-//        Map<String,String> nameToSequencing = new HashMap<>();
-//        List<ConstructionFile> cfs = new ArrayList<>();
         
         List<File> files = parseDirectory(dir, nameToSequencing, cfs);
         
@@ -55,50 +53,6 @@ public class ParseFolderConstructionFile {
             
         }
         
-
-        
-
-//        FilenameFilter txtFilter = new FilenameFilter() {
-//
-//            @Override
-//            public boolean accept(File file, String name) {
-//                return name.endsWith(".txt");
-//            }
-//        };
-//
-//
-//        FilenameFilter tsvFilter = new FilenameFilter() {
-//
-//            @Override
-//            public boolean accept(File file, String name) {
-//                return name.endsWith(".tsv");
-//            }
-//        };
-//
-//
-//        File[] txtFiles = dir.listFiles(txtFilter);
-//        File[] tsvFiles = dir.listFiles(tsvFilter);
-//
-//        Path txtPath = Paths.get(txtFiles[0].getAbsolutePath());
-//
-//        String stepSec  = new String(Files.readAllBytes(txtPath), StandardCharsets.UTF_8);
-//        StringBuilder seqSec = new StringBuilder();
-//        
-//        for (File seqtsv: tsvFiles){
-//            
-//            String currSeq  = new String(Files.readAllBytes(Paths.get(seqtsv.getAbsolutePath())), StandardCharsets.UTF_8);
-//            seqSec.append("\n");
-//            seqSec.append(currSeq);
-//
-//        }
-//        
-//        StringBuilder CF = new StringBuilder();
-//        CF.append(stepSec);
-//        CF.append(seqSec.toString());
-//        
-//        
-//        String cfile = CF.toString();
-//        return cfile;
 
 
     }
@@ -124,21 +78,6 @@ public class ParseFolderConstructionFile {
     }
     
     
-//    private static String readAllBytesJava7(String filePath) 
-//    {
-//        String content = "";
-// 
-//        try
-//        {
-//            content = new String ( Files.readAllBytes( Paths.get(filePath) ) );
-//        } 
-//        catch (IOException e) 
-//        {
-//            e.printStackTrace();
-//        }
-// 
-//        return content;
-//    }
     
     
     private List<File> parseDirectory(File dir, Map<String, String> nameToSequencing, List<ConstructionFile> cfs) throws IOException {
@@ -208,11 +147,7 @@ public class ParseFolderConstructionFile {
         if (afile.getName().endsWith(".ape") || afile.getName().endsWith(".seq") || afile.getName().endsWith(".str") || afile.getName().endsWith(".gb")){
 
             String fileContent = readFile(afile);
-
-//                    int locus = fileContent.indexOf("LOCUS");
-//                    int def = fileContent.indexOf("DEFINITION");
-//                    String seqName = fileContent.substring(locus + 5, def);
-//                    
+              
 
             String seqName =  afile.getName();
 
@@ -259,87 +194,4 @@ public class ParseFolderConstructionFile {
         
         
             
-            
-//            
-//            
-//            //Handle .txt or .tsv files as cfs or oligos
-//            FilenameFilter txtFilter = new FilenameFilter() {
-//
-//                @Override
-//                public boolean accept(File file, String name) {
-//                    return name.endsWith(".txt");
-//                }
-//            };
-//            
-//            //Handle .ape, .seq, .str, .gb as genbank
-//            
-//            
-//            
-//            
-//            File[] txtFiles = dir.listFiles(txtFilter);
-//
-//        Path txtPath = Paths.get(txtFiles[0].getAbsolutePath());
-//
-//        String stepSec  = new String(Files.readAllBytes(txtPath), StandardCharsets.UTF_8);
-//        StringBuilder seqSec = new StringBuilder();
-//        
-//        for (File seqtsv: tsvFiles){
-//            
-//            String currSeq  = new String(Files.readAllBytes(Paths.get(seqtsv.getAbsolutePath())), StandardCharsets.UTF_8);
-//            seqSec.append("\n");
-//            seqSec.append(currSeq);
-//
-//        }
-//        
-//        StringBuilder CF = new StringBuilder();
-//        CF.append(stepSec);
-//        CF.append(seqSec.toString());
-//        
-//        
-//        String cfile = CF.toString();
-//        }
-
-
-
-    
-    
-//    public static void main(String[] args) {
-//      File folder = new File("G:\\Test");
-//      ParseFolderConstructionFile listFiles = new ParseFolderConstructionFile();
-//      listFiles.listAllFiles(folder);
-//
-//     }
-//     // Uses listFiles method  
-//     public void listAllFiles(File folder){
-//         File[] fileNames = folder.listFiles();
-//         for(File file : fileNames){
-//             // if directory call the same method again
-//             if(file.isDirectory()){
-//                 listAllFiles(file);
-//             }else{
-//                 try {
-//                     readContent(file);
-//                 } catch (IOException e) {
-//                     // TODO Auto-generated catch block
-//                     e.printStackTrace();
-//                 }
-//        
-//             }
-//         }
-//     }
-//
-//    public void readContent(File file) throws IOException{
-//         try(BufferedReader br  = new BufferedReader(new FileReader(file))){
-//               String strLine;
-//               // Read lines from the file, returns null when end of stream 
-//               // is reached
-//               while((strLine = br.readLine()) != null){
-//               }
-//         }
-//     }
-//     
-//     public void readContent(Path filePath) throws IOException{
-//         List<String> fileList = Files.readAllLines(filePath);
-//     }
-    
-
+ 
