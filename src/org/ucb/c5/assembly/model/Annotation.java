@@ -30,12 +30,14 @@ public class Annotation {
     private final String color;
     private final int start;
     private final int end;
+    private final boolean isRevComp;
 
-    public Annotation(String name, String color, int start, int end) {
+    public Annotation(String name, String color, int start, int end, boolean isRevComp) {
         this.name = name;
         this.color = color;
         this.start = start;
         this.end = end;
+        this.isRevComp = isRevComp;
     }
 
     public String getName() {
@@ -52,5 +54,9 @@ public class Annotation {
 
     public int getEnd() {
         return end;
+    }
+
+    public boolean isRevComp() {
+        return isRevComp;
     }
 }
