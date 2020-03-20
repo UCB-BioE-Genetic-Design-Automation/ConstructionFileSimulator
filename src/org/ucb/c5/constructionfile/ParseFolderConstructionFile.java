@@ -32,10 +32,13 @@ public class ParseFolderConstructionFile {
         
         File dir = new File(dirPath);
         
+        List<File> files = new ArrayList<>();
         
-        List<File> files = parseDirectory(dir);
+        //Handle sub-directory
+        List<File> filesParse = parseDirectory(dir,files);
         
-        for(File file:files){
+        //Dispose files as cf or seq 
+        for(File file:filesParse){
             
             if (file.getName().toLowerCase().startsWith("construction") ){
 
@@ -57,7 +60,7 @@ public class ParseFolderConstructionFile {
 
     }
     
-    
+    //File reader
     String readFile(File file) throws IOException {
         
         String filePath = file.getAbsolutePath();
@@ -79,15 +82,14 @@ public class ParseFolderConstructionFile {
     
     
     
-    
-    public List<File> parseDirectory(File dir) throws IOException {
+    //Recursive folder parser
+    private List<File> parseDirectory(File dir, List<File> files) throws IOException {
         
-        List<File> files = new ArrayList<>();
         
         for(File afile : dir.listFiles()) {
             //Handle nested directories
             if(afile.isDirectory()) {
-                parseDirectory(afile);
+                parseDirectory(afile,files);
             }
             else{
                 files.add(afile);
@@ -96,7 +98,9 @@ public class ParseFolderConstructionFile {
         return files;
     }
 
-    public ConstructionFile runCF(File afile) throws IOException, Exception{
+    
+    //Handle cf
+    private ConstructionFile runCF(File afile) throws IOException, Exception{
         
  
         String cfContent = readFile(afile);
@@ -117,8 +121,8 @@ public class ParseFolderConstructionFile {
     }            
                 
 
-    
-    public Map<String,String> runSeq(File afile) throws IOException {
+    //Handle seq
+    private Map<String,String> runSeq(File afile) throws IOException {
         
         Map<String,String> nameToSequencing = new HashMap<>();
         
@@ -128,17 +132,46 @@ public class ParseFolderConstructionFile {
 //            case "txt":
 //                
 //            
-        //read txt
-        if (afile.getName().endsWith(".txt") || afile.getName().endsWith(".tsv") || afile.getName().endsWith(".csv")){
+        //read .txt or .tsv
+        if (afile.getName().endsWith(".txt") || afile.getName().endsWith(".tsv") ){
 
             String fileContent = readFile(afile);
 
             String[] byLine = fileContent.split("\n");
             for (String str: byLine){
-                String[] str2 = str.split("\\W+");
-                if(str2[1].matches("[ATCGatcg]+")){
-                    String seqName = str2[0];
-                    String seqContent = str2[1];
+                
+                //Ignore blank lines
+                if (str.trim().isEmpty()) {
+                    continue;
+                }
+
+                //Ignore commented-out lines
+                if (str.startsWith("//")) {
+                    continue;
+                }
+                
+                String[] str2 = str.split("(\\r|\\n|\\s)");
+                StringBuilder sb2 = new StringBuilder();
+                
+                for(String str3:str2){
+                    //ignore ""
+                    if (str3.trim().isEmpty()){
+                        continue;                      
+                    }
+                    //ignore comments
+                    if (str3.startsWith("//")) {
+                        continue;
+                    }
+                    sb2.append(str3);
+                    sb2.append("\n");
+                }
+                String[] strNew = sb2.toString().split("\n");
+
+                
+                
+                if(strNew[1].matches("[ATCGatcg]+")){
+                    String seqName = strNew[0];
+                    String seqContent = strNew[1];
                     nameToSequencing.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContent.replaceAll("(\\r|\\n|\\s)", ""));                    
                 }
                 
@@ -146,6 +179,7 @@ public class ParseFolderConstructionFile {
 
         }
 
+        //Handle .ape .seq .str or .gb
         if (afile.getName().endsWith(".ape") || afile.getName().endsWith(".seq") || afile.getName().endsWith(".str") || afile.getName().endsWith(".gb")){
 
             String fileContent = readFile(afile);
@@ -176,9 +210,10 @@ public class ParseFolderConstructionFile {
     
     public static void main(String args[]) throws Exception  {
         
-        String dirPath = "/Users/Star/Downloads/2020_01_20-Lycopene5";
+        //Enter Path name as a String
+        String dirPath = "/Users/Star/Documents/Capstone/Examples";
         
-        
+        //initiate
         ParseFolderConstructionFile parseFolder = new ParseFolderConstructionFile();
         parseFolder.initiate();
         
@@ -187,6 +222,7 @@ public class ParseFolderConstructionFile {
         
         parseFolder.run(dirPath, CFiles, NtoS);
         
+        //for debug
         System.out.print(CFiles);
     }
 
