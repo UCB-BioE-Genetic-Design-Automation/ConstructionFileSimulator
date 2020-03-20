@@ -33,7 +33,7 @@ public class ParseFolderConstructionFile {
         File dir = new File(dirPath);
         
         
-        List<File> files = parseDirectory(dir, nameToSequencing, cfs);
+        List<File> files = parseDirectory(dir);
         
         for(File file:files){
             
@@ -80,23 +80,23 @@ public class ParseFolderConstructionFile {
     
     
     
-    private List<File> parseDirectory(File dir, Map<String, String> nameToSequencing, List<ConstructionFile> cfs) throws IOException {
+    public List<File> parseDirectory(File dir) throws IOException {
         
         List<File> files = new ArrayList<>();
         
         for(File afile : dir.listFiles()) {
             //Handle nested directories
             if(afile.isDirectory()) {
-                parseDirectory(afile, nameToSequencing, cfs);
+                parseDirectory(afile);
             }
             else{
-            files.add(afile);
+                files.add(afile);
             }
         }
         return files;
     }
 
-    private ConstructionFile runCF(File afile) throws IOException, Exception{
+    public ConstructionFile runCF(File afile) throws IOException, Exception{
         
  
         String cfContent = readFile(afile);
@@ -118,7 +118,7 @@ public class ParseFolderConstructionFile {
                 
 
     
-    private Map<String,String> runSeq(File afile) throws IOException {
+    public Map<String,String> runSeq(File afile) throws IOException {
         
         Map<String,String> nameToSequencing = new HashMap<>();
         
@@ -136,10 +136,12 @@ public class ParseFolderConstructionFile {
             String[] byLine = fileContent.split("\n");
             for (String str: byLine){
                 String[] str2 = str.split("\\W+");
-                String seqName = str2[0];
-                String seqContent = str2[1];
-                nameToSequencing.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContent.replaceAll("(\\r|\\n|\\s)", ""));
-
+                if(str2[1].matches("[ATCGatcg]+")){
+                    String seqName = str2[0];
+                    String seqContent = str2[1];
+                    nameToSequencing.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContent.replaceAll("(\\r|\\n|\\s)", ""));                    
+                }
+                
             }
 
         }
@@ -174,7 +176,7 @@ public class ParseFolderConstructionFile {
     
     public static void main(String args[]) throws Exception  {
         
-        String dirPath = "/Users/Star/Downloads/2020_01_20-Lycopene5/Construction Files";
+        String dirPath = "/Users/Star/Downloads/2020_01_20-Lycopene5";
         
         
         ParseFolderConstructionFile parseFolder = new ParseFolderConstructionFile();

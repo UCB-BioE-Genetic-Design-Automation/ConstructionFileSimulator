@@ -26,7 +26,7 @@ public class OligoScanner {
     public void initiate() throws Exception {
         nameToOligo = new HashMap<>();
         
-        String dir = "/Users/jca20n/Pimar";
+        String dir = "";
         File fdir = new File(dir);
         readInOligos(fdir, nameToOligo);
     }

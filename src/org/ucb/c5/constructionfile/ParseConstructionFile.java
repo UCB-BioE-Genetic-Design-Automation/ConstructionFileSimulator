@@ -23,34 +23,7 @@ import java.util.List;
  *
  */
 public class ParseConstructionFile {
-//    public void initiate() {
-//    }
-//    public ConstructionFile run(String rawText) throws Exception {
-//        // Create a map to store given sequences and a list to store the steps
-//        HashMap<String, String> sequences = new HashMap<>();
-//        List<Step> steps = new ArrayList<>();
-//        // Initiate CFID and plasmidName
-//        ChangeableString plasmidName = new ChangeableString("");
-//        ChangeableString CFID = new ChangeableString("");
-//        // Split the raw text into the steps and sequences section
-//        String[] sections = rawText.split("((?<=>)|(?=>))");       
-//        
-//        
-//        String stepSection = sections[0].concat(sections[1]);        
-//        
-//        
-//        
-//        String seqSection = "";
-//        for (int i = 2; i < sections.length; i++){
-//            
-//            
-//            seqSection = seqSection.concat(sections[i]);
-//        }
-//        processSteps(stepSection, CFID, plasmidName, steps);
-//        processSequences(seqSection, sequences);
-//        return new ConstructionFile(CFID.toString(), steps, plasmidName.toString(), sequences);
-//    }
-    
+
     
     public void initiate() {
     }
@@ -65,17 +38,38 @@ public class ParseConstructionFile {
         ChangeableString CFID = new ChangeableString("");
         // Split the raw text into the steps and sequences section
         
-        int stepSym = rawText.indexOf(">");
-        String rawText1 = rawText.substring(stepSym+1,rawText.length());
-        int seqSym = rawText1.indexOf(">");
+//        int stepSym = rawText.indexOf(">");
+//        String rawText1 = rawText.substring(stepSym+1,rawText.length());
+//        int seqSym = rawText1.indexOf(">");
         //String[] sections = rawText.split("\\>");
         
+        String[] lines = rawText.split("\n");
+        int seqStart = 0;
+        StringBuilder stepSecSB = new StringBuilder();
         
-        //step section without starting >
-        String stepSection = rawText1.substring(0,seqSym-1);
-        //seq section with all >
-        String seqSection = rawText1.substring(seqSym,rawText.length()-1);
+        for(int i=0;i<lines.length-2;i++){
+            
+            if(lines[i+2].matches("[ATCGatcg]+")){
+                break;
+            }else{
+                
+                stepSecSB.append(lines[i]);
+                stepSecSB.append("\n");
+            }
+        }
         
+        
+        String stepSection = stepSecSB.toString();
+        int start = stepSection.length();
+//        stepSection = stepSection.replace(">", "");
+        String seqSection = rawText.substring(start);
+        
+        
+//        //step section without starting >
+//        String stepSection = rawText1.substring(0,seqSym-1);
+//        //seq section with all >
+//        String seqSection = rawText1.substring(seqSym,rawText.length()-1);
+//        
         
         
         processSteps(stepSection, CFID, plasmidName, steps);
@@ -113,7 +107,7 @@ public class ParseConstructionFile {
         plasmidName.changeTo(lines[0].split("\\s+")[1]);
 
         //Process each good line
-        for (int i = 1; i < lines.length; i++) {
+        for (int i = 0; i < lines.length; i++) {
             String aline = lines[i];
 
             //Ignore blank lines
@@ -129,6 +123,11 @@ public class ParseConstructionFile {
             //Parse out the construction file ID
             if (aline.startsWith("ID")) {
                 CFID.changeTo(aline.split("\\s+")[1]);
+                continue;
+            }
+            
+            //Ignore title
+            if (aline.toLowerCase().startsWith(">")){
                 continue;
             }
 
@@ -163,84 +162,98 @@ public class ParseConstructionFile {
 
     private void processSequences(String seqSection, HashMap<String, String> sequences){
         //Break it into lines
-//        String[] seqSections = rawText.split(">");        
-//        
+////        String[] seqSections = rawText.split(">");        
+////        
+////        for (int i = 1; i < seqSections.length; i++) {        
+////          
+////            String currSection = seqSections[i];
+////            
+////            // Ignore blank lines
+////            if (currSection.trim().isEmpty()) {                
+////                          
+////                continue;
+////            }
+////            // Ignore commented-out lines
+////            if (currSection.startsWith("//")) {
+////                continue;
+////            }
+////            // Split the sequence section by the newline character
+////            currSection = currSection.replaceAll("\r", "\n");
+////            currSection = currSection.replaceAll("\t", "");
+////            String[] splitSection = currSection.split("\n");
+////            String seqName = splitSection[0].split(" ")[0];
+////            String seqContents = "";
+////            for (int j = 1; j < splitSection.length; j++) {
+////                seqContents = seqContents.concat(splitSection[j]);
+////            }
+////            // Save to the sequences dictionary
+////            sequences.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContents.replaceAll("(\\r|\\n|\\s)", ""));
+////        }
 //
-//        
-//        for (int i = 1; i < seqSections.length; i++) {        
-//        
+//        String[] seqSections = seqSection.split(">");
+//
+//        for (int i = 1; i < seqSections.length; i++) {
 //    
 //            String currSection = seqSections[i];
 //            
-//            // Ignore blank lines
-//            if (currSection.trim().isEmpty()) {                
+//            String[] currSecLn = currSection.split("\n");
+//                       
+////            for (int i1 = 0; i<currSecLn.length; i1++){
+////                // Ignore blank lines
+////                if (currSecLn[i1].trim().isEmpty() == true) {
+////                //currSecLn[i1] = null;
+////                continue;
+////                }
+////                // Ignore commented-out lines
+////                if (currSecLn[i1].startsWith("//") == true) {
+////                //currSecLn[i1] = null;
+////                continue;
+////                }
+////                
+////            }
+//                    
+//            String seqName = currSecLn[0];
+//            String seqContents = currSecLn[1];
+//            sequences.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContents.replaceAll("(\\r|\\n|\\s)", ""));
 //            
-//                
-//                continue;
-//            }
-//            // Ignore commented-out lines
-//            if (currSection.startsWith("//")) {
-//                continue;
-//            }
 //            // Split the sequence section by the newline character
-//            currSection = currSection.replaceAll("\r", "\n");
-//            currSection = currSection.replaceAll("\t", "");
-//            String[] splitSection = currSection.split("\n");
-//            String seqName = splitSection[0].split(" ")[0];
-//            String seqContents = "";
-//            for (int j = 1; j < splitSection.length; j++) {
-//                seqContents = seqContents.concat(splitSection[j]);
-//            }
-//            // Save to the sequences dictionary
-//            sequences.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContents.replaceAll("(\\r|\\n|\\s)", ""));
+////            currSection = currSection.replaceAll("\r", "\n");
+////            currSection = currSection.replaceAll("\t", "");
+////            String[] splitSection = currSection.split("\n");
+////            String seqName = splitSection[0].split(" ")[0];
+////            String seqContents = "";
+////            for (int j = 1; j < splitSection.length; j++) {
+////                seqContents = seqContents.concat(splitSection[j]);
+////            }
+////            // Save to the sequences dictionary
+////            sequences.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContents.replaceAll("(\\r|\\n|\\s)", ""));
+////        
 //        }
-
-
-
-
-        String[] seqSections = seqSection.split(">");
-
-        for (int i = 1; i < seqSections.length; i++) {
-    
-            String currSection = seqSections[i];
+        
+        
+        String[] lines = seqSection.split("\n");
+        
+        for(int j=0;j<lines.length-1;j++){
             
-            String[] currSecLn = currSection.split("\n");
-            
-//            
-//            
-//            for (int i1 = 0; i<currSecLn.length; i1++){
-//                // Ignore blank lines
-//                if (currSecLn[i1].trim().isEmpty() == true) {
-//                //currSecLn[i1] = null;
-//                continue;
-//                }
-//                // Ignore commented-out lines
-//                if (currSecLn[i1].startsWith("//") == true) {
-//                //currSecLn[i1] = null;
-//                continue;
-//                }
-//                
-//            }
-            
-           
-            String seqName = currSecLn[0];
-            String seqContents = currSecLn[1];
-            sequences.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContents.replaceAll("(\\r|\\n|\\s)", ""));
+            //Ignore blank lines
+            if (lines[j].trim().isEmpty()) {
+                continue;
+            }
 
-            
-            // Split the sequence section by the newline character
-//            currSection = currSection.replaceAll("\r", "\n");
-//            currSection = currSection.replaceAll("\t", "");
-//            String[] splitSection = currSection.split("\n");
-//            String seqName = splitSection[0].split(" ")[0];
-//            String seqContents = "";
-//            for (int j = 1; j < splitSection.length; j++) {
-//                seqContents = seqContents.concat(splitSection[j]);
-//            }
-//            // Save to the sequences dictionary
-//            sequences.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContents.replaceAll("(\\r|\\n|\\s)", ""));
-//        
+            //Ignore commented-out lines
+            if (lines[j].startsWith("//")) {
+                continue;
+            }
+            if(lines[j].matches("[ATCGatcg]+") == false && lines[j+1].matches("[ATCGatcg]+")){
+                String seqName = lines[j].replace(">", "");
+                String seqContent = lines[j+1];
+                sequences.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContent.replaceAll("(\\r|\\n|\\s)", ""));
+
+                
+            }
         }
+        
+        
     }
 
     private Step parseLine(Operation op, String[] spaces, String plasmidName) {
