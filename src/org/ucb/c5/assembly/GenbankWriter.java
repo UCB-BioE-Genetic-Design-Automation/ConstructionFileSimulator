@@ -22,8 +22,8 @@ public class GenbankWriter {
     /**
      * 
      * @param sequence  The DNA sequence of a plasmid
-     * @param annotations Map from feature label to start and end positions
-     * @param filepath  Where to write the genbank file
+     * @param annotations a list of features and their start and end on the sequence
+     * @param filepath  Where to write the genbank file and its file name
      * @throws Exception 
      */
     public String run(String sequence, List<Annotation> annotations, String filepath) throws Exception {

@@ -26,9 +26,22 @@ public class AutoAnnotate {
         gbwriter = new GenbankWriter();
         RevComp rc = new RevComp();
         rc.initiate();
+
+        //Read in directory locations
+        Map<String,String> fileLocations = new HashMap<>();
+        try {
+            String data2 = FileUtils.readFile("data_pathss.txt");
+            String[] lines = data2.split("\\r|\\r?\\n");
+            for (String line : lines) {
+                String[] tabs = line.split("\t");
+                fileLocations.put(tabs[0], tabs[1]);
+            }
+        } catch (Exception err) {
+            System.exit(0);
+        }
         
         features = new HashMap<>();
-        String data = FileUtils.readFile("/Users/jca20n/Pimar/sequences/Pimar_Features.txt");
+        String data = FileUtils.readFile(fileLocations.get("default_features"));
         String[] lines = data.split("\\r|\\r?\\n");
         for(String line : lines) {
             String[] tabs = line.split("\t");
