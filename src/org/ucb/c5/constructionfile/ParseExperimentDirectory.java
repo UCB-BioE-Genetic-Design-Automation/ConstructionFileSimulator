@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import org.ucb.c5.constructionfile.model.ConstructionFile;
+import org.ucb.c5.constructionfile.model.Experiment;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 import org.ucb.c5.utils.FileUtils;
 
@@ -17,14 +18,16 @@ import org.ucb.c5.utils.FileUtils;
  *
  * @author Zihang Shao
  */
-public class ParseFolderConstructionFile {
+public class ParseExperimentDirectory {
 
     public void initiate() {
     }
 
-    public void run(String dirPath, List<ConstructionFile> cfs, Map<String, Polynucleotide> nameToSequencing) throws Exception {
+    public Experiment run(String dirPath) throws Exception {
         File dir = new File(dirPath);
         List<File> files = new ArrayList<>();
+        List<ConstructionFile> cfs = new ArrayList<>();
+        Map<String, Polynucleotide> nameToPoly = new HashMap<>();
 
         //Handle sub-directory
         List<File> filesParse = parseDirectory(dir, files);
@@ -34,9 +37,11 @@ public class ParseFolderConstructionFile {
             if (file.getName().toLowerCase().startsWith("construction")) {
                 cfs.add(runCF(file));
             } else {
-                nameToSequencing.putAll(runSeq(file));
+                nameToPoly.putAll(runSeq(file));
             }
         }
+        
+        return new Experiment(dir.getName(), cfs, nameToPoly);
     }
 
     //Recursive folder parser
@@ -121,16 +126,13 @@ public class ParseFolderConstructionFile {
         String dirPath = "/Users/jca20n/Pimar/experiments/2020_02_04-Lycopene6";
 
         //initiate
-        ParseFolderConstructionFile parseFolder = new ParseFolderConstructionFile();
+        ParseExperimentDirectory parseFolder = new ParseExperimentDirectory();
         parseFolder.initiate();
 
-        Map<String, Polynucleotide> NtoS = new HashMap<>();
-        List<ConstructionFile> CFiles = new ArrayList<>();
-
-        parseFolder.run(dirPath, CFiles, NtoS);
+        Experiment exp = parseFolder.run(dirPath);
 
         //for debug
-        System.out.print(CFiles);
+        System.out.print(exp);
     }
 
 }

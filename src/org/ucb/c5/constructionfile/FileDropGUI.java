@@ -28,13 +28,10 @@ public class FileDropGUI extends javax.swing.JFrame {
                         String dirPath = files[i].getCanonicalPath();
                         System.out.println(dirPath);
       
-                        ParseFolderConstructionFile parseFolder = new ParseFolderConstructionFile();
+                        ParseExperimentDirectory parseFolder = new ParseExperimentDirectory();
                         parseFolder.initiate();
 
-                        Map<String, Polynucleotide> NtoS = new HashMap<>();
-                        List<ConstructionFile> CFiles = new ArrayList<>();
-
-                        parseFolder.run(dirPath, CFiles, NtoS);
+                        parseFolder.run(dirPath);
                     } catch (Exception ex) {
                     }
                 }   // end for: through each dropped file
