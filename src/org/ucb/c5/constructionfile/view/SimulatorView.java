@@ -8,12 +8,18 @@ import org.ucb.c5.constructionfile.model.Polynucleotide;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.JFileChooser;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
-import static javax.swing.text.StyleConstants.TabSet;
 import javax.swing.text.TabSet;
 import javax.swing.text.TabStop;
+import org.ucb.c5.utils.FileUtils;
 
 /**
  *
@@ -21,12 +27,73 @@ import javax.swing.text.TabStop;
  * @edit Zihang Shao
  */
 public class SimulatorView extends javax.swing.JFrame {
+    
 
     /**
      * Creates new form SimulatorView
      */
     public SimulatorView() {
         initComponents();
+        setVisible(true);
+//        
+//        //Find locations of sequence data and ApE Features
+//        String apefeaturesFile = null;
+//        String seqFileDir = null;
+//        
+//        try {
+//            //Load sequence location info
+//            String data = FileUtils.readFile("SequenceLocals.txt");
+//            String[] lines = data.split("\\r|\\r?\\n");
+//            apefeaturesFile = lines[0];
+//            seqFileDir = lines[1];
+//        } catch (Exception ex) {
+//            //OK to fail
+//        }
+//        
+//        //Ask for locations using a dialog if didn't find them
+//        boolean dosave = false;
+//        if (apefeaturesFile == null) {
+//            JFileChooser jFileChooser = new JFileChooser();
+//            jFileChooser.setCurrentDirectory(new File("C:\\"));
+//            jFileChooser.setDialogTitle("Locate the ApE feature file");
+//
+//            int result = jFileChooser.showOpenDialog(this);
+//
+//            if (result == JFileChooser.APPROVE_OPTION) {
+//                File selectedFile = jFileChooser.getSelectedFile();
+//                apefeaturesFile = selectedFile.getAbsolutePath();
+//                dosave = true;
+//            } else {
+//                System.exit(0);
+//            }
+//        }
+//        
+//        if(seqFileDir == null) {
+//            JFileChooser jFileChooser = new JFileChooser();
+//            jFileChooser.setCurrentDirectory(new File("C:\\"));
+//            jFileChooser.setDialogTitle("Locate the root of sequence files");
+//            jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+//
+//            int result = jFileChooser.showOpenDialog(this);
+//
+//            if (result == JFileChooser.APPROVE_OPTION) {
+//                File selectedFile = jFileChooser.getSelectedFile();
+//                seqFileDir = selectedFile.getAbsolutePath();
+//                dosave = true;
+//            } else {
+//                System.exit(0);
+//            }
+//        }
+//
+//        if(dosave == true) {
+//            String towrite = apefeaturesFile + "\n" + seqFileDir;
+//            FileUtils.writeFile(towrite, "SequenceLocals.txt");
+//        }
+//        
+//        //Parse all the .seq, ape, and .gb files for sequence
+//        Map<String,String> apeSequence = findApeFiles(seqFileDir);
+//        
+////TODO:  need to put all the sequences found in the cf somehow
 
         int w = cfPane.getFontMetrics(cfPane.getFont()).charWidth(' ');
         TabStop[] stops = {new TabStop(w * 40)};
@@ -303,7 +370,7 @@ public class SimulatorView extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new SimulatorView().setVisible(true);
+                new SimulatorView();
             }
         });
     }
@@ -317,4 +384,52 @@ public class SimulatorView extends javax.swing.JFrame {
     private javax.swing.JTextArea resultArea;
     private javax.swing.JButton runBtn;
     // End of variables declaration//GEN-END:variables
+
+    /**Recursively traverse the supplied dir and find all sequence files
+     * 
+     * @param dir
+     * @return 
+     */
+    private Map<String, String> findApeFiles(String dir) {
+        List<File> seqfiles = new ArrayList<>();
+        seqfiles = walk(seqfiles, dir);
+        
+        //Parse each sequence
+        Map<String,String> out = new HashMap<>();
+        for(File f : seqfiles) {
+            try {
+                String gb = FileUtils.readFile(f.getAbsolutePath());
+                String[] regions = gb.split("ORIGIN");
+                String seqmess = regions[1].toUpperCase();
+                String seq = seqmess.replaceAll("[^ATCGN]", "");
+                String[] persplit = f.getName().split("\\.");
+                out.put(persplit[0], seq);
+            } catch (Exception ex) {
+                System.err.println("error reading " + f);
+            }
+        }
+        return out;
+    }
+    
+    public List<File> walk(List<File> seqfiles, String path ) {
+        File root = new File( path );
+        File[] list = root.listFiles();
+
+        if (list == null) return seqfiles;
+
+        for ( File f : list ) {
+            if ( f.isDirectory() ) {
+                walk(seqfiles, f.getAbsolutePath() );
+            }
+            else {
+                //Gets here if f is a file
+                String filepath = f.getAbsolutePath();
+                if(filepath.endsWith(".seq") || filepath.endsWith(".ape") || filepath.endsWith(".gb") || filepath.endsWith(".gbk") || filepath.endsWith(".gk")) {
+                    seqfiles.add(f);
+//                    System.out.println("added " + filepath);
+                }
+            }
+        }
+        return seqfiles;
+    }
 }

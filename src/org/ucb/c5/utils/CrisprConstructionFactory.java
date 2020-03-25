@@ -57,7 +57,7 @@ public class CrisprConstructionFactory {
         steps.add(new Transformation("lig", strain, antibiotic, pdtName));
         
         //Instantiate the Construction File
-        ConstructionFile constf = new ConstructionFile("ID", steps, "pdt", null);
+        ConstructionFile constf = new ConstructionFile(steps, "pdt", null);
         return constf;
     }
     

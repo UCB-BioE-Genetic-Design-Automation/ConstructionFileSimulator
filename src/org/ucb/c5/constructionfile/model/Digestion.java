@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @author J. Christopher Anderson
  */
-public class Digestion extends Step {
+public class Digestion implements Step {
     private final String substrate;
     private final List<Enzyme> enzymes;
     private final String product;
@@ -18,7 +18,6 @@ public class Digestion extends Step {
         this.product = product;
         List<String> substrates = new ArrayList<>();
         substrates.add(substrate);
-        this.setSubstrates(substrates);
     }
     
     public List<Enzyme> getEnzymes() {

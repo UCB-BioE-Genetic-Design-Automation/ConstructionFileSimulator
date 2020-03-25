@@ -28,7 +28,7 @@ public class SimulateConstructionFile {
     }
 
     public Polynucleotide run(ConstructionFile CF) throws Exception {
-        Map<String, String> CFMap = CF.getSequences();
+        Map<String, Polynucleotide> CFMap = CF.getSequences();
         Map<String, Polynucleotide> fragments = new HashMap<>(); // Map with all of the intermediate polypeptides
         for (Step step : CF.getSteps()) {
             processStep(step, CFMap, fragments, CF.getPdtName());
@@ -39,7 +39,7 @@ public class SimulateConstructionFile {
     }
 
     // Process an individual step
-    private void processStep(Step step, Map<String, String> CFMap, Map<String, Polynucleotide> fragments, String pdtName) throws Exception {
+    private void processStep(Step step, Map<String, Polynucleotide> CFMap, Map<String, Polynucleotide> fragments, String pdtName) throws Exception {
         switch (step.getOperation()) {
             case acquire:
                 simulateAcquisition((Acquisition) step, CFMap, fragments);
@@ -77,10 +77,10 @@ public class SimulateConstructionFile {
 
     // Load the specified name into the local dictionary from the global CF dictionary so the sequence can be found
     // This should be a check that there is a polypeptide in the dictionary that matches the specified name, otherwise throw error
-    private void simulateAcquisition(Acquisition acquisition, Map<String, String> CFMap, Map<String, Polynucleotide> fragments) throws Exception{
+    private void simulateAcquisition(Acquisition acquisition, Map<String, Polynucleotide> CFMap, Map<String, Polynucleotide> fragments) throws Exception{
         String dnaName = acquisition.getProduct();
         if (CFMap.containsKey(dnaName)) {
-            fragments.put(dnaName, new Polynucleotide(CFMap.get(dnaName)));
+            fragments.put(dnaName, CFMap.get(dnaName));
         }
         else {
             throw new Exception("There is an acquire statement that references a polypeptide sequence not provided in the construction file");

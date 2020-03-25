@@ -10,7 +10,7 @@ package org.ucb.c5.constructionfile.model;
  *
  * @author J. Christopher Anderson
  */
-public class PCR extends Step {
+public class PCR implements Step {
     //Loose-coupled references by name
     private final String oligo1;
     private final String oligo2;

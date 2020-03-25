@@ -6,7 +6,7 @@ import java.util.List;
  *
  * @author J. Christopher Anderson
  */
-public class PCA extends Step {
+public class PCA implements Step {
     //Loose-coupled references by name
     private final List<String> oligoPool;
     private final String product;

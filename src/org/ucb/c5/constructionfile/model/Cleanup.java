@@ -14,7 +14,7 @@
 // * @author J. Christopher Anderson
 // * @author lucaskampman
 // */
-//public class Cleanup extends Step {
+//public class Cleanup implements Step {
 //    private final String Digproduct;
 //    private final String CleanedUp;
 //    

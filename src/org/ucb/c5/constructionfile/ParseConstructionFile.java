@@ -2,9 +2,6 @@ package org.ucb.c5.constructionfile;
 
 import org.ucb.c5.constructionfile.model.*;
 import org.ucb.c5.utils.FileUtils;
-import org.ucb.c5.utils.ChangeableString;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,78 +13,59 @@ import java.util.List;
  * @author J. Christopher Anderson
  * @rewritten by Connor Tou, Zexuan Zhao
  * @rewritten by Zihang Shao
- * New thing for steps: after instantiate a step...
- * 1. set previous step, which is the direct previous step in CF in a linear order
- * 2. populate parental steps, which generate a tree relationship of steps in a CF (not visualizable)
- * 3. set stepID, which is a concatenation of CFID and it's position in the CF
- *
  */
 public class ParseConstructionFile {
+    public void initiate() { }
 
-    
-    public void initiate() {
-    }
-    
-    
     public ConstructionFile run(String rawText) throws Exception {
         // Create a map to store given sequences and a list to store the steps
-        HashMap<String, String> sequences = new HashMap<>();
+        HashMap<String, Polynucleotide> sequences = new HashMap<>();
         List<Step> steps = new ArrayList<>();
-        // Initiate CFID and plasmidName
-        ChangeableString plasmidName = new ChangeableString("");
-        ChangeableString CFID = new ChangeableString("");
-        // Split the raw text into the steps and sequences section
         
-//        int stepSym = rawText.indexOf(">");
-//        String rawText1 = rawText.substring(stepSym+1,rawText.length());
-//        int seqSym = rawText1.indexOf(">");
-        //String[] sections = rawText.split("\\>");
-        
-        String[] lines = rawText.split("\n");
-        int seqStart = 0;
-        StringBuilder stepSecSB = new StringBuilder();
-        
-        for(int i=0;i<lines.length-2;i++){
-            
-            if(lines[i+2].matches("[ATCGatcg]+")){
-                break;
-            }else{
-                
-                stepSecSB.append(lines[i]);
-                stepSecSB.append("\n");
+        //Handle when a dividing line separates cf and seqs
+        String[] underSplit = rawText.split("(-)\\1{3,}");
+        if(underSplit.length == 2) {
+            try {
+                processSequences(underSplit[1], sequences);
+            } catch(Exception err) {
+                throw new IllegalArgumentException("Could not parse sequences below the line:\n" + underSplit[1]);
             }
+            try {
+                processSteps(underSplit[0], steps);
+            } catch(Exception err) {
+                throw new IllegalArgumentException("Could not parse steps above the line:\n" + underSplit[0]);
+            }
+            String plasmidName = steps.get(steps.size()-1).getProduct();
+            return new ConstructionFile(steps, plasmidName, sequences);
+        }
+
+        //Handle when a > designates boundary
+        int gtLocus = rawText.indexOf(">", 1);
+        if(gtLocus > -1) {
+            String stepSection = rawText.substring(0,gtLocus);
+            String seqSection = rawText.substring(gtLocus);
+            try {
+                processSteps(stepSection, steps);
+            } catch(Exception err) {
+                throw new IllegalArgumentException("Could not parse steps before fasta in:\n" + stepSection);
+            }
+            try {
+                processSequences(seqSection, sequences);
+            } catch (Exception err) {
+                throw new IllegalArgumentException("Could not parse fasta in:\n" + seqSection);
+            }
+            String plasmidName = steps.get(steps.size()-1).getProduct();
+            return new ConstructionFile(steps, plasmidName, sequences);
         }
         
-        
-        String stepSection = stepSecSB.toString();
-        int start = stepSection.length();
-//        stepSection = stepSection.replace(">", "");
-        String seqSection = rawText.substring(start);
-        
-        
-//        //step section without starting >
-//        String stepSection = rawText1.substring(0,seqSym-1);
-//        //seq section with all >
-//        String seqSection = rawText1.substring(seqSym,rawText.length()-1);
-//        
-        
-        
-        processSteps(stepSection, CFID, plasmidName, steps);
-        processSequences(seqSection, sequences);
-        return new ConstructionFile(CFID.toString(), steps, plasmidName.toString(), sequences);
+        //Handle if no sequences are provided
+        String stepSection = rawText;
+        processSteps(stepSection, steps);
+        String plasmidName = steps.get(steps.size()-1).getProduct();
+        return new ConstructionFile(steps, plasmidName, sequences);
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
-    private void processSteps(String rawText, ChangeableString CFID, ChangeableString plasmidName, List<Step> steps) throws Exception {
+    private void processSteps(String rawText, List<Step> steps) throws Exception {
         //Replace common unnessary words
         String text = rawText.replace("to ", "");
         text = text.replace("from ", "");
@@ -102,9 +80,7 @@ public class ParseConstructionFile {
         text = text.replaceAll("\t", " ");
 
         //Break it into lines
-        String[] lines = text.split("\n");
-        //Parse out the name of the plasmid
-        plasmidName.changeTo(lines[0].split("\\s+")[1]);
+        String[] lines = text.split("\\r|\\r?\\n");
 
         //Process each good line
         for (int i = 0; i < lines.length; i++) {
@@ -119,12 +95,6 @@ public class ParseConstructionFile {
             if (aline.startsWith("//")) {
                 continue;
             }
-
-            //Parse out the construction file ID
-            if (aline.startsWith("ID")) {
-                CFID.changeTo(aline.split("\\s+")[1]);
-                continue;
-            }
             
             //Ignore title
             if (aline.toLowerCase().startsWith(">")){
@@ -133,130 +103,87 @@ public class ParseConstructionFile {
 
             //Try to parse the operation, if fails will throw Exception
             String[] spaces = aline.split("\\s+");
+            String sop = spaces[0].toLowerCase();
+            if(sop.equals("cleanup")) {
+                continue;
+            }
+            
             Operation op;
             try {
-                op = Operation.valueOf(spaces[0]);
+                op = Operation.valueOf(sop);
+            } catch(Exception err) {
+                throw new IllegalArgumentException("Unable to parse operation: " + sop);
             }
-            catch(Exception IllegalArgumentException) {
-                op = Operation.valueOf(spaces[0].toLowerCase());
-            }
-            //If past the gauntlet, keep the line
-            Step parsedStep = parseLine(op, spaces, plasmidName.toString());
-            parsedStep.set_str(aline);
-            parsedStep.setSessionID("_");
-            steps.add(parsedStep);
-        }
-        /*
-        if(CFID.equals("")){
-            throw new Exception("No CFID");
-        } */
-        //set Step ID and previous Step
-        /* for (int i = 0; i < steps.size(); i++){
-            steps.get(i).setStepID(CFID + String.valueOf(i));
-            if(i >0){
-                steps.get(i).setPreviousStep(steps.get(i-1));
-            }
-            steps.get(i).populateParentSteps();
-        } */
-    }
-
-    private void processSequences(String seqSection, HashMap<String, String> sequences){
-        //Break it into lines
-////        String[] seqSections = rawText.split(">");        
-////        
-////        for (int i = 1; i < seqSections.length; i++) {        
-////          
-////            String currSection = seqSections[i];
-////            
-////            // Ignore blank lines
-////            if (currSection.trim().isEmpty()) {                
-////                          
-////                continue;
-////            }
-////            // Ignore commented-out lines
-////            if (currSection.startsWith("//")) {
-////                continue;
-////            }
-////            // Split the sequence section by the newline character
-////            currSection = currSection.replaceAll("\r", "\n");
-////            currSection = currSection.replaceAll("\t", "");
-////            String[] splitSection = currSection.split("\n");
-////            String seqName = splitSection[0].split(" ")[0];
-////            String seqContents = "";
-////            for (int j = 1; j < splitSection.length; j++) {
-////                seqContents = seqContents.concat(splitSection[j]);
-////            }
-////            // Save to the sequences dictionary
-////            sequences.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContents.replaceAll("(\\r|\\n|\\s)", ""));
-////        }
-//
-//        String[] seqSections = seqSection.split(">");
-//
-//        for (int i = 1; i < seqSections.length; i++) {
-//    
-//            String currSection = seqSections[i];
-//            
-//            String[] currSecLn = currSection.split("\n");
-//                       
-////            for (int i1 = 0; i<currSecLn.length; i1++){
-////                // Ignore blank lines
-////                if (currSecLn[i1].trim().isEmpty() == true) {
-////                //currSecLn[i1] = null;
-////                continue;
-////                }
-////                // Ignore commented-out lines
-////                if (currSecLn[i1].startsWith("//") == true) {
-////                //currSecLn[i1] = null;
-////                continue;
-////                }
-////                
-////            }
-//                    
-//            String seqName = currSecLn[0];
-//            String seqContents = currSecLn[1];
-//            sequences.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContents.replaceAll("(\\r|\\n|\\s)", ""));
-//            
-//            // Split the sequence section by the newline character
-////            currSection = currSection.replaceAll("\r", "\n");
-////            currSection = currSection.replaceAll("\t", "");
-////            String[] splitSection = currSection.split("\n");
-////            String seqName = splitSection[0].split(" ")[0];
-////            String seqContents = "";
-////            for (int j = 1; j < splitSection.length; j++) {
-////                seqContents = seqContents.concat(splitSection[j]);
-////            }
-////            // Save to the sequences dictionary
-////            sequences.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContents.replaceAll("(\\r|\\n|\\s)", ""));
-////        
-//        }
-        
-        
-        String[] lines = seqSection.split("\n");
-        
-        for(int j=0;j<lines.length-1;j++){
             
-            //Ignore blank lines
-            if (lines[j].trim().isEmpty()) {
-                continue;
+            //If past the gauntlet, keep the line
+            try {
+                Step parsedStep = parseLine(op, spaces);
+                steps.add(parsedStep);
+            } catch(Exception err) {
+                err.printStackTrace();
+                throw new IllegalArgumentException("Could not parse the line:\n" + aline + "\nin text:\n" + rawText);
             }
+        }
+    }
 
-            //Ignore commented-out lines
-            if (lines[j].startsWith("//")) {
-                continue;
-            }
-            if(lines[j].matches("[ATCGatcg]+") == false && lines[j+1].matches("[ATCGatcg]+")){
-                String seqName = lines[j].replace(">", "");
-                String seqContent = lines[j+1];
-                sequences.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContent.replaceAll("(\\r|\\n|\\s)", ""));
-
-                
+    private void processSequences(String seqSection, HashMap<String, Polynucleotide> sequences){
+        //Handle if it is a list of FASTA
+        if(seqSection.contains(">")) {
+            String[] fseqs = seqSection.split(">");
+            for(String f : fseqs) {
+                if(f.trim().isEmpty()) {
+                    continue;
+                }
+                String[] lines = f.trim().split("\\r|\\r?\\n");
+                String[] spaces = lines[0].split("\\s+");
+                String name = spaces[0];
+                String seq = lines[1];
+                if(!seq.toUpperCase().matches("[ATCG]+")) {
+                    throw new IllegalArgumentException("Sequence:\n" + seq + "\ncontains non-DNA sequences in:\n" + f);
+                }
+                sequences.put(name, createPoly(seq));
+                return;
             }
         }
         
-        
+        //Handle if it is in TSV
+        String[] lines = seqSection.split("\\r|\\r?\\n");
+            for (String line : lines) {
+                //Ignore blank lines
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
+
+                //Ignore commented-out lines
+                if (line.startsWith("//")) {
+                    continue;
+                }
+
+                String[] tabs = line.split("\t");
+                String name = tabs[0];
+                String seq = tabs[1];
+                if(!seq.toUpperCase().matches("[ATCG]+")) {
+                    throw new IllegalArgumentException("Sequence:\n" + seq + "\ncontains non-DNA sequences in:\n" + line);
+                }
+                sequences.put(name, createPoly(seq));
+                return;
+            }
+            
+        throw new IllegalArgumentException("Unable to parse sequences in:\n" + seqSection);
     }
 
-    private Step parseLine(Operation op, String[] spaces, String plasmidName) {
+    
+    private Polynucleotide createPoly(String seq) {
+        //If it's an oligo
+        if(seq.length() < 100) {
+            return new Polynucleotide(seq, "", "", false, false, false);
+        }
+        
+        //If it's a plasmid
+        return new Polynucleotide(seq, true);
+    }
+    
+    private Step parseLine(Operation op, String[] spaces) throws Exception {
         
         switch (op) {
             case pcr:
@@ -283,9 +210,15 @@ public class ParseConstructionFile {
                         spaces[1].split(","),
                         spaces[2]);
             case transform:
+                String plasmidName = null;
+                if(spaces.length>4) {
+                    plasmidName = spaces[4];
+                } else {
+                    plasmidName = spaces[1];
+                }
                 return createTransform(
                         spaces[1],
-                        spaces[2].replace(",", ""),
+                        spaces[2].replaceAll(",", ""),
                         spaces[3],
                         plasmidName);
             case acquire:
@@ -359,29 +292,11 @@ public class ParseConstructionFile {
     public static void main(String[] args) throws Exception {
         ParseConstructionFile pCF = new ParseConstructionFile();
         pCF.initiate();
-        String CFPath = System.getProperty("user.dir") + "/src/org/ucb/c5/constructionfile/data/pcrtest.txt";
-        File CFFile = new File(CFPath);
-        String text = FileUtils.readFile(CFFile.getAbsolutePath());
+        
+        String text = FileUtils.readResourceFile("constructionfile/data/Construction of aspC1.txt");
         ConstructionFile cf = pCF.run(text);
-        /*
-        String CFDir = System.getProperty("user.dir") + "/src/org/ucb/c5/Assigner/constructionfile/data";
-        System.out.println(CFDir);
-        ParseConstructionFile pCF = new ParseConstructionFile();
-        pCF.initiate();
-        File CFdir = new File(CFDir);
-        File[] CFfiles = CFdir.listFiles();
-        if (CFfiles != null) {
-            for (int i = 0; i < CFfiles.length; i++) {
-                if (CFfiles[i].getName().equals(".DS_Store")) {
-                    continue;
-                }
-                String text = FileUtils.readFile(CFfiles[i].getAbsolutePath());
-                ConstructionFile cf = pCF.run(text);
-                for (Step step : cf.getSteps()) {
-                    System.out.println(step.get_str() + ":");
-                    System.out.println(step.getSubstrates());
-                }
-            }
-        } */
+        
+        System.out.println(cf.toString());
     }
+
 }

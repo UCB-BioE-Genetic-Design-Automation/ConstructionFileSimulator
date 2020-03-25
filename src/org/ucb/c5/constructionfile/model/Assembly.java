@@ -7,7 +7,7 @@ import java.util.List;
 
  * @author J. Christopher Anderson
  */
-public class Assembly extends Step {
+public class Assembly implements Step {
     private final List<String> fragments;
     private final Enzyme enzyme;
     private final String product;

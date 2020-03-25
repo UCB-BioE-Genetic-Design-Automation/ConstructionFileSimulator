@@ -13,12 +13,10 @@ import java.util.Map;
 public class ConstructionFile {
     private final List<Step> steps;
     private String pdtName = null;
-    private final String ID;
-    private final Map<String, String> sequences;
+    private final Map<String, Polynucleotide> sequences;
 
 
-    public ConstructionFile(String ID, List<Step> steps, String pdtName, Map<String, String> sequences) {
-        this.ID = ID;
+    public ConstructionFile(List<Step> steps, String pdtName, Map<String, Polynucleotide> sequences) {
         this.steps = steps;
         this.pdtName = pdtName;
         this.sequences = sequences;
@@ -31,11 +29,7 @@ public class ConstructionFile {
         return pdtName;
     }
 
-    public String getID(){
-        return ID;
-    }
-
-    public Map<String, String> getSequences() {
+    public Map<String, Polynucleotide> getSequences() {
         return sequences;
     }
     
@@ -75,7 +69,7 @@ public class ConstructionFile {
         steps.add(new Transformation("lig", "DH10B", Antibiotic.Spec, pdtName));
 
         //Instantiate the Construction File
-        ConstructionFile constf = new ConstructionFile("ID", steps, "pdt", null);
+        ConstructionFile constf = new ConstructionFile(steps, "pdt", null);
         
         //Print it out
         for(Step astep : constf.getSteps()) {

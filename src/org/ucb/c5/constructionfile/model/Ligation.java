@@ -6,13 +6,12 @@ import java.util.List;
  *
  * @author J. Christopher Anderson
  */
-public class Ligation extends Step {
+public class Ligation implements Step {
     private final List<String> fragments;
     private final String product;
 
     public Ligation(List<String> fragments, String product) {
         this.fragments = fragments;
-        this.setSubstrates(fragments);
         this.product = product;
     }
 

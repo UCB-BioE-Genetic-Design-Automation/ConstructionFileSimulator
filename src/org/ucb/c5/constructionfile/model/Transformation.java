@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author J. Christopher Anderson
  */
-public class Transformation extends Step {
+public class Transformation implements Step {
 
     private final String dna;
     private final String strain;
@@ -26,7 +26,6 @@ public class Transformation extends Step {
         this.product = product;
         List<String> substrates = new ArrayList<>();
         substrates.add(dna);
-        this.setSubstrates(substrates);
     }
 
     public String getDna() {

@@ -4,7 +4,7 @@ package org.ucb.c5.constructionfile.model;
  *
  * @author J. Christopher Anderson
  */
-public class Acquisition extends Step {
+public class Acquisition implements Step {
     private final String dnaName;
     
     public Acquisition(String dnaName) {
