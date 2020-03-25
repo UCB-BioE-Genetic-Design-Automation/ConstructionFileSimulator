@@ -5,13 +5,13 @@
  */
 package org.ucb.c5.constructionfile;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import org.ucb.c5.constructionfile.model.ConstructionFile;
+import org.ucb.c5.constructionfile.model.Polynucleotide;
+import org.ucb.c5.utils.FileUtils;
 
 /**
  *
@@ -22,7 +22,7 @@ public class ParseFolderConstructionFile {
     public void initiate() {
     }
 
-    public void run(String dirPath, List<ConstructionFile> cfs, Map<String, String> nameToSequencing) throws Exception {
+    public void run(String dirPath, List<ConstructionFile> cfs, Map<String, Polynucleotide> nameToSequencing) throws Exception {
         File dir = new File(dirPath);
         List<File> files = new ArrayList<>();
 
@@ -32,30 +32,10 @@ public class ParseFolderConstructionFile {
         //Dispose files as cf or seq 
         for (File file : filesParse) {
             if (file.getName().toLowerCase().startsWith("construction")) {
-
                 cfs.add(runCF(file));
             } else {
                 nameToSequencing.putAll(runSeq(file));
             }
-        }
-    }
-
-    //File reader
-    String readFile(File file) throws IOException {
-        String filePath = file.getAbsolutePath();
-        BufferedReader br = new BufferedReader(new FileReader(filePath));
-        try {
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
-
-            while (line != null) {
-                sb.append(line);
-                sb.append("\n");
-                line = br.readLine();
-            }
-            return sb.toString();
-        } finally {
-            br.close();
         }
     }
 
@@ -74,7 +54,7 @@ public class ParseFolderConstructionFile {
 
     //Handle cf
     private ConstructionFile runCF(File afile) throws IOException, Exception {
-        String cfContent = readFile(afile);
+        String cfContent = FileUtils.readFile(afile.getAbsolutePath());
         ParseConstructionFile parseConstruction = new ParseConstructionFile();
         parseConstruction.initiate();
         try {
@@ -87,16 +67,16 @@ public class ParseFolderConstructionFile {
     }
 
     //Handle seq
-    private Map<String, String> runSeq(File afile) throws IOException {
+    private Map<String, Polynucleotide> runSeq(File afile) throws IOException, Exception {
 
-        Map<String, String> nameToSequencing = new HashMap<>();
+        Map<String, Polynucleotide> nameToPoly = new HashMap<>();
 
-        //read .txt or .tsv
+        //read .txt or .tsv files with oligo sequences
         if (afile.getName().endsWith(".txt") || afile.getName().endsWith(".tsv")) {
 
-            String fileContent = readFile(afile);
+            String fileContent = FileUtils.readFile(afile.getAbsolutePath());
 
-            String[] byLine = fileContent.split("\n");
+            String[] byLine = fileContent.split("\\r|\\r?\\n");
             for (String str : byLine) {
 
                 //Ignore blank lines
@@ -109,45 +89,30 @@ public class ParseFolderConstructionFile {
                     continue;
                 }
 
-                String[] str2 = str.split("(\\r|\\n|\\s)");
-                StringBuilder sb2 = new StringBuilder();
-
-                for (String str3 : str2) {
-                    //ignore ""
-                    if (str3.trim().isEmpty()) {
-                        continue;
-                    }
-                    //ignore comments
-                    if (str3.startsWith("//")) {
-                        continue;
-                    }
-                    sb2.append(str3);
-                    sb2.append("\n");
+                String[] tabs = str.split("\t");
+                String name = tabs[0];
+                String seq = tabs[1];
+                if(!seq.matches("[ATCGatcg]+")) {
+                    throw new Exception("Oligo file has non-DNA sequence:\n" + seq);
                 }
-                String[] strNew = sb2.toString().split("\n");
-
-                if (strNew[1].matches("[ATCGatcg]+")) {
-                    String seqName = strNew[0];
-                    String seqContent = strNew[1];
-                    nameToSequencing.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContent.replaceAll("(\\r|\\n|\\s)", ""));
-                }
+                nameToPoly.put(name, new Polynucleotide(seq, "", "", false, false, false));
             }
         }
 
         //Handle .ape .seq .str or .gb
         if (afile.getName().endsWith(".ape") || afile.getName().endsWith(".seq") || afile.getName().endsWith(".str") || afile.getName().endsWith(".gb")) {
 
-            String fileContent = readFile(afile);
+            String fileContent = FileUtils.readFile(afile.getAbsolutePath());
             String seqName = afile.getName();
 
             int origin = fileContent.lastIndexOf("ORIGIN");
 
             String rawSeq = fileContent.substring(origin + 6);
-            String seqContent = rawSeq.replaceAll("[^A-za-z ]", "");
+            String seqContent = rawSeq.replaceAll("[^A-za-z]", "");
 
-            nameToSequencing.put(seqName.replaceAll("(\\r|\\n|\\s)", ""), seqContent.replaceAll("(\\r|\\n|\\s)", ""));
+            nameToPoly.put(seqName, new Polynucleotide(seqContent, true));
         }
-        return nameToSequencing;
+        return nameToPoly;
     }
 
     public static void main(String args[]) throws Exception {
@@ -159,7 +124,7 @@ public class ParseFolderConstructionFile {
         ParseFolderConstructionFile parseFolder = new ParseFolderConstructionFile();
         parseFolder.initiate();
 
-        Map<String, String> NtoS = new HashMap<>();
+        Map<String, Polynucleotide> NtoS = new HashMap<>();
         List<ConstructionFile> CFiles = new ArrayList<>();
 
         parseFolder.run(dirPath, CFiles, NtoS);

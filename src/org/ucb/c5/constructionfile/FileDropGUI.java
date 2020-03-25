@@ -5,12 +5,12 @@
  */
 package org.ucb.c5.constructionfile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.ucb.c5.constructionfile.model.ConstructionFile;
+import org.ucb.c5.constructionfile.model.Polynucleotide;
 
 /**
  *
@@ -31,7 +31,7 @@ public class FileDropGUI extends javax.swing.JFrame {
                         ParseFolderConstructionFile parseFolder = new ParseFolderConstructionFile();
                         parseFolder.initiate();
 
-                        Map<String, String> NtoS = new HashMap<>();
+                        Map<String, Polynucleotide> NtoS = new HashMap<>();
                         List<ConstructionFile> CFiles = new ArrayList<>();
 
                         parseFolder.run(dirPath, CFiles, NtoS);
