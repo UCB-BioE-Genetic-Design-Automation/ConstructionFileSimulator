@@ -315,7 +315,7 @@ public class SimulatorView extends javax.swing.JFrame {
         Polynucleotide result;
         try {
             ConstructionFile cf = parseConstructionFile.run(cfText);
-            result = simulateConstructionFile.run(cf);
+            result = simulateConstructionFile.run(cf, new HashMap<>());
             resultArea.setText(result.getSequence());
         }
         catch (Exception e){

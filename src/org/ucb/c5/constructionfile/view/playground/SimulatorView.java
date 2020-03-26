@@ -8,6 +8,7 @@ import org.ucb.c5.constructionfile.model.Polynucleotide;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.util.HashMap;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -817,7 +818,7 @@ public class SimulatorView extends javax.swing.JFrame {
         Polynucleotide result;
         try {
             ConstructionFile cf = parseConstructionFile.run(cfText);
-            result = simulateConstructionFile.run(cf);
+            result = simulateConstructionFile.run(cf, new HashMap<>());
             resultArea.setText(result.getSequence());
         }
         catch (Exception e){

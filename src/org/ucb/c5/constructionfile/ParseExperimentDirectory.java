@@ -41,7 +41,7 @@ public class ParseExperimentDirectory {
             }
         }
         
-        return new Experiment(dir.getName(), cfs, nameToPoly);
+        return new Experiment(dir.getAbsolutePath(), cfs, nameToPoly);
     }
 
     //Recursive folder parser
@@ -108,7 +108,8 @@ public class ParseExperimentDirectory {
         if (afile.getName().endsWith(".ape") || afile.getName().endsWith(".seq") || afile.getName().endsWith(".str") || afile.getName().endsWith(".gb")) {
 
             String fileContent = FileUtils.readFile(afile.getAbsolutePath());
-            String seqName = afile.getName();
+            String filename = afile.getName();
+            String seqName = filename.substring(0, filename.length()-4);
 
             int origin = fileContent.lastIndexOf("ORIGIN");
 

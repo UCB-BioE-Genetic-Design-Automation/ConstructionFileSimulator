@@ -7,29 +7,21 @@ import org.ucb.c5.constructionfile.simulators.PCRSimulator;
 import org.ucb.c5.constructionfile.model.*;
 import org.ucb.c5.utils.FileUtils;
 import org.ucb.c5.utils.RestrictionEnzymeFactory;
-
-import java.io.File;
 import java.util.*;
 
 public class SimulateConstructionFile {
-    public static void main(String[] args) throws Exception {
-        ParseConstructionFile pCF = new ParseConstructionFile();
-        pCF.initiate();
-        String CFPath = System.getProperty("user.dir") + "/src/org/ucb/c5/constructionfile/data/pcrtest.txt";
-        File CFFile = new File(CFPath);
-        String text = FileUtils.readFile(CFFile.getAbsolutePath());
-        ConstructionFile cf = pCF.run(text);
-        SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
-        Polynucleotide product = simulateConstructionFile.run(cf);
-        System.out.println(product);
-    }
+
 
     public void initiate() {
     }
 
-    public Polynucleotide run(ConstructionFile CF) throws Exception {
+    public Polynucleotide run(ConstructionFile CF, Map<String, Polynucleotide> nameToPoly) throws Exception {
+        // Populate a Map with all of the intermediate polypeptides and directory-parsed sequences  
+        Map<String, Polynucleotide> fragments = new HashMap<>(); 
+        fragments.putAll(nameToPoly);
+        
         Map<String, Polynucleotide> CFMap = CF.getSequences();
-        Map<String, Polynucleotide> fragments = new HashMap<>(); // Map with all of the intermediate polypeptides
+        fragments.putAll(CFMap);
         for (Step step : CF.getSteps()) {
             processStep(step, CFMap, fragments, CF.getPdtName());
             // curr = processStep(step, curr, CF.getSequences()); // Update the Map
@@ -152,5 +144,19 @@ public class SimulateConstructionFile {
 
     private void simulateTransform(Transformation transformation, Map<String, Polynucleotide> fragments, String pdtName) {
         fragments.put(pdtName, fragments.get(transformation.getDna()));
+    }
+    
+    public static void main(String[] args) throws Exception {
+        //Parse an example file
+        ParseConstructionFile pCF = new ParseConstructionFile();
+        pCF.initiate();
+        String text = FileUtils.readResourceFile("constructionfile/data/pcrtest.txt");
+//        String text = FileUtils.readFile("/Users/jca20n/Pimar/experiments/2020_02_04-Lycopene6/eden/Construction of pLYC31E.txt");
+        ConstructionFile cf = pCF.run(text);
+        
+        //Simulate the construction file
+        SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
+        Polynucleotide product = simulateConstructionFile.run(cf, new HashMap<>());
+        System.out.println(product);
     }
 }

@@ -142,8 +142,8 @@ public class ParseConstructionFile {
                     throw new IllegalArgumentException("Sequence:\n" + seq + "\ncontains non-DNA sequences in:\n" + f);
                 }
                 sequences.put(name, createPoly(seq));
-                return;
             }
+            return;
         }
         
         //Handle if it is in TSV
@@ -166,10 +166,7 @@ public class ParseConstructionFile {
                     throw new IllegalArgumentException("Sequence:\n" + seq + "\ncontains non-DNA sequences in:\n" + line);
                 }
                 sequences.put(name, createPoly(seq));
-                return;
             }
-            
-        throw new IllegalArgumentException("Unable to parse sequences in:\n" + seqSection);
     }
 
     

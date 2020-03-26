@@ -1,4 +1,5 @@
 package org.ucb.c5.constructionfile;
+import java.util.HashMap;
 import org.ucb.c5.constructionfile.model.ConstructionFile;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 
@@ -17,7 +18,7 @@ public class ValidateConstructionFile {
     }
     public boolean run(ConstructionFile CF, Polynucleotide product) throws Exception {
         SimulateConstructionFile simulator = new SimulateConstructionFile();
-        Polynucleotide seq = simulator.run(CF);
+        Polynucleotide seq = simulator.run(CF, new HashMap<>());
         // Take into account that the product may be rotated
         return (seq.equals(product));
     }
