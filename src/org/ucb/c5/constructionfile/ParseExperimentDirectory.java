@@ -13,6 +13,7 @@ import org.ucb.c5.constructionfile.model.ConstructionFile;
 import org.ucb.c5.constructionfile.model.Experiment;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 import org.ucb.c5.utils.FileUtils;
+import org.ucb.c5.utils.Log;
 
 /**
  *
@@ -24,6 +25,7 @@ public class ParseExperimentDirectory {
     }
 
     public Experiment run(String dirPath) throws Exception {
+        Log.info("Parsing experiment directory: " + dirPath);
         File dir = new File(dirPath);
         List<File> files = new ArrayList<>();
         List<ConstructionFile> cfs = new ArrayList<>();
@@ -73,7 +75,7 @@ public class ParseExperimentDirectory {
 
     //Handle seq
     private Map<String, Polynucleotide> runSeq(File afile) throws IOException, Exception {
-
+        Log.info("Extracting sequences from: " + afile.getAbsolutePath());
         Map<String, Polynucleotide> nameToPoly = new HashMap<>();
 
         //read .txt or .tsv files with oligo sequences
@@ -97,10 +99,11 @@ public class ParseExperimentDirectory {
                 String[] tabs = str.split("\t");
                 String name = tabs[0];
                 String seq = tabs[1];
-                if(!seq.matches("[ATCGatcg]+")) {
+                if(!seq.matches("[ACGTRYSWKMBDHVNacgtryswkmbdhvn]+")) {
                     throw new Exception("Oligo file has non-DNA sequence:\n" + seq);
                 }
                 nameToPoly.put(name, new Polynucleotide(seq, "", "", false, false, false));
+                Log.info("Added oligo:\t" + name + "\t" + seq);
             }
         }
 
@@ -115,8 +118,11 @@ public class ParseExperimentDirectory {
 
             String rawSeq = fileContent.substring(origin + 6);
             String seqContent = rawSeq.replaceAll("[^A-za-z]", "");
-
+            if(!seqContent.matches("[ACGTRYSWKMBDHVNacgtryswkmbdhvn]+")) {
+                throw new IllegalArgumentException("Sequence " + seqName + "is not DNA");
+            }
             nameToPoly.put(seqName, new Polynucleotide(seqContent, true));
+            Log.info("Added plasmid:\t" + seqName + " of length " + seqContent.length());
         }
         return nameToPoly;
     }

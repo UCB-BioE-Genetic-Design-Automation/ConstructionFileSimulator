@@ -15,6 +15,7 @@ import org.ucb.c5.assembly.AutoAnnotate;
 import org.ucb.c5.constructionfile.model.ConstructionFile;
 import org.ucb.c5.constructionfile.model.Experiment;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
+import org.ucb.c5.utils.Log;
 
 /**
  *
@@ -41,7 +42,7 @@ public class SimulateExperimentDirectory {
 
         //Run the simulator
         for (ConstructionFile cf : exp.getCfs()) {
-            System.out.println("Working on cf: " + cf.getPdtName());
+            Log.info("Simulating construction file for product: " + cf.getPdtName());
             Polynucleotide pdt = simulator.run(cf, exp.getNameToPoly());
             autoanno.run(pdt.getSequence(), dirPath + "/" + cf.getPdtName() + ".seq");
         }
