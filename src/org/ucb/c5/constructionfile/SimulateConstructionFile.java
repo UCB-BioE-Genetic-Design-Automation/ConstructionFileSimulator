@@ -8,6 +8,7 @@ import org.ucb.c5.constructionfile.model.*;
 import org.ucb.c5.utils.FileUtils;
 import org.ucb.c5.utils.RestrictionEnzymeFactory;
 import java.util.*;
+import org.ucb.c5.utils.Log;
 
 public class SimulateConstructionFile {
 
@@ -70,6 +71,7 @@ public class SimulateConstructionFile {
     // Load the specified name into the local dictionary from the global CF dictionary so the sequence can be found
     // This should be a check that there is a polypeptide in the dictionary that matches the specified name, otherwise throw error
     private void simulateAcquisition(Acquisition acquisition, Map<String, Polynucleotide> CFMap, Map<String, Polynucleotide> fragments) throws Exception{
+        Log.info("SimulatingAcquisition: " + acquisition.getProduct());
         String dnaName = acquisition.getProduct();
         if (CFMap.containsKey(dnaName)) {
             fragments.put(dnaName, CFMap.get(dnaName));
@@ -80,6 +82,7 @@ public class SimulateConstructionFile {
     }
 
     private void simulatePCR(PCR pcr, Map<String, Polynucleotide> fragments) throws Exception{
+        Log.info("Simulating PCR (o1,o2,template,pdt): " + pcr.getOligo1() + ", " + pcr.getOligo2() + ", " + pcr.getTemplate() + ", " + pcr.getProduct());
         PCRSimulator PCRSimulator = new PCRSimulator();
         PCRSimulator.run(pcr, fragments);
     }
@@ -89,6 +92,16 @@ public class SimulateConstructionFile {
     }
 
     private void simulateDigest(Digestion digestion, Map<String, Polynucleotide> fragments) throws Exception {
+        //Log it
+        String enzlog = "";
+        for(Enzyme enz : digestion.getEnzymes()) {
+            enzlog+=enz.name();
+            enzlog+=", ";
+        }
+        enzlog = enzlog.substring(0, enzlog.length()-2);
+        Log.info("Simulating Digestion of " + digestion.getSubstrate() + " with " + enzlog);
+        
+        //Digest it
         DigestSimulator digestSimulator = new DigestSimulator();
         digestSimulator.initiate();
         Polynucleotide substrate = fragments.get(digestion.getSubstrate());
@@ -120,6 +133,15 @@ public class SimulateConstructionFile {
     }
 
     private void simulateLigate(Ligation ligation, Map<String, Polynucleotide> fragments) throws Exception{
+        //Log it
+        String fraglog = "";
+        for(String frag : ligation.getFragments()) {
+            fraglog+=frag;
+            fraglog+=", ";
+        }
+        fraglog = fraglog.substring(0, fraglog.length()-2);
+        Log.info("Simulating Ligation of " + fraglog + " for product " + ligation.getProduct());
+
         LigateSimulator LigateSimulator = new LigateSimulator();
         LigateSimulator.initiate();
         List<Polynucleotide> polys = new ArrayList<>();
@@ -131,18 +153,23 @@ public class SimulateConstructionFile {
     }
 
     private void simulateAssemble(Assembly assembly, Map<String, Polynucleotide> fragments) throws Exception {
+        //Log it
+        String fraglog = "";
+        for (String frag : assembly.getFragments()) {
+            fraglog += frag;
+            fraglog += ", ";
+        }
+        fraglog = fraglog.substring(0, fraglog.length()-2);
+        Log.info("Simulating Assembly of " + fraglog + " for product " + assembly.getProduct());
+
         AssemblySimulator AssemblySimulator = new AssemblySimulator();
         AssemblySimulator.initiate();
         Polynucleotide assemblyProduct = AssemblySimulator.run(assembly, fragments);
         fragments.put(assembly.getProduct(), assemblyProduct);
     }
 
-    // This is not implemented completely, right now it will just transfer the sequence to the product name in the map
-//    private void simulateCleanup(Cleanup cleanup, Map<String, Polynucleotide> fragments) {
-//        fragments.put(cleanup.getProduct(), fragments.get(cleanup.getSubstrate()));
-//    }
-
     private void simulateTransform(Transformation transformation, Map<String, Polynucleotide> fragments, String pdtName) {
+        Log.info("Simulating Transformation of " + transformation.getProduct());
         fragments.put(pdtName, fragments.get(transformation.getDna()));
     }
     

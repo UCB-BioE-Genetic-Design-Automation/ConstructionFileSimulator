@@ -61,6 +61,7 @@ public class ParseExperimentDirectory {
 
     //Handle cf
     private ConstructionFile runCF(File afile) throws IOException, Exception {
+        Log.info("Parsing construction file: " + afile.getAbsolutePath());
         String cfContent = FileUtils.readFile(afile.getAbsolutePath());
         ParseConstructionFile parseConstruction = new ParseConstructionFile();
         parseConstruction.initiate();
