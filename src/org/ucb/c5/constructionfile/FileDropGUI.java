@@ -5,13 +5,6 @@
  */
 package org.ucb.c5.constructionfile;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.ucb.c5.constructionfile.model.ConstructionFile;
-import org.ucb.c5.constructionfile.model.Polynucleotide;
-
 /**
  *
  * @author jca20n
@@ -90,6 +83,7 @@ public class FileDropGUI extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new FileDropGUI().setVisible(true);
             }
