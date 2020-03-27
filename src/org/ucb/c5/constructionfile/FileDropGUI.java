@@ -26,12 +26,10 @@ public class FileDropGUI extends javax.swing.JFrame {
                 for (int i = 0; i < files.length; i++) {
                     try {
                         String dirPath = files[i].getCanonicalPath();
-                        System.out.println(dirPath);
-      
-                        ParseExperimentDirectory parseFolder = new ParseExperimentDirectory();
-                        parseFolder.initiate();
-
-                        parseFolder.run(dirPath);
+                        //Simulate the experiment and write results
+                        SimulateExperimentDirectory sed = new SimulateExperimentDirectory();
+                        sed.initiate();
+                        sed.run(dirPath);
                     } catch (Exception ex) {
                     }
                 }   // end for: through each dropped file
