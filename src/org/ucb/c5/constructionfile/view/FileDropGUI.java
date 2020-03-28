@@ -5,6 +5,12 @@
  */
 package org.ucb.c5.constructionfile.view;
 
+import com.sun.awt.AWTUtilities;
+import java.awt.Color;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
 import org.ucb.c5.constructionfile.SimulateExperimentDirectory;
 import org.ucb.c5.utils.Log;
 
@@ -13,13 +19,19 @@ import org.ucb.c5.utils.Log;
  * @author jca20n
  */
 public class FileDropGUI extends javax.swing.JFrame {
+    Border redborder = javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 51, 51), new java.awt.Color(255, 153, 153), new java.awt.Color(255, 153, 153), new java.awt.Color(255, 204, 204));
+    Border greenborder = javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(0, 153, 51), new java.awt.Color(102, 255, 102), new java.awt.Color(0, 102, 0), new java.awt.Color(204, 255, 204));
+    Border whiteborder = javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, java.awt.Color.white, java.awt.Color.white, java.awt.Color.white, java.awt.Color.white);
+
     public FileDropGUI() {
         Log.info("Initializing the FileDropGUI");
         initComponents();
+        jLabel1.setBorder(whiteborder);
         
         new FileDrop(System.out, this.getContentPane(), new FileDrop.Listener() {
             @Override
             public void filesDropped(java.io.File[] files) {
+                getGlassPane().setVisible(false);
                 for (int i = 0; i < files.length; i++) {
                     try {
                         String dirPath = files[i].getCanonicalPath();
@@ -27,7 +39,9 @@ public class FileDropGUI extends javax.swing.JFrame {
                         SimulateExperimentDirectory sed = new SimulateExperimentDirectory();
                         sed.initiate();
                         sed.run(dirPath);
+                        jLabel1.setBorder(greenborder);
                     } catch (Exception ex) {
+                        jLabel1.setBorder(redborder);
                     }
                 }   // end for: through each dropped file
             }   // end filesDropped
@@ -53,10 +67,19 @@ public class FileDropGUI extends javax.swing.JFrame {
 
         jLabel1.setBackground(new java.awt.Color(255, 255, 255));
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/ucb/c5/constructionfile/view/filedropimg.png"))); // NOI18N
+        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                jLabel1MouseEntered(evt);
+            }
+        });
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 230, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jLabel1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseEntered
+        jLabel1.setBorder(whiteborder);
+    }//GEN-LAST:event_jLabel1MouseEntered
 
     /**
      * @param args the command line arguments

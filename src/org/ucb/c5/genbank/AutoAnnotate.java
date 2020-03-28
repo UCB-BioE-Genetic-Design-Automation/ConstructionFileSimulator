@@ -70,6 +70,7 @@ public class AutoAnnotate {
             features.put(rc.run(seq), annotrc);
         }
     }
+    
     public void run(String sequence, String path) throws Exception {
         String seq = sequence.toUpperCase();
         seq = seq + seq;
