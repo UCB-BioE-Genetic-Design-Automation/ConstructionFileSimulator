@@ -2,7 +2,7 @@ package org.ucb.c5.constructionfile.simulators;
 
 import org.ucb.c5.constructionfile.model.PCR;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
-import org.ucb.c5.utils.CalcEditDistance;
+import org.ucb.c5.sequtils.CalcEditDistance;
 import org.ucb.c5.utils.RevComp;
 import org.ucb.c5.utils.StringRotater;
 

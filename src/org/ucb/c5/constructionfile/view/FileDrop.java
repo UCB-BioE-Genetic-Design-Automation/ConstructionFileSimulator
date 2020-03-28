@@ -1,4 +1,4 @@
-package org.ucb.c5.constructionfile;
+package org.ucb.c5.constructionfile.view;
 
 
 import java.awt.datatransfer.DataFlavor;

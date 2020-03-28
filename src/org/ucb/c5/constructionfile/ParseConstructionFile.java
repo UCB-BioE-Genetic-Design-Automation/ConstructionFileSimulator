@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import org.ucb.c5.utils.Log;
 
 
 /**
@@ -77,6 +78,7 @@ public class ParseConstructionFile {
         text = text.replaceAll("\\(", "");
         text = text.replaceAll("\\)", "");
         text = text.replaceAll("\r", "\n");
+        text = text.replaceAll("\\\\", "\n\\\\");
         text = text.replaceAll("\t", " ");
 
         //Break it into lines
@@ -104,6 +106,8 @@ public class ParseConstructionFile {
             //Try to parse the operation, if fails will throw Exception
             String[] spaces = aline.split("\\s+");
             String sop = spaces[0].toLowerCase();
+            
+            //Cleanup was removed from ConstructionFile
             if(sop.equals("cleanup")) {
                 continue;
             }
@@ -120,7 +124,7 @@ public class ParseConstructionFile {
                 Step parsedStep = parseLine(op, spaces);
                 steps.add(parsedStep);
             } catch(Exception err) {
-                err.printStackTrace();
+                Log.severe(err.getMessage());
                 throw new IllegalArgumentException("Could not parse the line:\n" + aline + "\nin text:\n" + rawText);
             }
         }

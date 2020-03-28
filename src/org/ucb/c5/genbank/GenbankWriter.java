@@ -4,13 +4,13 @@
  * and open the template in the editor.
  */
 
-package org.ucb.c5.assembly;
+package org.ucb.c5.genbank;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.ucb.c5.assembly.model.Annotation;
+import org.ucb.c5.genbank.model.Annotation;
 import org.ucb.c5.utils.FileUtils;
 
 /**

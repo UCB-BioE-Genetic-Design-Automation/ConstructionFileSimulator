@@ -4,15 +4,18 @@
  * and open the template in the editor.
  */
 
-package org.ucb.c5.assembly;
+package org.ucb.c5.genbank;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.ucb.c5.assembly.model.Annotation;
+import javax.naming.ConfigurationException;
+import org.ucb.c5.genbank.model.Annotation;
 import org.ucb.c5.sequtils.RevComp;
 import org.ucb.c5.utils.FileUtils;
+import org.ucb.c5.utils.Log;
 
 /**
  *
@@ -29,19 +32,32 @@ public class AutoAnnotate {
 
         //Read in directory locations
         Map<String,String> fileLocations = new HashMap<>();
+        File afile = new File("data_paths.txt");
+        if(!afile.exists()) {
+            Log.severe("File data_paths.txt is missing");
+            throw new ConfigurationException("Missing data_paths.txt");
+        }
+        
         try {
-            String data2 = FileUtils.readFile("data_pathss.txt");
+            String data2 = FileUtils.readFile("data_paths.txt");
             String[] lines = data2.split("\\r|\\r?\\n");
             for (String line : lines) {
                 String[] tabs = line.split("\t");
                 fileLocations.put(tabs[0], tabs[1]);
             }
         } catch (Exception err) {
-            System.exit(0);
+            Log.severe("Unable to read data_paths.txt");
+            throw new ConfigurationException("Unreadable data_paths.txt");
         }
         
         features = new HashMap<>();
-        String data = FileUtils.readFile(fileLocations.get("default_features"));
+        String data = null;
+        try {
+            data = FileUtils.readFile(fileLocations.get("default_features"));
+        } catch(Exception err) {
+            Log.severe("File data_paths.txt error with 'default_features'");
+            throw new ConfigurationException("data_paths.txt error on default_features");
+        }
         String[] lines = data.split("\\r|\\r?\\n");
         for(String line : lines) {
             String[] tabs = line.split("\t");

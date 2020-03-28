@@ -3,7 +3,7 @@ package org.ucb.c5.constructionfile.simulators;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ucb.c5.utils.PolyRevComp;
+import org.ucb.c5.sequtils.PolyRevComp;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 
 /**

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package org.ucb.c5.assembly.model;
+package org.ucb.c5.genbank.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;

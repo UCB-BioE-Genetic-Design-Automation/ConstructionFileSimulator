@@ -3,7 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.ucb.c5.constructionfile;
+package org.ucb.c5.constructionfile.view;
+
+import org.ucb.c5.constructionfile.SimulateExperimentDirectory;
+import org.ucb.c5.utils.Log;
 
 /**
  *
@@ -11,6 +14,7 @@ package org.ucb.c5.constructionfile;
  */
 public class FileDropGUI extends javax.swing.JFrame {
     public FileDropGUI() {
+        Log.info("Initializing the FileDropGUI");
         initComponents();
         
         new FileDrop(System.out, this.getContentPane(), new FileDrop.Listener() {
@@ -48,7 +52,7 @@ public class FileDropGUI extends javax.swing.JFrame {
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/ucb/c5/constructionfile/filedropimg.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/ucb/c5/constructionfile/view/filedropimg.png"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 230, -1));
 
         pack();

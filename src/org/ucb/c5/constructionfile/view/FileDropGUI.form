@@ -38,7 +38,7 @@
           <Color blue="ff" green="ff" red="ff" type="rgb"/>
         </Property>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/org/ucb/c5/constructionfile/filedropimg.png"/>
+          <Image iconType="3" name="/org/ucb/c5/constructionfile/view/filedropimg.png"/>
         </Property>
       </Properties>
       <Constraints>

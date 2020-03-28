@@ -48,7 +48,7 @@ public class Log {
             });
         } catch (Exception ex) {
             System.err.println("Unable to initiate logger");
-            System.exit(0);
+//            System.exit(0);
         }
     }
     

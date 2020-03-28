@@ -1,6 +1,7 @@
-package org.ucb.c5.utils;
+package org.ucb.c5.sequtils;
 
 import org.ucb.c5.constructionfile.model.Polynucleotide;
+import org.ucb.c5.utils.SequenceUtils;
 
 /**
  * Reverse complement Function for a Polynucleotide

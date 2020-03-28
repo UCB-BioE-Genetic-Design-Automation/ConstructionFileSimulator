@@ -32,41 +32,41 @@ public class Exonuclease{
     }
     
 
-       
-    public String toString() {
-        String separator = "-";
-     
-        String out = "";
-        out += "5'" + separator;
-        
-        for (int i = 0; i < this.ext5.length() - 1; i++) {
-            out += " ";    
-        } 
-
-        out += this.sequence;
-
-        for (int i = 1; i < this.ext3.length(); i++) {
-            out += " ";
-        }
-
-        out += separator + "3'\n";
-
-        //Do the other strand
-        out += "3'" + separator;
-        for (int i = 1; i < this.ext5.length(); i++) {
-            out += " ";
-        }
-
-        out += SequenceUtils.complement(this.sequence);
-
-        for (int i = 0; i < this.ext3.length() - 1; i++) {
-            out += " ";
-        }
-
-        out += separator + "5'\n";
-
-        return out;
-    }
+//       
+//    public String toString() {
+//        String separator = "-";
+//     
+//        String out = "";
+//        out += "5'" + separator;
+//        
+//        for (int i = 0; i < this.ext5.length() - 1; i++) {
+//            out += " ";    
+//        } 
+//
+//        out += this.sequence;
+//
+//        for (int i = 1; i < this.ext3.length(); i++) {
+//            out += " ";
+//        }
+//
+//        out += separator + "3'\n";
+//
+//        //Do the other strand
+//        out += "3'" + separator;
+//        for (int i = 1; i < this.ext5.length(); i++) {
+//            out += " ";
+//        }
+//
+//        out += SequenceUtils.complement(this.sequence);
+//
+//        for (int i = 0; i < this.ext3.length() - 1; i++) {
+//            out += " ";
+//        }
+//
+//        out += separator + "5'\n";
+//
+//        return out;
+//    }
     
     public static void main(String[] args) {
         
