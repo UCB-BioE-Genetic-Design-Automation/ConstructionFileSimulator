@@ -34,7 +34,7 @@ public class FileDropGUI extends javax.swing.JFrame {
                         SimulateExperimentDirectory sed = new SimulateExperimentDirectory();
                         sed.initiate();
                         sed.run(dirPath);
-                        Log.info("     Success!!");
+                        Log.info("--> -->  Success!!");
                         jLabel1.setBorder(greenborder);
                     } catch (Exception ex) {
                         Log.severe(ex.getMessage());
@@ -69,7 +69,7 @@ public class FileDropGUI extends javax.swing.JFrame {
                 jLabel1MouseEntered(evt);
             }
         });
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 230, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 230, 300));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
