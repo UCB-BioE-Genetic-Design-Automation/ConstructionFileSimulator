@@ -71,7 +71,7 @@ public class SimulateConstructionFile {
     // Load the specified name into the local dictionary from the global CF dictionary so the sequence can be found
     // This should be a check that there is a polypeptide in the dictionary that matches the specified name, otherwise throw error
     private void simulateAcquisition(Acquisition acquisition, Map<String, Polynucleotide> CFMap, Map<String, Polynucleotide> fragments) throws Exception{
-        Log.info("SimulatingAcquisition: " + acquisition.getProduct());
+        Log.info("Simulating Acquisition: " + acquisition.getProduct());
         String dnaName = acquisition.getProduct();
         if (CFMap.containsKey(dnaName)) {
             fragments.put(dnaName, CFMap.get(dnaName));

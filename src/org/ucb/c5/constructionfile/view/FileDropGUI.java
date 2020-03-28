@@ -5,11 +5,6 @@
  */
 package org.ucb.c5.constructionfile.view;
 
-import com.sun.awt.AWTUtilities;
-import java.awt.Color;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JPanel;
 import javax.swing.border.Border;
 import org.ucb.c5.constructionfile.SimulateExperimentDirectory;
 import org.ucb.c5.utils.Log;
@@ -39,8 +34,10 @@ public class FileDropGUI extends javax.swing.JFrame {
                         SimulateExperimentDirectory sed = new SimulateExperimentDirectory();
                         sed.initiate();
                         sed.run(dirPath);
+                        Log.info("     Success!!");
                         jLabel1.setBorder(greenborder);
                     } catch (Exception ex) {
+                        Log.severe(ex.getMessage());
                         jLabel1.setBorder(redborder);
                     }
                 }   // end for: through each dropped file
