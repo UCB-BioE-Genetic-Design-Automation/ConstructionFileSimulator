@@ -11,7 +11,8 @@ import org.ucb.c5.utils.Log;
 
 /**
  *
- * @author jca20n
+ * @author J. Christopher Anderson
+ * @author Hanxiao Zhang
  */
 public class FileDropGUI extends javax.swing.JFrame {
     Border redborder = javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, new java.awt.Color(255, 51, 51), new java.awt.Color(255, 153, 153), new java.awt.Color(255, 153, 153), new java.awt.Color(255, 204, 204));
