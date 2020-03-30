@@ -1,4 +1,4 @@
-package org.ucb.c5.utils;
+package org.ucb.c5.sequtils;
 
 import org.ucb.c5.constructionfile.model.RestrictionEnzyme;
 import org.ucb.c5.constructionfile.model.Enzyme;

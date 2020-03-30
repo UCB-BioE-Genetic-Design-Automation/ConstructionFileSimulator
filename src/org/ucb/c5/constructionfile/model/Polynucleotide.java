@@ -1,6 +1,6 @@
 package org.ucb.c5.constructionfile.model;
 
-import org.ucb.c5.utils.RevComp;
+import org.ucb.c5.genbank.model.RevComp;
 import org.ucb.c5.utils.SequenceUtils;
 
 /**

@@ -3,8 +3,8 @@ package org.ucb.c5.constructionfile.simulators;
 import org.ucb.c5.constructionfile.model.PCR;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 import org.ucb.c5.sequtils.CalcEditDistance;
-import org.ucb.c5.utils.RevComp;
-import org.ucb.c5.utils.StringRotater;
+import org.ucb.c5.genbank.model.RevComp;
+import org.ucb.c5.sequtils.StringRotater;
 
 import java.util.ArrayList;
 import java.util.HashMap;

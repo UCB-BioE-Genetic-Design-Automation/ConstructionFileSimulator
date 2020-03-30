@@ -1,4 +1,4 @@
-package org.ucb.c5.utils;
+package org.ucb.c5.sequtils;
 
 public class StringRotater {
     public void initiate() throws Exception {

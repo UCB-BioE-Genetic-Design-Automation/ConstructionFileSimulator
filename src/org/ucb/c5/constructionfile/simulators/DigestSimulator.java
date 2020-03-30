@@ -1,7 +1,7 @@
 package org.ucb.c5.constructionfile.simulators;
 
 import org.ucb.c5.sequtils.PolyRevComp;
-import org.ucb.c5.utils.RestrictionEnzymeFactory;
+import org.ucb.c5.sequtils.RestrictionEnzymeFactory;
 import org.ucb.c5.constructionfile.model.Enzyme;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 import org.ucb.c5.constructionfile.model.RestrictionEnzyme;

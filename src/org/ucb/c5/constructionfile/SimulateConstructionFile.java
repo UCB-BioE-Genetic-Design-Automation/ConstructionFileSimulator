@@ -6,7 +6,7 @@ import org.ucb.c5.constructionfile.simulators.LigateSimulator;
 import org.ucb.c5.constructionfile.simulators.PCRSimulator;
 import org.ucb.c5.constructionfile.model.*;
 import org.ucb.c5.utils.FileUtils;
-import org.ucb.c5.utils.RestrictionEnzymeFactory;
+import org.ucb.c5.sequtils.RestrictionEnzymeFactory;
 import java.util.*;
 import org.ucb.c5.utils.Log;
 

@@ -1,4 +1,4 @@
-package org.ucb.c5.utils;
+package org.ucb.c5.genbank.model;
 
 import java.util.HashMap;
 import java.util.Map;
