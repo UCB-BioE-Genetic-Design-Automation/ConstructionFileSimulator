@@ -7,6 +7,8 @@
 package org.ucb.c5.genbank;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +45,9 @@ public class AutoAnnotate {
             String[] lines = data2.split("\\r|\\r?\\n");
             for (String line : lines) {
                 String[] tabs = line.split("\t");
-                fileLocations.put(tabs[0], tabs[1]);
+                Path ppath = Paths.get(tabs[1]);
+                String filepath = ppath.toString();
+                fileLocations.put(tabs[0], filepath);
             }
         } catch (Exception err) {
             Log.severe("Unable to read data_paths.txt");
