@@ -12,8 +12,18 @@ import java.util.List;
 import java.util.Map;
 
 public class AssemblySimulator {
+    DigestSimulator digestSimulator;
+    LigateSimulator ligateSimulator;
+    RevComp revcomp;
+            
     public void initiate() throws Exception {
-
+            // Create digest and ligate simulators
+            digestSimulator = new DigestSimulator();
+            digestSimulator.initiate();
+            ligateSimulator = new LigateSimulator();
+            ligateSimulator.initiate();
+            revcomp = new RevComp();
+            revcomp.initiate();
     }
 
     public Polynucleotide run(Assembly assembly, Map<String, Polynucleotide> fragments) throws Exception{
@@ -24,30 +34,31 @@ public class AssemblySimulator {
         }
         Enzyme enzyme = assembly.getEnzyme();
         if (enzyme == Enzyme.BsmBI || enzyme == Enzyme.BsaI) {
-            // Create digest and ligate simulators
-            DigestSimulator digestSimulator = new DigestSimulator();
-            digestSimulator.initiate();
-            LigateSimulator ligateSimulator = new LigateSimulator();
-            ligateSimulator.initiate();
-            // Find the largest fragments of the digestion products of each sequence using the given enzyme and put into a list
-            List<Polynucleotide> largestFrags = new ArrayList<>();
+            //Find all the BsaI site-free fragments of the digestion products of each sequence using the given enzyme and put into a list
+            List<Polynucleotide> validFrags = new ArrayList<>();
             List<RestrictionEnzyme> enzymeList = new ArrayList<>();
-            enzymeList.add(new RestrictionEnzymeFactory().run(enzyme));
+            RestrictionEnzyme res = new RestrictionEnzymeFactory().run(enzyme);
+            enzymeList.add(res);
+            String ressite = res.getSite();
+            String rcsite = revcomp.run(ressite);
+            
             for (Polynucleotide assemblyFrag : assemblyFragments) {
                 List<Polynucleotide> digestFrags = digestSimulator.run(assemblyFrag, enzymeList);
-                int longest = 0;
-                Polynucleotide poly = null;
                 for (Polynucleotide polyTemp : digestFrags) {
-                    if (polyTemp.getSequence().length() > longest) {
-                        longest = polyTemp.getSequence().length();
-                        poly = polyTemp;
+                    String seq = polyTemp.getSequence();
+                    if(seq.contains(ressite)) {
+                        continue;
                     }
+                    if(seq.contains(rcsite)) {
+                        continue;
+                    }
+                    validFrags.add(polyTemp);
                 }
-                largestFrags.add(poly);
             }
-            // Ligate the largest fragments together
+            
+            // Ligate the valid fragments together
             Polynucleotide ligationProduct;
-            ligationProduct = ligateSimulator.run(largestFrags);
+            ligationProduct = ligateSimulator.run(validFrags);
             return ligationProduct;
         }
         // Test multiple fragment assembly
