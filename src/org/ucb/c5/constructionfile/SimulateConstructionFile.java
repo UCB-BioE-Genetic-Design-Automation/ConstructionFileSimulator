@@ -104,7 +104,15 @@ public class SimulateConstructionFile {
         //Digest it
         DigestSimulator digestSimulator = new DigestSimulator();
         digestSimulator.initiate();
-        Polynucleotide substrate = fragments.get(digestion.getSubstrate());
+        
+        Polynucleotide substrate;
+        try {
+            substrate = fragments.get(digestion.getSubstrate());
+        } catch(NullPointerException err) {
+            Log.severe("Sequence " + digestion.getSubstrate() + " is missing");
+            throw err;
+        }
+        
         List<Enzyme> enzymeList = digestion.getEnzymes();
         String productName = digestion.getProduct();
 
