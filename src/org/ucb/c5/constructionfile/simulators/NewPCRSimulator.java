@@ -6,22 +6,24 @@
 
 package org.ucb.c5.constructionfile.simulators;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
+import org.ucb.c5.sequtils.PolyRevComp;
 
 /**
  *
  * @author J. Christopher Anderson
  */
 public class NewPCRSimulator {
-    public void initiate() throws Exception {}
+    private PolyRevComp revcomp;
     
-    public Polynucleotide run(Polynucleotide oligo1, Polynucleotide oligo2, List<Polynucleotide> templates) {
+    public void initiate() throws Exception {
+        revcomp = new PolyRevComp();
+    }
+    
+    public Polynucleotide run(Polynucleotide oligo1, Polynucleotide oligo2, List<Polynucleotide> templates) throws Exception {
         if(oligo1.isIsDoubleStranded()) {
             throw new IllegalArgumentException("Oligo1 must be single stranded");
         }
@@ -35,17 +37,20 @@ public class NewPCRSimulator {
         species.add(oligo2);
         species.addAll(templates);
         
+        Set<Polynucleotide> oldspecies = new HashSet<>(species);
+        
         //Simulate thermocycling
-        int speciecount = species.size();
+        simulateDissociation(species);
         while(true) {
-            simulateDissociation(species);
-            simulateAnneal(species);
-            simulatePolymerization(species);
-            
-            if(species.size() == speciecount) {
+            if(species == oldspecies) {
                 break;
             }
-            speciecount = species.size();
+            
+            oldspecies = species;
+            
+            simulateAnneal(species);
+            simulatePolymerization(species);
+            simulateDissociation(species);
         }
         
         //Determine which of the species is the PCR product
@@ -55,8 +60,44 @@ public class NewPCRSimulator {
         return null;
     }
 
-    private void simulateDissociation(Set<Polynucleotide> species) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void simulateDissociation(Set<Polynucleotide> species) throws Exception {
+        Set<Polynucleotide> newspecies =  new HashSet<>();
+        for(Polynucleotide poly : species) {
+            //If it's already single stranded, no need to do anything
+            if(!poly.isIsDoubleStranded()) {
+                continue;
+            }
+            
+            //Handle if it is circular
+            if(poly.isIsCircular()) {
+                //TODO, not yet implemented
+                continue;
+            }
+      
+            //Handle as linear, double stranded
+            Polynucleotide forstrand = dissociate(poly);
+            Polynucleotide rev = revcomp.run(poly);
+            Polynucleotide revstrand = dissociate(rev);
+            newspecies.add(forstrand);
+            newspecies.add(revstrand);
+            
+            //TODO:  need to override .equals and hashcode functions in Polynucleotide for this to collapse properly
+        }
+        species.addAll(newspecies);
+    }
+    
+    private Polynucleotide dissociate(Polynucleotide poly) {
+            String forstrand = poly.getSequence();
+            
+            if (!poly.getExt5().startsWith("-")) {
+                forstrand = poly.getExt5() + forstrand;
+            }
+            
+            if (poly.getExt3().startsWith("-")) {
+                forstrand += poly.getExt3();
+            }
+            
+            return new Polynucleotide(forstrand);
     }
 
     private void simulateAnneal(Set<Polynucleotide> species) {
@@ -64,10 +105,26 @@ public class NewPCRSimulator {
     }
 
     private void simulatePolymerization(Set<Polynucleotide> species) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //For each Polynucleotide, if the 
     }
     
-    public static void main(String[] args) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public static void main(String[] args) throws Exception {
+        NewPCRSimulator sim = new NewPCRSimulator();
+        sim.initiate();
+
+        //run a regular pcr
+        
+        //run an ipcr on a circular template over the origin
+        
+        //run a pcr with degenerate oligos
+        
+        //run a soeing reaction on 2+ templates
+        
+        //run a wobble with 2 oligos no template
+        
+        //run a PCA with many oligos as template and 2 oligos as primers
+        
+        //run a hybrid with 2 oligos, and both oligo and ds templates
+        
     }
 }
