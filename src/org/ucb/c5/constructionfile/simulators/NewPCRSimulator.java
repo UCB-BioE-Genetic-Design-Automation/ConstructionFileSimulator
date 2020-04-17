@@ -101,11 +101,12 @@ public class NewPCRSimulator {
     }
 
     private void simulateAnneal(Set<Polynucleotide> species) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //similar code exists in old PCRSimulator
+        //Move the single stranded ends of the annealed products to 5ext and 3ext of poly
     }
 
     private void simulatePolymerization(Set<Polynucleotide> species) {
-        //For each Polynucleotide, if the 
+        //For each Polynucleotide, if there is a recessed 5' ext, fill it in
     }
     
     public static void main(String[] args) throws Exception {
