@@ -68,18 +68,14 @@ public class ParseConstructionFile {
 
     private void processSteps(String rawText, List<Step> steps) throws Exception {
         //Replace common unnessary words
-        String text = rawText.replace("to ", "");
-        text = text.replace("from ", "");
-        text = text.replace("on ", "");
-        text = text.replace("with ", "");
-        text = text.replace("the ", "");
-        text = text.replace(" bp", "");
-        text = text.replace("bp", "");
-        text = text.replaceAll("\\(", "");
-        text = text.replaceAll("\\)", "");
+        
+        String text = rawText;
+
         text = text.replaceAll("\r", "\n");
         text = text.replaceAll("\\\\", "\n\\\\");
-        text = text.replaceAll("\t", " ");
+        
+
+
 
         //Break it into lines
         String[] lines = text.split("\\r|\\r?\\n");
@@ -94,18 +90,19 @@ public class ParseConstructionFile {
             }
 
             //Ignore commented-out lines
-            if (aline.startsWith("//")) {
+            if (aline.trim().startsWith("//")) {
                 continue;
             }
             
             //Ignore title
-            if (aline.toLowerCase().startsWith(">")){
+            if (aline.toLowerCase().trim().startsWith(">")){
                 continue;
             }
 
             //Try to parse the operation, if fails will throw Exception
             String[] spaces = aline.split("\\s+");
             String sop = spaces[0].toLowerCase();
+            String lineNoOP = aline.substring(sop.length());
             
             //Cleanup was removed from ConstructionFile
             if(sop.equals("cleanup")) {
@@ -121,7 +118,8 @@ public class ParseConstructionFile {
             
             //If past the gauntlet, keep the line
             try {
-                Step parsedStep = parseLine(op, spaces);
+                ///parseLine input (Operation, String)
+                Step parsedStep = parseLine(op, lineNoOP);
                 steps.add(parsedStep);
             } catch(Exception err) {
                 Log.severe(err.getMessage());
@@ -184,52 +182,171 @@ public class ParseConstructionFile {
         return new Polynucleotide(seq, true);
     }
     
-    private Step parseLine(Operation op, String[] spaces) throws Exception {
+    //parseLine input (Operation, String)
+    private Step parseLine(Operation op, String lineNoOP) throws Exception {
+        
+        //Standardize
+        lineNoOP = lineNoOP.replaceAll("\\s+and\\s+", ",");
+        lineNoOP = lineNoOP.replace("/", ",");
+
         
         switch (op) {
-            case pcr:
+            
+            case pcr://pcr oligo1,oligo2 on template \t (size bp,product) 
+                               
+                //split content w/i and w/o ()
+                String[] parenPCR = lineNoOP.split("\\(");
+                //split oligo and plasmid
+                String[] oligoPlasmidPCR = parenPCR[0].split(" on ");
+                //trim and split oligos
+                String oligoPlasmidPCR0 = oligoPlasmidPCR[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",");
+                String[] oligosPCR = oligoPlasmidPCR0.split(",");
+                //extract plasmid
+                String templatePCR = oligoPlasmidPCR[1].trim();
+                
+                //eliminate ()
+                String sizeProductPCR = parenPCR[1].trim();
+                sizeProductPCR = sizeProductPCR.replaceAll("\\(", "");
+                sizeProductPCR = sizeProductPCR.replaceAll("\\)", "");
+                //split by "bp,"
+                String[] spPCR = sizeProductPCR.split("bp,");
+                String sizePCR = spPCR[0].trim();
+                String productPCR = spPCR[1].trim();
+                //evoke createPCR and return
                 return createPCR(
-                        spaces[1].split(","),
-                        spaces[2],
-                        spaces[3],
-                        spaces[4]);
-            case pca:
+                        oligosPCR,
+                        templatePCR,
+                        sizePCR,
+                        productPCR
+                );
+                
+                
+            case pca://pca oligo1,oligo2 \t (product)
+                
+                String[] parenPCA = lineNoOP.split("\\(");
+                //Extract oligos
+                String oliPCA = parenPCA[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+",",");
+                String[] oligosPCA = oliPCA.split(",");
+                //Eliminate (), extract product
+                String productPCA = parenPCA[1].replaceAll("\\(", "").replaceAll("\\)", "").trim();
+                
+                
                 return createPCA(
-                        spaces[1].split(","),
-                        spaces[3]);
-//            case cleanup:
-//                return createCleanup(
-//                        spaces[1],
-//                        spaces[2]);
-            case digest:
+                        oligosPCA,
+                        productPCA
+                );
+                
+                
+            case digest://digest substrate with enzyme1,enzyme2 \t (product)
+                
+                //split ()
+                String[] parenDig = lineNoOP.split("\\(");
+                //split oligo and enzyme
+                String[] oligoEnzyDig = parenDig[0].trim().split(" with ");
+                //extract oligos
+                String subDig = oligoEnzyDig[0].trim();
+                //extract enzyme
+                String enzDig = oligoEnzyDig[1].trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",");
+                String[] enzyDig = enzDig.split(",");
+                //extract product
+                String productDig = parenDig[1].replaceAll("\\(", "").replaceAll("\\)", "").trim();
+                
+                
                 return createDigest(
-                        spaces[1],
-                        spaces[2].split(","),
-                        spaces[3]);
-            case ligate:
+                        subDig,
+                        enzyDig,
+                        productDig
+                );
+                
+                
+            case ligate://ligate frag1,frag2 \t (product)
+                
+                String[] segLig = lineNoOP.split("\\(");
+                
+                
+                //extract frag
+                String fragLig = segLig[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+",",");
+                String[] fragsLig = fragLig.split(",");
+                //extract product
+                String productLig = segLig[1].replaceAll("\\(", "").replaceAll("\\)", "").trim();            
+                
                 return createLigation(
-                        spaces[1].split(","),
-                        spaces[2]);
-            case transform:
-                String plasmidName = null;
-                if(spaces.length>4) {
-                    plasmidName = spaces[4];
+                        fragsLig,
+                        productLig
+                );
+                
+                                                
+            case transform://transform substrate \t (strain,antibiotic,product)
+                
+                //split ()
+                String[] parenTrans = lineNoOP.split("\\(");
+                //extract substrate
+                String subTrans = parenTrans[0].trim();
+                
+                //split strain, antibiotic, product(if there is)
+                String[] parenInTrans = parenTrans[1].replaceAll("\\(", "").replaceAll("\\)", "").trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",").split(",");
+                //extract strain, antibiotic
+                String strainTrans = parenInTrans[0].trim();
+                String antibioticTrans = parenInTrans[1].trim();
+                
+                //extract product if there is one
+                String plasmidNameTrans = null;
+                if (parenInTrans.length > 2){
+                    plasmidNameTrans = parenInTrans[2];
                 } else {
-                    plasmidName = spaces[1];
+                    plasmidNameTrans = subTrans;
                 }
+                
+                
                 return createTransform(
-                        spaces[1],
-                        spaces[2].replaceAll(",", ""),
-                        spaces[3],
-                        plasmidName);
-            case acquire:
+                        subTrans,
+                        strainTrans,
+                        antibioticTrans,
+                        plasmidNameTrans
+                );
+                
+                
+            case acquire://acquire oligo oligo1,oligo oligo2, oligo3,plasmid plasmid1,plasmid2
+                
+                //eliminate excessive info oligo, plasmid
+                String textAcq = lineNoOP.replaceAll("\\s+oligo\\s+", " ");
+                textAcq = textAcq.replaceAll(",oligo\\s+", ",");
+                textAcq = textAcq.replaceAll("\\s+plasmid\\s+", " ");
+                textAcq = textAcq.replaceAll(",plasmid\\s+",",");
+                //standardize connection between oligos, plasmids
+                textAcq = textAcq.trim().replaceAll("\\s+", ",");
+                
+                //extract oligos, plasmids
+                String[] combineAcq = textAcq.split(",");
+                
                 return createAcquire(
-                        spaces[2].split(","));
-            case assemble:
+                        combineAcq
+                );
+                
+                
+            case assemble://assemble frag1,frag2 \t (enzyme,product)
+                
+                //split ()
+                String[] parenASB = lineNoOP.split("\\(");
+                
+                //extract fragments
+                String fragASB = parenASB[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",");
+                String[] fragsASB = fragASB.split(",");
+                
+                //split enzyme and product
+                String parenInASB = parenASB[1].replaceAll("\\(","").replaceAll("\\)", "").trim();
+                String[] enzyProdASB = parenInASB.replaceAll(",\\s+",",").replaceAll("\\s+", ",").split(",");
+                //extract enzyme and product
+                String enzymeASB = enzyProdASB[0].trim();
+                String productASB = enzyProdASB[1].trim();
+                
                 return createAssemble(
-                        spaces[1].split(","),
-                        spaces[2].replace(",", ""),
-                        spaces[3]);
+                        fragsASB,
+                        enzymeASB,
+                        productASB
+                );
+                
+                
             default:
                 throw new RuntimeException("Not implemented " + op);
         }
@@ -247,9 +364,7 @@ public class ParseConstructionFile {
         return new PCA(frags, product);
     }
     
-//    private Step createCleanup(String substrate, String product) {
-//        return new Cleanup(substrate, product);
-//    }
+
 
     private Step createDigest(String substrate, String[] enzymes, String product) {
         List<Enzyme> enzList = new ArrayList<>();
