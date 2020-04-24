@@ -6,8 +6,13 @@ import org.ucb.c5.constructionfile.model.BluntingType;
 /**
  *
  * @author yisheng
+ * @edit Zihang Shao
  */
 public class BluntingSimulator {
+    
+    public void initiate(){
+        
+    }
     
     public Polynucleotide run(Polynucleotide substrate, BluntingType type) throws Exception {
         
@@ -66,6 +71,7 @@ public class BluntingSimulator {
             String ext3 = "AATT";
             Polynucleotide poly1 = new Polynucleotide("caaacccg", ext5, ext3);
             BluntingSimulator blu1 = new BluntingSimulator();
+            blu1.initiate();
             System.out.println(blu1.run(poly1, BluntingType.Polymerase).toString());
         }
 
@@ -75,6 +81,7 @@ public class BluntingSimulator {
             String ext3 = "-CC";
             Polynucleotide poly2 = new Polynucleotide("gaaacccGAGGAGaaaaaaaa", ext5, ext3);
             BluntingSimulator blu2 = new BluntingSimulator();
+            blu2.initiate();
             System.out.println(blu2.run(poly2, BluntingType.Polymerase).toString());
         }
         
@@ -86,6 +93,7 @@ public class BluntingSimulator {
             String ext3 = "AATT";
             Polynucleotide poly3 = new Polynucleotide("caaacccg", ext5, ext3);
             BluntingSimulator blu3 = new BluntingSimulator();
+            blu3.initiate();
             System.out.println(blu3.run(poly3, BluntingType.Exonuclease));
         }
 
@@ -95,6 +103,7 @@ public class BluntingSimulator {
             String ext3 = "-CC";
             Polynucleotide poly4 = new Polynucleotide("gaaacccGAGGAGaaaaaaaa", ext5, ext3);
             BluntingSimulator blu4 = new BluntingSimulator();
+            blu4.initiate();
             System.out.println(blu4.run(poly4, BluntingType.Exonuclease));
         }
                

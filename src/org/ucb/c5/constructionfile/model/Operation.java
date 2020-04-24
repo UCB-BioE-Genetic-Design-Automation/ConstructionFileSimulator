@@ -9,6 +9,7 @@ package org.ucb.c5.constructionfile.model;
 /**
  *
  * @author J. Christopher Anderson
+ * @edit Zihang Shao
  */
 public enum Operation {
     acquire,
@@ -19,6 +20,7 @@ public enum Operation {
     assemble,
 //    cleanup,
     transform,
+    blunting
 //    miniprep,
 //    sequence,
 //    inoculate,

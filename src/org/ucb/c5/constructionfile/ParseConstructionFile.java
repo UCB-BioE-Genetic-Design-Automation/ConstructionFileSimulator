@@ -347,6 +347,31 @@ public class ParseConstructionFile {
                 );
                 
                 
+            case blunting://blunting sub1 \t (type,product)
+                
+                //split()
+                String[] parenBlu = lineNoOP.split("\\(");
+                
+                //extract substrate
+                String subBlu = parenBlu[0].trim();
+                
+                //split type and product
+                String parenInBlu = parenBlu[1].replaceAll("\\(","").replaceAll("\\)", "").trim();
+                String[] typeProdBlu = parenInBlu.replaceAll(",\\s+",",").replaceAll("\\s+", ",").split(",");
+                
+                //extract type
+                String typeBlu = typeProdBlu[0].trim();
+                //extract product
+                String productBlu = typeProdBlu[1].trim();
+                
+                return createBlunting(
+                        subBlu,
+                        typeBlu,
+                        productBlu
+                );
+              
+                
+                
             default:
                 throw new RuntimeException("Not implemented " + op);
         }
@@ -364,7 +389,7 @@ public class ParseConstructionFile {
         return new PCA(frags, product);
     }
     
-
+ 
 
     private Step createDigest(String substrate, String[] enzymes, String product) {
         List<Enzyme> enzList = new ArrayList<>();
@@ -404,7 +429,13 @@ public class ParseConstructionFile {
         }
         return new Assembly(frags, ez, product);
     }
+    
+    private Step createBlunting(String substrate, String type, String product){
+        return new Blunting(substrate, type, product);
+    }
 
+    
+    
     public static void main(String[] args) throws Exception {
         ParseConstructionFile pCF = new ParseConstructionFile();
         pCF.initiate();

@@ -8,6 +8,7 @@ import org.ucb.c5.constructionfile.model.*;
 import org.ucb.c5.utils.FileUtils;
 import org.ucb.c5.sequtils.RestrictionEnzymeFactory;
 import java.util.*;
+import org.ucb.c5.constructionfile.simulators.BluntingSimulator;
 import org.ucb.c5.utils.Log;
 
 public class SimulateConstructionFile {
@@ -63,6 +64,10 @@ public class SimulateConstructionFile {
 //                break; // simulateSequence(step, CFMap, fragments);
 //            case inoculate:
 //                break; // simulateInoculate(step, CFMap, fragments);
+            case blunting:
+                simulateBlunting((Blunting) step, fragments);
+                break;
+                
             default:
                 throw new RuntimeException("Not implemented " + step.getOperation());
         }
@@ -179,6 +184,18 @@ public class SimulateConstructionFile {
     private void simulateTransform(Transformation transformation, Map<String, Polynucleotide> fragments, String pdtName) {
         Log.info("Simulating Transformation of " + transformation.getProduct());
         fragments.put(pdtName, fragments.get(transformation.getDna()));
+    }
+    
+    private void simulateBlunting(Blunting blunting, Map<String, Polynucleotide> fragments) throws Exception{
+        Log.info("Simulating " + blunting.getTypes() + " Blunting of " + blunting.getSubstrate() + " for product " + blunting.getProduct());
+        
+        BluntingSimulator bluntSimulator = new BluntingSimulator();
+        bluntSimulator.initiate();
+        BluntingType type = BluntingType.valueOf(blunting.getTypes());
+        Polynucleotide substrate = fragments.get(blunting.getSubstrate());
+        Polynucleotide bluntingProduct = bluntSimulator.run(substrate, type);
+        fragments.put(blunting.getProduct(), bluntingProduct);
+        
     }
     
     public static void main(String[] args) throws Exception {

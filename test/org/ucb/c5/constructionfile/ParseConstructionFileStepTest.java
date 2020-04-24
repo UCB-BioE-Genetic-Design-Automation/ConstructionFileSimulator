@@ -12,6 +12,8 @@ import org.junit.Test;
 import org.ucb.c5.constructionfile.model.Acquisition;
 import org.ucb.c5.constructionfile.model.Antibiotic;
 import org.ucb.c5.constructionfile.model.Assembly;
+import org.ucb.c5.constructionfile.model.Blunting;
+import org.ucb.c5.constructionfile.model.BluntingType;
 import org.ucb.c5.constructionfile.model.ConstructionFile;
 import org.ucb.c5.constructionfile.model.Digestion;
 import org.ucb.c5.constructionfile.model.Enzyme;
@@ -23,83 +25,10 @@ import org.ucb.c5.constructionfile.model.Transformation;
 
 /**
  *
- * @author Star
+ * @author Zihang Shao
  */
 public class ParseConstructionFileStepTest {
     
-//    private Step crPCR(String[] oligos, String template, String size, String product) {    
-//        return new PCR(oligos[0], oligos[1], template, product);
-//    }
-//    
-//    private Step crPCA(String[] oligos, String product) {
-//        List<String> frags = new ArrayList<>();
-//        for (String frag : oligos) {
-//            frags.add(frag);
-//        }
-//        return new PCA(frags, product);
-//    }
-//    
-// 
-//
-//    private Step crDigest(String substrate, String[] enzymes, String product) {
-//        List<Enzyme> enzList = new ArrayList<>();
-//        for (String enz : enzymes) {
-//            Enzyme enzyme;
-//            try {
-//                enzyme = Enzyme.valueOf(enz);
-//            }
-//            catch(Exception IllegalArgumentException) {
-//                enzyme = Enzyme.valueOf(enz.toLowerCase());
-//            }
-//            enzList.add(enzyme);
-//        }
-//        return new Digestion(substrate, enzList, product);
-//    }
-//
-//    private Step crLigation(String[] fragments, String product) {
-//        List<String> frags = new ArrayList<>();
-//        frags.addAll(Arrays.asList(fragments));
-//        return new Ligation(frags, product);
-//    }
-//
-//    private Step crTransform(String substrate, String strain, String antibiotic, String product) {
-//        Antibiotic ab = Antibiotic.valueOf(antibiotic);
-//        return new Transformation(substrate, strain, ab, product);
-//    }
-//
-//    private Step crAcquire(String[] dnas) {
-//        return new Acquisition(dnas[0]);
-//    }
-//    
-//    private Step crAssemble(String[] fragments, String enzyme, String product){
-//        Enzyme ez = Enzyme.valueOf(enzyme);
-//        List<String> frags = new ArrayList<>();
-//        for (String frag:fragments){
-//            frags.add(frag);
-//        }
-//        return new Assembly(frags, ez, product);
-//    }    
-//    @Test
-//    public void testAcqiureComma() throws Exception {
-//        String rawText = 
-//                "acquire oligo A1,A2,A3\n" +
-//                "acquire plasmid B1,B2,B3\n" +
-//                "acquire oligo A4,oligo A5\n"+
-//                "acquire plasmid B4,plasmid B5\n"+
-//                "acquire oligo A6,plasmid B6\n"+
-//                "acquire plasmid B7,oligo A7\n";
-//        
-//        ParseConstructionFile pcf = new ParseConstructionFile();
-//        pcf.initiate();
-//        ConstructionFile CF = pcf.run(rawText);
-//        
-//        List<Step> steps = CF.getSteps();
-//        int numSteps = steps.size();
-//        int numExpect = 10;
-//        
-//        assert(numSteps==numExpect);
-//        
-//    }
     
     @Test
     public void testPCR() throws Exception {
@@ -347,10 +276,6 @@ public class ParseConstructionFileStepTest {
     }  
     
     
-    
-    
-    
-    
     @Test
     public void testAssembly() throws Exception {
         String rawText = 
@@ -399,5 +324,44 @@ public class ParseConstructionFileStepTest {
     }
     
     
+    
+    @Test
+    public void testBlunting() throws Exception {
+        String rawText = 
+                "blunting a1\t(b1,c1)\n" +
+                "blunting a2 \t( b2, c2)\n"+
+                "blunting a3\t (b3 c3 )\n"+
+                "blunting a4 \t ( b4   c4 )\n"+
+                "blunting a5       (    b5\tc5)\n"+
+                "blunting a6 (b6 \t c6    )\n"+
+                "blunting a7(    b7/c7   )\n"
+                ;
+                     
+        
+        ParseConstructionFile pcf = new ParseConstructionFile();
+        pcf.initiate();
+        ConstructionFile CF = pcf.run(rawText);
+        
+        List<Step> steps = CF.getSteps();
+        Step step1 = new Blunting("a1", "b1", "c1");
+        Step step2 = new Blunting("a2", "b2", "c2");
+        Step step3 = new Blunting("a3", "b3", "c3");
+        Step step4 = new Blunting("a4", "b4", "c4");
+        Step step5 = new Blunting("a5", "b5", "c5");
+        Step step6 = new Blunting("a6", "b6", "c6");
+        Step step7 = new Blunting("a7", "b7", "c7");
+
+
+        if (step1 == steps.get(1) &&
+            step2 == steps.get(2) &&
+            step3 == steps.get(3) &&
+            step4 == steps.get(4) &&
+            step5 == steps.get(5) &&
+            step6 == steps.get(6) &&
+            step7 == steps.get(7) 
+           ){
+        assert(true);
+        }        
+    }
     
 }

@@ -5,8 +5,9 @@ import java.util.List;
 /**
  *
  * @author yisheng
+ * @edit Zihang Shao
  */
-public class Blunting extends Step{
+public class Blunting implements Step{
     private final String substrate;
     private final String types;
     private final String product;
@@ -18,7 +19,6 @@ public Blunting(String substrate, String types, String product) {
         this.product = product;
         List<String> substrates = new ArrayList<>();
         substrates.add(substrate);
-        this.setSubstrates(substrates);
 
     }
 
