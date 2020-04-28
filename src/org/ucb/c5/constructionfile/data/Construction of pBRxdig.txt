@@ -1,6 +1,6 @@
 >Construction of pBRxdig
 Digest pBR322	(EcoRI,BamHI, dig)
-Blunt dig	(Exonuclease, xdig)
+Blunting dig	(Exonuclease, xdig)
 Ligate xdig	(pBRxdig)
 
 >pBR322

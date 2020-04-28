@@ -1,0 +1,294 @@
+LOCUS       pBR322                  3988 bp    DNA        circular     05-APR-2020
+DEFINITION  Cloning vector pBR322, complete sequence.
+KEYWORDS    .
+SOURCE      Cloning vector pBR322
+  ORGANISM  Cloning vector pBR322 other sequences; artificial sequences;
+            vectors.
+REFERENCE   1  (bases 1 to 4361)
+  AUTHORS   New England Biolabs.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (18-OCT-2007) Research Department, New England Biolabs,
+            240 County Road, Ipswich, MA 01938, USA
+COMMENT     1.  pBR322 beta-lactamase (bla, conferring ampicillin resistance)
+            is transcribed in vitro and in vivo both from its natural promoter
+            (P3) and from promoter P1, a pSC101 promoter artificially
+            juxtaposed with the bla sequence during construction of the pBR322
+            plasmid.  (Ref: Brosius et al, J Biol Chem 257, 9205-9210 (1982)).
+            2.  Corrects sequence error in tet gene deriving from the original
+            pSC101 sequence, present in GenBank entry (see accession J01749)
+            and NEB sequences dated 6/6/02 and earlier, based on sequencing of
+            pBR322 and pACYC184 at NEB in 2007 (Mathieu-Sheltry, V. and Cantin,
+            E., unpublished).  Correction is C1134T, representing a Thr350Ile
+            correction in the expressed protein.
+COMMENT     ApEinfo:methylated:1
+FEATURES             Location/Qualifiers
+     gene            6..906
+                     /gene="tet"
+                     /locus_tag="tet"
+                     /label="tet"
+                     /ApEinfo_label="tet"
+                     /ApEinfo_fwdcolor="#ff797d"
+                     /ApEinfo_revcolor="#ff102f"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     CDS             6..906
+                     /gene="tet"
+                     /note="tetR (confers resistance to tetracycline)"
+                     /codon_start=1
+                     /product="tetracycline efflux protein, class C"
+                     /translation="MKSNNALIVILGTVTLDAVGIGLVMPVLPGLLRDIVHSDSIASH
+                     YGVLLALYALMQFLCAPVLGALSDRFGRRPVLLASLLGATIDYAIMATTPVLWILYAG
+                     RIVAGITGATGAVAGAYIADITDGEDRARHFGLMSACFGVGMVAGPVAGGLLGAISLH
+                     APFLAAAVLNGLNLLLGCFLMQESHKGERRPMPLRAFNPVSSFRWARGMTIVAALMTV
+                     FFIMQLVGQVPAALWVIFGEDRFRWSATMIGLSLAVFGILHALAQAFVTGPATKRFGE
+                     KQAIIAGMAADALGYVLLAFATRGWMAFPIMILLASGGIGMPALQAMLSRQVDDDHQG
+                     QLQGSLAALTSLTSIIGPLIVTAIYAASASTWNGLAWIVGAALYLVCLPALRRGAWSR
+                     ATST"
+                     /locus_tag="tetracycline efflux protein, class C"
+                     /label="tetracycline efflux protein, class C"
+                     /ApEinfo_label="tetracycline efflux protein, class C"
+                     /ApEinfo_fwdcolor="#3d8be4"
+                     /ApEinfo_revcolor="#3d8be4"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     RBS             1535..1539
+                     /note="rop RBS"
+                     /locus_tag="rop RBS"
+                     /label="rop RBS"
+                     /ApEinfo_label="rop RBS"
+                     /ApEinfo_fwdcolor="cyan"
+                     /ApEinfo_revcolor="cyan"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     gene            1545..1736
+                     /gene="rop"
+                     /locus_tag="rop"
+                     /label="rop"
+                     /ApEinfo_label="rop"
+                     /ApEinfo_fwdcolor="#ff797d"
+                     /ApEinfo_revcolor="#ff102f"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     CDS             1545..1736
+                     /gene="rop"
+                     /exception="alternative start codon"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="ROP protein"
+                     /translation="MTKQEKTALNMARFIRSQTLTLLEKLNELDADEQADICESLHDH
+                     ADELYRSCLARFGDDGENL"
+                     /locus_tag="ROP protein"
+                     /label="ROP protein"
+                     /ApEinfo_label="ROP protein"
+                     /ApEinfo_fwdcolor="#3d8be4"
+                     /ApEinfo_revcolor="#3d8be4"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     rep_origin      complement(2164..2752)
+                     /note="pMB1 origin of replication (counter-clockwise)
+                     (RNAII -35 to RNA/DNA switch point)"
+                     /locus_tag="pMB1 origin of replication (counter-clockwise)
+                     (RNAII -35 to RNA/DNA switch point)"
+                     /label="pMB1 origin of replication (counter-clockwise)
+                     (RNAII -35 to RNA/DNA switch point)"
+                     /ApEinfo_label="pMB1 origin of replication
+                     (counter-clockwise) (RNAII -35 to RNA/DNA switch point)"
+                     /ApEinfo_fwdcolor="#999999"
+                     /ApEinfo_revcolor="#999999"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     misc_RNA        complement(2164..2716)
+                     /note="RNAII transcript (complementary strand)"
+                     /locus_tag="RNAII transcript (complementary strand)"
+                     /label="RNAII transcript (complementary strand)"
+                     /ApEinfo_label="RNAII transcript (complementary strand)"
+                     /ApEinfo_fwdcolor="pink"
+                     /ApEinfo_revcolor="pink"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     -35_signal      2570..2575
+                     /note="RNAI promoter (clockwise); TTGAAG"
+                     /locus_tag="RNAI promoter (clockwise); TTGAAG"
+                     /label="RNAI promoter (clockwise); TTGAAG"
+                     /ApEinfo_label="RNAI promoter (clockwise); TTGAAG"
+                     /ApEinfo_fwdcolor="cyan"
+                     /ApEinfo_revcolor="green"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     -10_signal      2592..2597
+                     /note="RNAI promoter (clockwise); GCTACA"
+                     /locus_tag="RNAI promoter (clockwise); GCTACA"
+                     /label="RNAI promoter (clockwise); GCTACA"
+                     /ApEinfo_label="RNAI promoter (clockwise); GCTACA"
+                     /ApEinfo_fwdcolor="pink"
+                     /ApEinfo_revcolor="pink"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     misc_RNA        2606..2713
+                     /note="RNAI transcript"
+                     /locus_tag="RNAI transcript"
+                     /label="RNAI transcript"
+                     /ApEinfo_label="RNAI transcript"
+                     /ApEinfo_fwdcolor="pink"
+                     /ApEinfo_revcolor="pink"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     -10_signal      complement(2726..2731)
+                     /note="RNAII promoter (counter-clockwise); CGTAAT"
+                     /locus_tag="RNAII promoter (counter-clockwise); CGTAAT"
+                     /label="RNAII promoter (counter-clockwise); CGTAAT"
+                     /ApEinfo_label="RNAII promoter (counter-clockwise);
+                     CGTAAT"
+                     /ApEinfo_fwdcolor="pink"
+                     /ApEinfo_revcolor="pink"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     -35_signal      complement(2747..2752)
+                     /note="RNAII promoter (counter-clockwise); TTGAGA"
+                     /locus_tag="RNAII promoter (counter-clockwise); TTGAGA"
+                     /label="RNAII promoter (counter-clockwise); TTGAGA"
+                     /ApEinfo_label="RNAII promoter (counter-clockwise);
+                     TTGAGA"
+                     /ApEinfo_fwdcolor="cyan"
+                     /ApEinfo_revcolor="green"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     gene            complement(2923..3783)
+                     /gene="bla"
+                     /locus_tag="bla"
+                     /label="bla"
+                     /ApEinfo_label="bla"
+                     /ApEinfo_fwdcolor="#ff797d"
+                     /ApEinfo_revcolor="#ff102f"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     CDS             complement(2923..3783)
+                     /gene="bla"
+                     /note="ampR (confers resistance to ampicillin)"
+                     /codon_start=1
+                     /product="beta-lactamase"
+                     /translation="MSIQHFRVALIPFFAAFCLPVFAHPETLVKVKDAEDQLGARVGY
+                     IELDLNSGKILESFRPEERFPMMSTFKVLLCGAVLSRVDAGQEQLGRRIHYSQNDLVE
+                     YSPVTEKHLTDGMTVRELCSAAITMSDNTAANLLLTTIGGPKELTAFLHNMGDHVTRL
+                     DRWEPELNEAIPNDERDTTMPAAMATTLRKLLTGELLTLASRQQLIDWMEADKVAGPL
+                     LRSALPAGWFIADKSGAGERGSRGIIAALGPDGKPSRIVVIYTTGSQATMDERNRQIA
+                     EIGASLIKHW"
+                     /locus_tag="beta-lactamase"
+                     /label="beta-lactamase"
+                     /ApEinfo_label="beta-lactamase"
+                     /ApEinfo_fwdcolor="#3d8be4"
+                     /ApEinfo_revcolor="#3d8be4"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     sig_peptide     complement(3715..3783)
+                     /gene="bla"
+                     /note="required for secretion to the periplasm; cleaved
+                     off to form the mature beta-lactamase protein."
+                     /locus_tag="bla(1)"
+                     /label="bla(1)"
+                     /ApEinfo_label="bla"
+                     /ApEinfo_fwdcolor="pink"
+                     /ApEinfo_revcolor="pink"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     RBS             complement(3791..3795)
+                     /note="bla RBS"
+                     /locus_tag="bla RBS"
+                     /label="bla RBS"
+                     /ApEinfo_label="bla RBS"
+                     /ApEinfo_fwdcolor="cyan"
+                     /ApEinfo_revcolor="cyan"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     -10_signal      complement(3827..3832)
+                     /note="bla (P3) promoter (counter-clockwise); GAGACA;
+                     transcript start 4188 (complementary strand)"
+                     /locus_tag="bla (P3) promoter (counter-clockwise); GAGACA;
+                     transcript start 4188 (complementary strand)"
+                     /label="bla (P3) promoter (counter-clockwise); GAGACA;
+                     transcript start 4188 (complementary strand)"
+                     /ApEinfo_label="bla (P3) promoter (counter-clockwise);
+                     GAGACA; transcript start 4188 (complementary strand)"
+                     /ApEinfo_fwdcolor="pink"
+                     /ApEinfo_revcolor="pink"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     -35_signal      complement(3848..3853)
+                     /note="bla (P3) promoter (counter-clockwise); TTCAAA"
+                     /locus_tag="bla (P3) promoter (counter-clockwise); TTCAAA"
+                     /label="bla (P3) promoter (counter-clockwise); TTCAAA"
+                     /ApEinfo_label="bla (P3) promoter (counter-clockwise);
+                     TTCAAA"
+                     /ApEinfo_fwdcolor="cyan"
+                     /ApEinfo_revcolor="green"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+ORIGIN
+        1 gaattgatcc tctacgccgg acgcatcgtg gccggcatca ccggcgccac aggtgcggtt
+       61 gctggcgcct atatcgccga catcaccgat ggggaagatc gggctcgcca cttcgggctc
+      121 atgagcgctt gtttcggcgt gggtatggtg gcaggccccg tggccggggg actgttgggc
+      181 gccatctcct tgcatgcacc attccttgcg gcggcggtgc tcaacggcct caacctacta
+      241 ctgggctgct tcctaatgca ggagtcgcat aagggagagc gtcgaccgat gcccttgaga
+      301 gccttcaacc cagtcagctc cttccggtgg gcgcggggca tgactatcgt cgccgcactt
+      361 atgactgtct tctttatcat gcaactcgta ggacaggtgc cggcagcgct ctgggtcatt
+      421 ttcggcgagg accgctttcg ctggagcgcg acgatgatcg gcctgtcgct tgcggtattc
+      481 ggaatcttgc acgccctcgc tcaagccttc gtcactggtc ccgccaccaa acgtttcggc
+      541 gagaagcagg ccattatcgc cggcatggcg gccgacgcgc tgggctacgt cttgctggcg
+      601 ttcgcgacgc gaggctggat ggccttcccc attatgattc ttctcgcttc cggcggcatc
+      661 gggatgcccg cgttgcaggc catgctgtcc aggcaggtag atgacgacca tcagggacag
+      721 cttcaaggat cgctcgcggc tcttaccagc ctaacttcga tcattggacc gctgatcgtc
+      781 acggcgattt atgccgcctc ggcgagcaca tggaacgggt tggcatggat tgtaggcgcc
+      841 gccctatacc ttgtctgcct ccccgcgttg cgtcgcggtg catggagccg ggccacctcg
+      901 acctgaatgg aagccggcgg cacctcgcta acggattcac cactccaaga attggagcca
+      961 atcaattctt gcggagaact gtgaatgcgc aaaccaaccc ttggcagaac atatccatcg
+     1021 cgtccgccat ctccagcagc cgcacgcggc gcatctcggg cagcgttggg tcctggccac
+     1081 gggtgcgcat gatcgtgctc ctgtcgttga ggacccggct aggctggcgg ggttgcctta
+     1141 ctggttagca gaatgaatca ccgatacgcg agcgaacgtg aagcgactgc tgctgcaaaa
+     1201 cgtctgcgac ctgagcaaca acatgaatgg tcttcggttt ccgtgtttcg taaagtctgg
+     1261 aaacgcggaa gtcagcgccc tgcaccatta tgttccggat ctgcatcgca ggatgctgct
+     1321 ggctaccctg tggaacacct acatctgtat taacgaagcg ctggcattga ccctgagtga
+     1381 tttttctctg gtcccgccgc atccataccg ccagttgttt accctcacaa cgttccagta
+     1441 accgggcatg ttcatcatca gtaacccgta tcgtgagcat cctctctcgt ttcatcggta
+     1501 tcattacccc catgaacaga aatccccctt acacggaggc atcagtgacc aaacaggaaa
+     1561 aaaccgccct taacatggcc cgctttatca gaagccagac attaacgctt ctggagaaac
+     1621 tcaacgagct ggacgcggat gaacaggcag acatctgtga atcgcttcac gaccacgctg
+     1681 atgagcttta ccgcagctgc ctcgcgcgtt tcggtgatga cggtgaaaac ctctgacaca
+     1741 tgcagctccc ggagacggtc acagcttgtc tgtaagcgga tgccgggagc agacaagccc
+     1801 gtcagggcgc gtcagcgggt gttggcgggt gtcggggcgc agccatgacc cagtcacgta
+     1861 gcgatagcgg agtgtatact ggcttaacta tgcggcatca gagcagattg tactgagagt
+     1921 gcaccatatg cggtgtgaaa taccgcacag atgcgtaagg agaaaatacc gcatcaggcg
+     1981 ctcttccgct tcctcgctca ctgactcgct gcgctcggtc gttcggctgc ggcgagcggt
+     2041 atcagctcac tcaaaggcgg taatacggtt atccacagaa tcaggggata acgcaggaaa
+     2101 gaacatgtga gcaaaaggcc agcaaaaggc caggaaccgt aaaaaggccg cgttgctggc
+     2161 gtttttccat aggctccgcc cccctgacga gcatcacaaa aatcgacgct caagtcagag
+     2221 gtggcgaaac ccgacaggac tataaagata ccaggcgttt ccccctggaa gctccctcgt
+     2281 gcgctctcct gttccgaccc tgccgcttac cggatacctg tccgcctttc tcccttcggg
+     2341 aagcgtggcg ctttctcata gctcacgctg taggtatctc agttcggtgt aggtcgttcg
+     2401 ctccaagctg ggctgtgtgc acgaaccccc cgttcagccc gaccgctgcg ccttatccgg
+     2461 taactatcgt cttgagtcca acccggtaag acacgactta tcgccactgg cagcagccac
+     2521 tggtaacagg attagcagag cgaggtatgt aggcggtgct acagagttct tgaagtggtg
+     2581 gcctaactac ggctacacta gaaggacagt atttggtatc tgcgctctgc tgaagccagt
+     2641 taccttcgga aaaagagttg gtagctcttg atccggcaaa caaaccaccg ctggtagcgg
+     2701 tggttttttt gtttgcaagc agcagattac gcgcagaaaa aaaggatctc aagaagatcc
+     2761 tttgatcttt tctacggggt ctgacgctca gtggaacgaa aactcacgtt aagggatttt
+     2821 ggtcatgaga ttatcaaaaa ggatcttcac ctagatcctt ttaaattaaa aatgaagttt
+     2881 taaatcaatc taaagtatat atgagtaaac ttggtctgac agttaccaat gcttaatcag
+     2941 tgaggcacct atctcagcga tctgtctatt tcgttcatcc atagttgcct gactccccgt
+     3001 cgtgtagata actacgatac gggagggctt accatctggc cccagtgctg caatgatacc
+     3061 gcgagaccca cgctcaccgg ctccagattt atcagcaata aaccagccag ccggaagggc
+     3121 cgagcgcaga agtggtcctg caactttatc cgcctccatc cagtctatta attgttgccg
+     3181 ggaagctaga gtaagtagtt cgccagttaa tagtttgcgc aacgttgttg ccattgctgc
+     3241 aggcatcgtg gtgtcacgct cgtcgtttgg tatggcttca ttcagctccg gttcccaacg
+     3301 atcaaggcga gttacatgat cccccatgtt gtgcaaaaaa gcggttagct ccttcggtcc
+     3361 tccgatcgtt gtcagaagta agttggccgc agtgttatca ctcatggtta tggcagcact
+     3421 gcataattct cttactgtca tgccatccgt aagatgcttt tctgtgactg gtgagtactc
+     3481 aaccaagtca ttctgagaat agtgtatgcg gcgaccgagt tgctcttgcc cggcgtcaac
+     3541 acgggataat accgcgccac atagcagaac tttaaaagtg ctcatcattg gaaaacgttc
+     3601 ttcggggcga aaactctcaa ggatcttacc gctgttgaga tccagttcga tgtaacccac
+     3661 tcgtgcaccc aactgatctt cagcatcttt tactttcacc agcgtttctg ggtgagcaaa
+     3721 aacaggaagg caaaatgccg caaaaaaggg aataagggcg acacggaaat gttgaatact
+     3781 catactcttc ctttttcaat attattgaag catttatcag ggttattgtc tcatgagcgg
+     3841 atacatattt gaatgtattt agaaaaataa acaaataggg gttccgcgca catttccccg
+     3901 aaaagtgcca cctgacgtct aagaaaccat tattatcatg acattaacct ataaaaatag
+     3961 gcgtatcacg aggccctttc gtcttcaa   
+//
