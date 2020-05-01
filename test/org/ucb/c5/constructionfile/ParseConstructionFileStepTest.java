@@ -139,6 +139,44 @@ public class ParseConstructionFileStepTest {
     
     
     @Test
+    public void testPCARange() throws Exception {
+        String rawText = 
+                "pca a1-a2 (p1)\n" +
+                "pca b3-b4\t( p2)\n" +
+                "pca c23-c24      (p3  )\n"+
+                "pca d99-d100   \t    (    p4    )"
+                ;
+        
+        ParseConstructionFile pcf = new ParseConstructionFile();
+        pcf.initiate();
+        ConstructionFile CF = pcf.run(rawText);
+        
+        List<Step> steps = CF.getSteps();
+        
+        PCA pca0 = (PCA) steps.get(0);
+        assert(pca0.getOligoPool().get(0).equals("a1"));
+        assert(pca0.getOligoPool().get(1).equals("a2"));
+        assert(pca0.getProduct().equals("p1"));
+        
+        PCA pca1 = (PCA) steps.get(1);
+        assert(pca1.getOligoPool().get(0).equals("b3"));
+        assert(pca1.getOligoPool().get(1).equals("b4"));
+        assert(pca1.getProduct().equals("p2"));
+        
+        PCA pca2 = (PCA) steps.get(2);
+        assert(pca2.getOligoPool().get(0).equals("c23"));
+        assert(pca2.getOligoPool().get(1).equals("c24"));
+        assert(pca2.getProduct().equals("p3"));
+        
+        PCA pca3 = (PCA) steps.get(3);
+        assert(pca3.getOligoPool().get(0).equals("d99"));
+        assert(pca3.getOligoPool().get(1).equals("d100"));
+        assert(pca3.getProduct().equals("p4"));
+                       
+    }
+    
+    
+    @Test
     public void testDigestion() throws Exception {
         String rawText = 
                 "digest a1 with DpnI,SpeI\t(d1)\n" +
@@ -202,6 +240,44 @@ public class ParseConstructionFileStepTest {
             assert(ligate.getProduct().equals("c"+i));
         }
                    
+    }
+    
+    
+    @Test
+    public void testLigationRange() throws Exception {
+        String rawText = 
+                "ligate a1-a2 (p1)\n" +
+                "ligate b3-b4\t( p2)\n" +
+                "ligate c23-c24      (p3  )\n"+
+                "ligate d99-d100   \t    (    p4    )"
+                ;
+        
+        ParseConstructionFile pcf = new ParseConstructionFile();
+        pcf.initiate();
+        ConstructionFile CF = pcf.run(rawText);
+        
+        List<Step> steps = CF.getSteps();
+        
+        Ligation ligate0 = (Ligation) steps.get(0);
+        assert(ligate0.getFragments().get(0).equals("a1"));
+        assert(ligate0.getFragments().get(1).equals("a2"));
+        assert(ligate0.getProduct().equals("p1"));
+        
+        Ligation ligate1 = (Ligation) steps.get(1);
+        assert(ligate1.getFragments().get(0).equals("b3"));
+        assert(ligate1.getFragments().get(1).equals("b4"));
+        assert(ligate1.getProduct().equals("p2"));
+        
+        Ligation ligate2 = (Ligation) steps.get(2);
+        assert(ligate2.getFragments().get(0).equals("c23"));
+        assert(ligate2.getFragments().get(1).equals("c24"));
+        assert(ligate2.getProduct().equals("p3"));
+        
+        Ligation ligate3 = (Ligation) steps.get(3);
+        assert(ligate3.getFragments().get(0).equals("d99"));
+        assert(ligate3.getFragments().get(1).equals("d100"));
+        assert(ligate3.getProduct().equals("p4"));
+                       
     }
     
     
@@ -280,6 +356,70 @@ public class ParseConstructionFileStepTest {
             assert(assemble.getEnzyme().equals(ez[i-1]));
             assert(assemble.getProduct().equals("c"+i));
         }
+               
+    }
+    
+    
+    @Test
+    public void testAssemblyRange() throws Exception {
+        String rawText = 
+                "assemble a1-a2\t(DpnI,p1)\n" +
+                "assemble a9-a10 \t( XbaI, p2)\n"+
+                "assemble b35-b36\t (BsaI\tp3 )\n"+
+                "assemble c99-c100 \t ( Gibson p4 )\n"+
+                "assemble c207-c208 (BbsI    p5)\n"+
+                "assemble d999-d1000    (   BamHI/p6     )\n"
+                ;
+                
+        Enzyme[] ez = new Enzyme[6];
+        ez[0] = Enzyme.valueOf("DpnI");
+        ez[1] = Enzyme.valueOf("XbaI");
+        ez[2] = Enzyme.valueOf("BsaI");
+        ez[3] = Enzyme.valueOf("Gibson");
+        ez[4] = Enzyme.valueOf("BbsI");
+        ez[5] = Enzyme.valueOf("BamHI");
+                
+        ParseConstructionFile pcf = new ParseConstructionFile();
+        pcf.initiate();
+        ConstructionFile CF = pcf.run(rawText);
+        
+        List<Step> steps = CF.getSteps();
+        
+        Assembly asb0 = (Assembly) steps.get(0);
+        assert(asb0.getFragments().get(0).equals("a1"));
+        assert(asb0.getFragments().get(1).equals("a2"));
+        assert(asb0.getEnzyme().equals(ez[0]));
+        assert(asb0.getProduct().equals("p1"));
+        
+        Assembly asb1 = (Assembly) steps.get(1);
+        assert(asb1.getFragments().get(0).equals("a9"));
+        assert(asb1.getFragments().get(1).equals("a10"));
+        assert(asb1.getEnzyme().equals(ez[1]));
+        assert(asb1.getProduct().equals("p2"));
+        
+        Assembly asb2 = (Assembly) steps.get(2);
+        assert(asb2.getFragments().get(0).equals("b35"));
+        assert(asb2.getFragments().get(1).equals("b36"));
+        assert(asb2.getEnzyme().equals(ez[2]));
+        assert(asb2.getProduct().equals("p3"));
+        
+        Assembly asb3 = (Assembly) steps.get(3);
+        assert(asb3.getFragments().get(0).equals("c99"));
+        assert(asb3.getFragments().get(1).equals("c100"));
+        assert(asb3.getEnzyme().equals(ez[3]));
+        assert(asb3.getProduct().equals("p4"));
+        
+        Assembly asb4 = (Assembly) steps.get(4);
+        assert(asb4.getFragments().get(0).equals("c207"));
+        assert(asb4.getFragments().get(1).equals("c208"));
+        assert(asb4.getEnzyme().equals(ez[4]));
+        assert(asb4.getProduct().equals("p5"));
+        
+        Assembly asb5 = (Assembly) steps.get(5);
+        assert(asb5.getFragments().get(0).equals("d999"));
+        assert(asb5.getFragments().get(1).equals("d1000"));
+        assert(asb5.getEnzyme().equals(ez[5]));
+        assert(asb5.getProduct().equals("p6"));
                
     }
        
