@@ -33,13 +33,21 @@ public class ParseConstructionFileStepTest {
     @Test
     public void testPCR() throws Exception {
         String rawText = 
-                "pcr A1,A2 on B1\t(C1 bp,D1)\n" +
-                "pcr A3 A4 on B2\t( C2 bp,D2)\n" +
-                "pcr A5, A6 on  B3\t (C3 bp, D3)\n"+
-                "pcr A7\tA8 on \tB4 \t(C4 bp, D4)\n"+
-                "pcr A9   A10 on   B5    (C5 bp, D5 )\n"+
-                "pcr A11 and A12 on B6 (C6bp,D6)\n"+
-                "pcr A13/A14 on B7 \t ( C7bp,D7 )\n"
+                "pcr A1,B1 on C1\t(S1 bp,D1)\n" +
+                "pcr A2 B2 on C2\t( S2 bp,D2)\n" +
+                "pcr A3, B3 on  C3\t (S3 bp, D3)\n"+
+                "pcr A4\tB4 on \tC4 \t(S4 bp, D4)\n"+
+                "pcr A5   B5 on   C5    (S5 bp, D5 )\n"+
+                "pcr A6 and B6 on C6 (S6bp,D6)\n"+
+                "pcr A7/B7 on C7 \t ( S7bp,D7 )\n"+
+                
+                "pcr A8,B8 on C8\t(D8)\n" +
+                "pcr A9 B9 on C9 \t( D9)\n" +
+                "pcr A10, B10 on  C10\t (D10 )\n"+
+                "pcr A11\tB11 on \tC11 \t (D11   )\n"+
+                "pcr A12   B12 on   C12    (    D12 )\n"+
+                "pcr A13 and B13 on C13 ( D13 )\n"+
+                "pcr A14/B14 on C14 \t ( D14\t )\n"
                 ;
         
         ParseConstructionFile pcf = new ParseConstructionFile();
@@ -47,24 +55,57 @@ public class ParseConstructionFileStepTest {
         ConstructionFile CF = pcf.run(rawText);
         
         List<Step> steps = CF.getSteps();
-        Step step1 = new PCR("A1", "A2", "B1", "D1");
-        Step step2 = new PCR("A3", "A4", "B2", "D2");
-        Step step3 = new PCR("A5", "A6", "B3", "D3");
-        Step step4 = new PCR("A7", "A8", "B4", "D4");
-        Step step5 = new PCR("A9", "A10", "B5", "D5");
-        Step step6 = new PCR("A11", "A12", "B6", "D6");
-        Step step7 = new PCR("A13", "A14", "B7", "D7");
-
-        if ( step1 == steps.get(1) &&
-             step2 == steps.get(2) &&
-             step3 == steps.get(3) &&
-             step4 == steps.get(4) &&
-             step5 == steps.get(5) &&
-             step6 == steps.get(6) &&
-             step7 == steps.get(7) 
-           ){
-        assert(true);
-        }        
+               
+        for(int i=1;i<=steps.size();i++){
+            PCR pcr = (PCR) steps.get(i-1);
+            assert(pcr.getOligo1().equals("A"+i));
+            assert(pcr.getOligo2().equals("B"+i));
+            assert(pcr.getTemplate().equals("C"+i));
+            assert(pcr.getProduct().equals("D"+i));
+        }    
+                
+    }
+    
+    
+    @Test
+    public void testPCRRange() throws Exception {
+        String rawText = 
+                "pcr a1-a2 on C1\t(S1 bp,D1)\n" +
+                "pcr b3-b4   on C2\t( S2 bp,D2)\n" +
+                "pcr c23-c24 on  C3\t (S3 bp, D3)\n"+
+                "pcr d99-d100 \t on   C4 (    S4 bp,   D4    )"
+                ;
+        
+        ParseConstructionFile pcf = new ParseConstructionFile();
+        pcf.initiate();
+        ConstructionFile CF = pcf.run(rawText);
+        
+        List<Step> steps = CF.getSteps();
+        
+        PCR pcr0 = (PCR) steps.get(0);
+        assert(pcr0.getOligo1().equals("a1"));
+        assert(pcr0.getOligo2().equals("a2"));
+        assert(pcr0.getTemplate().equals("C1"));
+        assert(pcr0.getProduct().equals("D1"));
+        
+        PCR pcr1 = (PCR) steps.get(1);
+        assert(pcr1.getOligo1().equals("b3"));
+        assert(pcr1.getOligo2().equals("b4"));
+        assert(pcr1.getTemplate().equals("C2"));
+        assert(pcr1.getProduct().equals("D2"));
+        
+        PCR pcr2 = (PCR) steps.get(2);
+        assert(pcr2.getOligo1().equals("c23"));
+        assert(pcr2.getOligo2().equals("c24"));
+        assert(pcr2.getTemplate().equals("C3"));
+        assert(pcr2.getProduct().equals("D3"));
+        
+        PCR pcr3 = (PCR) steps.get(3);
+        assert(pcr3.getOligo1().equals("d99"));
+        assert(pcr3.getOligo2().equals("d100"));
+        assert(pcr3.getTemplate().equals("C4"));
+        assert(pcr3.getProduct().equals("D4"));
+                       
     }
     
     
@@ -81,42 +122,19 @@ public class ParseConstructionFileStepTest {
                 "pca a8,  b8  (c8)"
                 ;
         
-        List<String> str1 = Arrays.asList("a1","b1");
-        List<String> str2 = Arrays.asList("a2","b2");
-        List<String> str3 = Arrays.asList("a3","b3");
-        List<String> str4 = Arrays.asList("a4","b4");
-        List<String> str5 = Arrays.asList("a5","b5");
-        List<String> str6 = Arrays.asList("a6","b6");
-        List<String> str7 = Arrays.asList("a7","b7");
-        List<String> str8 = Arrays.asList("a8","b8");
-                
-        
         ParseConstructionFile pcf = new ParseConstructionFile();
         pcf.initiate();
         ConstructionFile CF = pcf.run(rawText);
-        
+                
         List<Step> steps = CF.getSteps();
-        Step step1 = new PCA(str1, "c1");
-        Step step2 = new PCA(str2, "c2");
-        Step step3 = new PCA(str3, "c3");
-        Step step4 = new PCA(str4, "c4");
-        Step step5 = new PCA(str5, "c5");
-        Step step6 = new PCA(str6, "c6");
-        Step step7 = new PCA(str7, "c7");
-        Step step8 = new PCA(str8, "c8");
-
-
-        if (step1 == steps.get(1) &&
-            step2 == steps.get(2) &&
-            step3 == steps.get(3) &&
-            step4 == steps.get(4) &&
-            step5 == steps.get(5) &&
-            step6 == steps.get(6) &&
-            step7 == steps.get(7) &&
-            step8 == steps.get(8)
-           ){
-        assert(true);
-        }        
+        
+        for(int i=1;i<=steps.size();i++){
+            PCA pca = (PCA) steps.get(i-1);
+            assert(pca.getOligoPool().get(0).equals("a"+i));
+            assert(pca.getOligoPool().get(1).equals("b"+i));
+            assert(pca.getProduct().equals("c"+i));
+        }
+                    
     }
     
     
@@ -131,40 +149,30 @@ public class ParseConstructionFileStepTest {
                 "digest a6 with BamHI and BglII   (d6   )\n"+
                 "digest a7 with MfeI/PstI  (   d7   )\n"
                 ;
-        
-        List<Enzyme> str1 = Arrays.asList(Enzyme.valueOf("DpnI"),Enzyme.valueOf("SpeI"));
-        List<Enzyme> str2 = Arrays.asList(Enzyme.valueOf("XbaI"),Enzyme.valueOf("XhoI"));
-        List<Enzyme> str3 = Arrays.asList(Enzyme.valueOf("BsaI"),Enzyme.valueOf("BsmBI"));
-        List<Enzyme> str4 = Arrays.asList(Enzyme.valueOf("Gibson"),Enzyme.valueOf("AarI"));
-        List<Enzyme> str5 = Arrays.asList(Enzyme.valueOf("BbsI"),Enzyme.valueOf("EcoRI"));
-        List<Enzyme> str6 = Arrays.asList(Enzyme.valueOf("BamHI"),Enzyme.valueOf("BglII"));
-        List<Enzyme> str7 = Arrays.asList(Enzyme.valueOf("MfeI"),Enzyme.valueOf("PstI"));
                 
+        List[] ezlist = new List[7];
+        ezlist[0] = Arrays.asList(Enzyme.valueOf("DpnI"),Enzyme.valueOf("SpeI"));
+        ezlist[1] = Arrays.asList(Enzyme.valueOf("XbaI"),Enzyme.valueOf("XhoI"));
+        ezlist[2] = Arrays.asList(Enzyme.valueOf("BsaI"),Enzyme.valueOf("BsmBI"));
+        ezlist[3] = Arrays.asList(Enzyme.valueOf("Gibson"),Enzyme.valueOf("AarI"));
+        ezlist[4] = Arrays.asList(Enzyme.valueOf("BbsI"),Enzyme.valueOf("EcoRI"));
+        ezlist[5] = Arrays.asList(Enzyme.valueOf("BamHI"),Enzyme.valueOf("BglII"));
+        ezlist[6] = Arrays.asList(Enzyme.valueOf("MfeI"),Enzyme.valueOf("PstI"));
         
         ParseConstructionFile pcf = new ParseConstructionFile();
         pcf.initiate();
         ConstructionFile CF = pcf.run(rawText);
         
         List<Step> steps = CF.getSteps();
-        Step step1 = new Digestion("a1", str1, "d1");
-        Step step2 = new Digestion("a2", str2, "d2");
-        Step step3 = new Digestion("a3", str3, "d3");
-        Step step4 = new Digestion("a4", str4, "d4");
-        Step step5 = new Digestion("a5", str5, "d5");
-        Step step6 = new Digestion("a6", str6, "d6");
-        Step step7 = new Digestion("a7", str7, "d7");
-
-
-        if (step1 == steps.get(1) &&
-            step2 == steps.get(2) &&
-            step3 == steps.get(3) &&
-            step4 == steps.get(4) &&
-            step5 == steps.get(5) &&
-            step6 == steps.get(6) &&
-            step7 == steps.get(7) 
-           ){
-        assert(true);
-        }        
+        
+        for(int i=1;i<=steps.size();i++){
+            Digestion digest = (Digestion) steps.get(i-1);
+            assert(digest.getSubstrate().equals("a"+i));
+            assert(digest.getEnzymes().equals(ezlist[i-1]));
+            assert(digest.getProduct().equals("d"+i));
+            
+        }
+                
     }
     
     
@@ -180,43 +188,20 @@ public class ParseConstructionFileStepTest {
                 "ligate a7/b7  ( c7 )\n"+
                 "ligate a8,  b8  (c8)"
                 ;
-        
-        List<String> str1 = Arrays.asList("a1","b1");
-        List<String> str2 = Arrays.asList("a2","b2");
-        List<String> str3 = Arrays.asList("a3","b3");
-        List<String> str4 = Arrays.asList("a4","b4");
-        List<String> str5 = Arrays.asList("a5","b5");
-        List<String> str6 = Arrays.asList("a6","b6");
-        List<String> str7 = Arrays.asList("a7","b7");
-        List<String> str8 = Arrays.asList("a8","b8");
                 
-        
         ParseConstructionFile pcf = new ParseConstructionFile();
         pcf.initiate();
         ConstructionFile CF = pcf.run(rawText);
         
         List<Step> steps = CF.getSteps();
-        Step step1 = new Ligation(str1, "c1");
-        Step step2 = new Ligation(str2, "c2");
-        Step step3 = new Ligation(str3, "c3");
-        Step step4 = new Ligation(str4, "c4");
-        Step step5 = new Ligation(str5, "c5");
-        Step step6 = new Ligation(str6, "c6");
-        Step step7 = new Ligation(str7, "c7");
-        Step step8 = new Ligation(str8, "c8");
-
-
-        if (step1 == steps.get(1) &&
-            step2 == steps.get(2) &&
-            step3 == steps.get(3) &&
-            step4 == steps.get(4) &&
-            step5 == steps.get(5) &&
-            step6 == steps.get(6) &&
-            step7 == steps.get(7) &&
-            step8 == steps.get(8)
-           ){
-        assert(true);
-        }        
+        
+        for(int i=1;i<=steps.size();i++){
+            Ligation ligate = (Ligation) steps.get(i-1);
+            assert(ligate.getFragments().get(0).equals("a"+i));
+            assert(ligate.getFragments().get(1).equals("b"+i));
+            assert(ligate.getProduct().equals("c"+i));
+        }
+                   
     }
     
     
@@ -239,38 +224,25 @@ public class ParseConstructionFileStepTest {
         pcf.initiate();
         ConstructionFile CF = pcf.run(rawText);
         
-        Antibiotic ab1 = Antibiotic.valueOf("Spec");
-        Antibiotic ab2 = Antibiotic.valueOf("Amp");
-        Antibiotic ab3 = Antibiotic.valueOf("Kan");
-        Antibiotic ab4 = Antibiotic.valueOf("Cam");
-        Antibiotic ab5 = Antibiotic.valueOf("Tet");
-        Antibiotic ab6 = Antibiotic.valueOf("Gen");
-        Antibiotic ab7 = Antibiotic.valueOf("Pur");
-        Antibiotic ab8 = Antibiotic.valueOf("None");
+        Antibiotic[] ab = new Antibiotic[9];
+        ab[0] = Antibiotic.valueOf("Spec");
+        ab[1] = Antibiotic.valueOf("Amp");
+        ab[2] = Antibiotic.valueOf("Kan");
+        ab[3] = Antibiotic.valueOf("Cam");
+        ab[4] = Antibiotic.valueOf("Tet");
+        ab[5] = Antibiotic.valueOf("Gen");
+        ab[6] = Antibiotic.valueOf("Pur");
+        ab[7] = Antibiotic.valueOf("None");
+        ab[8] = Antibiotic.valueOf("None");
 
         
         List<Step> steps = CF.getSteps();
-        Step step1 = new Transformation("a1", "b1", ab1, "d1");
-        Step step2 = new Transformation("a2", "b2", ab2, "d2");
-        Step step3 = new Transformation("a3", "b3", ab3, "d3");
-        Step step4 = new Transformation("a4", "b4", ab4, "d4");
-        Step step5 = new Transformation("a5", "b5", ab5, "d5");
-        Step step6 = new Transformation("a6", "b6", ab6, "d6");
-        Step step7 = new Transformation("a7", "b7", ab7, "a7");
-        Step step8 = new Transformation("a8", "b8", ab8, "a8");
-        Step step9 = new Transformation("a9", "b9", ab8, "a9");
-
-        if (step1 == steps.get(1) &&
-            step2 == steps.get(2) &&
-            step3 == steps.get(3) &&
-            step4 == steps.get(4) &&
-            step5 == steps.get(5) &&
-            step6 == steps.get(6) &&
-            step7 == steps.get(7) &&
-            step8 == steps.get(8) &&
-            step9 == steps.get(9) 
-           ){
-        assert(true);
+        
+        for(int i=1;i<=steps.size();i++){
+            Transformation transform = (Transformation) steps.get(i-1);
+            assert(transform.getDna().equals("a"+i));
+            assert(transform.getStrain().equals("b"+i));
+            assert(transform.getAntibiotic().equals(ab[i-1]));
         }
                 
     }  
@@ -286,44 +258,31 @@ public class ParseConstructionFileStepTest {
                 "assemble a5 and b5 (BbsI    c5)\n"+
                 "assemble a6/b6    (   BamHI/c6     )\n"
                 ;
-        
-        List<String> str1 = Arrays.asList("a1","b1");
-        Enzyme ez1 = Enzyme.valueOf("DpnI");
-        List<String> str2 = Arrays.asList("a2","b2");
-        Enzyme ez2 = Enzyme.valueOf("XbaI");
-        List<String> str3 = Arrays.asList("a3","b3");
-        Enzyme ez3 = Enzyme.valueOf("BsaI");
-        List<String> str4 = Arrays.asList("a4","b4");
-        Enzyme ez4 = Enzyme.valueOf("Gibson");
-        List<String> str5 = Arrays.asList("a5","b5");
-        Enzyme ez5 = Enzyme.valueOf("BbsI");
-        List<String> str6 = Arrays.asList("a6","b6");
-        Enzyme ez6 = Enzyme.valueOf("BamHI");
-        
+                
+        Enzyme[] ez = new Enzyme[6];
+        ez[0] = Enzyme.valueOf("DpnI");
+        ez[1] = Enzyme.valueOf("XbaI");
+        ez[2] = Enzyme.valueOf("BsaI");
+        ez[3] = Enzyme.valueOf("Gibson");
+        ez[4] = Enzyme.valueOf("BbsI");
+        ez[5] = Enzyme.valueOf("BamHI");
+                
         ParseConstructionFile pcf = new ParseConstructionFile();
         pcf.initiate();
         ConstructionFile CF = pcf.run(rawText);
         
         List<Step> steps = CF.getSteps();
-        Step step1 = new Assembly(str1, ez1, "c1");
-        Step step2 = new Assembly(str2, ez2, "c2");
-        Step step3 = new Assembly(str3, ez3, "c3");
-        Step step4 = new Assembly(str4, ez4, "c4");
-        Step step5 = new Assembly(str5, ez5, "c5");
-        Step step6 = new Assembly(str6, ez6, "c6");
         
-        if (step1 == steps.get(1) &&
-            step2 == steps.get(2) &&
-            step3 == steps.get(3) &&
-            step4 == steps.get(4) &&
-            step5 == steps.get(5) &&
-            step6 == steps.get(6)  
-           ){
-        assert(true);
-        }        
+        for(int i=1;i<=steps.size();i++){
+            Assembly assemble = (Assembly) steps.get(i-1);
+            assert(assemble.getFragments().get(0).equals("a"+i));
+            assert(assemble.getFragments().get(1).equals("b"+i));
+            assert(assemble.getEnzyme().equals(ez[i-1]));
+            assert(assemble.getProduct().equals("c"+i));
+        }
+               
     }
-    
-    
+       
     
     @Test
     public void testBlunting() throws Exception {
@@ -336,32 +295,20 @@ public class ParseConstructionFileStepTest {
                 "blunting a6 (b6 \t c6    )\n"+
                 "blunting a7(    b7/c7   )\n"
                 ;
-                     
-        
+                             
         ParseConstructionFile pcf = new ParseConstructionFile();
         pcf.initiate();
         ConstructionFile CF = pcf.run(rawText);
         
         List<Step> steps = CF.getSteps();
-        Step step1 = new Blunting("a1", "b1", "c1");
-        Step step2 = new Blunting("a2", "b2", "c2");
-        Step step3 = new Blunting("a3", "b3", "c3");
-        Step step4 = new Blunting("a4", "b4", "c4");
-        Step step5 = new Blunting("a5", "b5", "c5");
-        Step step6 = new Blunting("a6", "b6", "c6");
-        Step step7 = new Blunting("a7", "b7", "c7");
-
-
-        if (step1 == steps.get(1) &&
-            step2 == steps.get(2) &&
-            step3 == steps.get(3) &&
-            step4 == steps.get(4) &&
-            step5 == steps.get(5) &&
-            step6 == steps.get(6) &&
-            step7 == steps.get(7) 
-           ){
-        assert(true);
-        }        
+        
+        for(int i=1;i<=steps.size();i++){
+            Blunting blunt = (Blunting) steps.get(i-1);
+            assert(blunt.getSubstrate().equals("a"+i));
+            assert(blunt.getTypes().equals("b"+i));
+            assert(blunt.getProduct().equals("c"+i));
+        }
+        
     }
     
 }

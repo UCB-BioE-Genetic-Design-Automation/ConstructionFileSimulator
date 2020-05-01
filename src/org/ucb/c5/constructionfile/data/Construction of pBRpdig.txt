@@ -1,5 +1,5 @@
 >Construction of pBRpdig
-Digest pBR322	(EcoRI,BamHI, dig)
+Digest pBR322 with EcoRI,BamHI (dig)
 Blunting dig	(Polymerase, pdig)
 Ligate pdig	(pBRpdig)
 

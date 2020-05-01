@@ -35,7 +35,7 @@ public class BluntingSimulateConstructionFileTest {
         ConstructionFile CF = pCF.run(text);
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
         Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
-        String pBRpdigSeq = FileUtils.readResourceFile("constructionfile/data/pBRpdig.ape");
+        String pBRpdigSeq = FileUtils.readResourceFile("constructionfile/data/pBRxdig.ape");
         int origin = pBRpdigSeq.lastIndexOf("ORIGIN");
         String rawSeq = pBRpdigSeq.substring(origin + 6);
         String expectSeq = rawSeq.replaceAll("[^A-za-z]", "");
