@@ -3,10 +3,8 @@ acquire oligo aspC1
 acquire oligo pTargRev
 acquire plasmid pTargetF
 pcr aspC1,pTargRev on pTargetF	(3927 bp, ipcr)
-cleanup ipcr	(pcrpdt)
-digest pcrpdt with SpeI	(spedig)
-cleanup spedig	(dig)
-ligate dig	(lig)
+digest ipcr with SpeI	(spedig)
+ligate spedig	(lig)
 transform lig	(Mach1, Spec)
 
 >aspC1
