@@ -67,16 +67,12 @@ public class ParseConstructionFile {
     }
 
     private void processSteps(String rawText, List<Step> steps) throws Exception {
-        //Replace common unnessary words
         
+        //Replace common unnessary words
         String text = rawText;
-
         text = text.replaceAll("\r", "\n");
         text = text.replaceAll("\\\\", "\n\\\\");
         
-
-
-
         //Break it into lines
         String[] lines = text.split("\\r|\\r?\\n");
 
@@ -188,7 +184,6 @@ public class ParseConstructionFile {
         //Standardize
         lineNoOP = lineNoOP.replaceAll("\\s+and\\s+", ",");
         lineNoOP = lineNoOP.replace("/", ",");
-
         
         switch (op) {
             
@@ -198,9 +193,12 @@ public class ParseConstructionFile {
                 String[] parenPCR = lineNoOP.split("\\(");
                 //split oligo and plasmid
                 String[] oligoPlasmidPCR = parenPCR[0].split(" on ");
+                
                 //trim and split oligos
-                String oligoPlasmidPCR0 = oligoPlasmidPCR[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",");
-                String[] oligosPCR = oligoPlasmidPCR0.split(",");
+                String oligosPCR0 = oligoPlasmidPCR[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",");
+                //evoke rangeInString to split oligos
+                String[] oligosPCR = rangeInString(oligosPCR0);
+  
                 //extract plasmid
                 String templatePCR = oligoPlasmidPCR[1].trim();
                 
@@ -209,9 +207,16 @@ public class ParseConstructionFile {
                 sizeProductPCR = sizeProductPCR.replaceAll("\\(", "");
                 sizeProductPCR = sizeProductPCR.replaceAll("\\)", "");
                 //split by "bp,"
-                String[] spPCR = sizeProductPCR.split("bp,");
-                String sizePCR = spPCR[0].trim();
-                String productPCR = spPCR[1].trim();
+                String sizePCR;
+                String productPCR;
+                if(sizeProductPCR.contains("bp,")){
+                    String[] spPCR = sizeProductPCR.split("bp,");
+                    sizePCR = spPCR[0].trim();
+                    productPCR = spPCR[1].trim();
+                }else{
+                    sizePCR = null;
+                    productPCR = sizeProductPCR.trim();
+                }                
                 //evoke createPCR and return
                 return createPCR(
                         oligosPCR,
@@ -224,13 +229,13 @@ public class ParseConstructionFile {
             case pca://pca oligo1,oligo2 \t (product)
                 
                 String[] parenPCA = lineNoOP.split("\\(");
-                //Extract oligos
+                //extract oligos
                 String oliPCA = parenPCA[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+",",");
-                String[] oligosPCA = oliPCA.split(",");
-                //Eliminate (), extract product
-                String productPCA = parenPCA[1].replaceAll("\\(", "").replaceAll("\\)", "").trim();
-                
-                
+                //split oligos
+                String[] oligosPCA = rangeInString(oliPCA);                
+                //eliminate (), extract product
+                String productPCA = parenPCA[1].replaceAll("\\(", "").replaceAll("\\)", "").trim();               
+                //evoke createPCA and return                
                 return createPCA(
                         oligosPCA,
                         productPCA
@@ -249,9 +254,8 @@ public class ParseConstructionFile {
                 String enzDig = oligoEnzyDig[1].trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",");
                 String[] enzyDig = enzDig.split(",");
                 //extract product
-                String productDig = parenDig[1].replaceAll("\\(", "").replaceAll("\\)", "").trim();
-                
-                
+                String productDig = parenDig[1].replaceAll("\\(", "").replaceAll("\\)", "").trim();                
+                //evoke createDigest and return
                 return createDigest(
                         subDig,
                         enzyDig,
@@ -261,15 +265,15 @@ public class ParseConstructionFile {
                 
             case ligate://ligate frag1,frag2 \t (product)
                 
-                String[] segLig = lineNoOP.split("\\(");
-                
-                
+                //split()
+                String[] segLig = lineNoOP.split("\\(");                               
                 //extract frag
                 String fragLig = segLig[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+",",");
-                String[] fragsLig = fragLig.split(",");
+                //split fragments
+                String[] fragsLig = rangeInString(fragLig);                
                 //extract product
                 String productLig = segLig[1].replaceAll("\\(", "").replaceAll("\\)", "").trim();            
-                
+                //evoke createLigation and return
                 return createLigation(
                         fragsLig,
                         productLig
@@ -295,9 +299,8 @@ public class ParseConstructionFile {
                     plasmidNameTrans = parenInTrans[2];
                 } else {
                     plasmidNameTrans = subTrans;
-                }
-                
-                
+                }                
+                //evoke createTransform and return
                 return createTransform(
                         subTrans,
                         strainTrans,
@@ -331,7 +334,8 @@ public class ParseConstructionFile {
                 
                 //extract fragments
                 String fragASB = parenASB[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",");
-                String[] fragsASB = fragASB.split(",");
+                //split fragments
+                String[] fragsASB = rangeInString(fragASB);
                 
                 //split enzyme and product
                 String parenInASB = parenASB[1].replaceAll("\\(","").replaceAll("\\)", "").trim();
@@ -340,6 +344,7 @@ public class ParseConstructionFile {
                 String enzymeASB = enzyProdASB[0].trim();
                 String productASB = enzyProdASB[1].trim();
                 
+                //evoke createAssemble and return
                 return createAssemble(
                         fragsASB,
                         enzymeASB,
@@ -369,9 +374,7 @@ public class ParseConstructionFile {
                         typeBlu,
                         productBlu
                 );
-              
-                
-                
+                                            
             default:
                 throw new RuntimeException("Not implemented " + op);
         }
@@ -389,8 +392,6 @@ public class ParseConstructionFile {
         return new PCA(frags, product);
     }
     
- 
-
     private Step createDigest(String substrate, String[] enzymes, String product) {
         List<Enzyme> enzList = new ArrayList<>();
         for (String enz : enzymes) {
@@ -432,6 +433,56 @@ public class ParseConstructionFile {
     
     private Step createBlunting(String substrate, String type, String product){
         return new Blunting(substrate, type, product);
+    }
+    
+    
+    public String identifyRange(String input) throws Exception{
+        
+        String[] startEnd = input.split("-");
+        
+        String token1 = startEnd[0].trim();
+        String token2 = startEnd[1].trim();
+
+        // Find the boundary, i, between the base name and the numbers
+        int i;
+        for (i = 0; i < token1.length(); i++) {
+            if (token1.charAt(i) != token2.charAt(i) || Character.isDigit(token1.charAt(i)) ) {
+                break;
+            }
+        }
+
+        // calculate the base name from the boundary
+        String baseName = token1.substring(0, i);
+        String output = token1;
+
+        // obtain the range values from the rest of the tokens, and add to the out list by generating strings in that range
+        try {
+            int startInt = Integer.parseInt(token1.substring(i, token1.length()));
+            int endInt = Integer.parseInt(token2.substring(i, token2.length()));
+            for (int j = startInt + 1; j <= endInt; j++) {
+                output = output + "," + baseName + j;
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid name range described. Must have same base name and only differ by integer values at the end.");
+        }
+        
+        return output;
+    }
+    
+    public String[] rangeInString(String in) throws Exception{
+        
+        String[] parts = in.split(",");
+        String expand = null;
+        for (String str: parts){
+            if (str.contains("-")){
+                expand = expand + identifyRange(str) + ",";
+            }else{
+                expand = expand + str + ",";
+            }            
+        }
+        String result = expand.substring(4,expand.length()-1);
+        String[] out = result.split(",");
+        return out;
     }
 
     
