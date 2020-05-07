@@ -13,6 +13,7 @@ import org.ucb.c5.constructionfile.model.Polynucleotide;
 import org.ucb.c5.sequtils.CalcEditDistance;
 import org.ucb.c5.sequtils.PolyRevComp;
 import org.ucb.c5.sequtils.RevComp;
+import org.ucb.c5.sequtils.StringRotater;
 
 /**
  *
@@ -22,6 +23,7 @@ public class NewPCRSimulator {
 
     private CalcEditDistance ced;
     private PolyRevComp revcomp;
+    private StringRotater rotator;
     private RevComp rc;
 
     public void initiate() throws Exception {
@@ -29,6 +31,8 @@ public class NewPCRSimulator {
         revcomp.initiate();
         rc = new RevComp();
         rc.initiate();
+        rotator = new StringRotater();
+        rotator.initiate();
         ced = new CalcEditDistance();
         ced.initiate();
     }
@@ -40,13 +44,20 @@ public class NewPCRSimulator {
         //Combine all the species in a set and denature them
         Set<Polynucleotide> species = new HashSet<>();
         species.addAll(templates);
-        Set<String> singleStrands = simulateDissociation(species);
+        Set<String> singleStrands = simulateDissociation(oligo1, oligo2, species);
 
         //Create another set for storing the previous round strands
         Set<String> oldStrands = new HashSet<>();
 
         //Simulate thermocycling
+        int breaker = 0;
         while (true) {
+            //Abort if exceeded 30 cycles
+            if (breaker > 30) {
+                throw new IllegalArgumentException("PCRSimulator stuck in a loop");
+            }
+            breaker++;
+
             //Add oligos then anneal and polymerize
             singleStrands.add(oligo1);
             singleStrands.add(oligo2);
@@ -71,12 +82,32 @@ public class NewPCRSimulator {
         throw new IllegalArgumentException("No PCR product generated");
     }
 
-    private Set<String> simulateDissociation(Set<Polynucleotide> species) throws Exception {
+    private Set<String> simulateDissociation(String oligo1, String oligo2, Set<Polynucleotide> species) throws Exception {
         Set<String> newspecies = new HashSet<>();
         for (Polynucleotide poly : species) {
             //Handle if it is circular
             if (poly.isIsCircular()) {
-                poly = new Polynucleotide(poly.getSequence() + poly.getSequence());
+                String plas = poly.getSequence().toUpperCase();
+                String fpdt = anneal(oligo1, plas);
+                if (fpdt != null) {
+                    String fpdt2 = fpdt.substring(oligo1.length());
+                    String fpdt3 = rc.run(fpdt2);
+                    int start = plas.indexOf(fpdt3) + fpdt3.length() + oligo1.length();
+                    String rotated = rotator.run(plas, start);
+                    String rotRC = rc.run(rotated);
+                    poly = new Polynucleotide(rotRC);
+                } else {
+                    String rpdt = anneal(oligo2, plas);
+                    if (rpdt != null) {
+                        String rpdt2 = rpdt.substring(oligo2.length());
+                        String rpdt3 = rc.run(rpdt2);
+                        int start = plas.indexOf(rpdt3) + rpdt3.length() + oligo2.length();
+                        String rotated = rotator.run(plas, start);
+                        poly = new Polynucleotide(rotated);
+                    } else {
+                        throw new IllegalArgumentException("Could not handle circular template");
+                    }
+                }
             }
 
             //Handle as linear, double stranded
@@ -147,7 +178,14 @@ public class NewPCRSimulator {
         int index = 11; //index + 6 = 17, the first site it could be
         int bestSimilarity = 17;  //17 is one short of the cutoff of 18
         int bestIndex = -1;
+        int breaker = 0;
         while (true) {
+            //Abort if exceeded excessive cycles
+            if (breaker > 5000) {
+                throw new IllegalArgumentException("PCRSimulator anneal stuck in a loop");
+            }
+            breaker++;
+
             //Find the next 6bp match, quit if there are no more
             index = rcB.indexOf(sixbp, index + 1);
             if (index == -1) {
@@ -167,10 +205,11 @@ public class NewPCRSimulator {
                 startB = 0;
             }
             String annealB = rcB.substring(startB, index + 6);
+            int maxlength = Math.max(annealA.length(), annealB.length());
 
             //Find the edit distance
             int distance = ced.run(annealA, annealB);
-            int similarity = 30 - distance;
+            int similarity = maxlength - distance;
             if (similarity > bestSimilarity) {
                 bestIndex = index;
                 bestSimilarity = similarity;
@@ -200,172 +239,8 @@ public class NewPCRSimulator {
             templates.add(template);
 
             String pdt = sim.run(oligo1, oligo2, templates);
-            System.out.println("\nExact match oligos on single template:");
+            System.out.println("Exact match oligos on single template:");
             System.out.println(pdt);
         }
-
-        //run a pcr with 5' tails (works)
-        {
-            String oligo1 = "ccataGGATCCgtatcacgaggcagaatttcag";
-            String oligo2 = "cgtatGAATTCattaccgcctttgagtgagc";
-            List<Polynucleotide> templates = new ArrayList<>();
-            Polynucleotide template = new Polynucleotide("TATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGgtatcacgaggcagaatttcagataaaaaaaatccttagctttcgctaaggatgatttctgGAATTCATGAGATCTTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCACGGATCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAAGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGACTCCTCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGGATCTCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATAGGATCCtaaCTCGAcgtgcaggcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTG");
-            templates.add(template);
-
-            String pdt = sim.run(oligo1, oligo2, templates);
-            System.out.println("\nOligos with 5' tails on single template:");
-            System.out.println(pdt);
-        }
-
-        //run a pcr on a circular template over the origin (works)
-        {
-            String oligo1 = "ccataGGATCCgtatcacgaggcagaatttcag";
-            String oligo2 = "cgtatGAATTCattaccgcctttgagtgagc";
-            List<Polynucleotide> templates = new ArrayList<>();
-            Polynucleotide template = new Polynucleotide("TCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGGATCTCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATAGGATCCtaaCTCGAcgtgcaggcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTGCCATCCAGCTGATATCCCCTATAGTGAGTCGTATTACATGGTCATAGCTGTTTCCTGGCAGCTCTGGCCCGTGTCTCAAAATCTCTGATGTTACATTGCACAAGATAAAAATATATCATCATGCCTCCTCTAGACCAGCCAGGACAGAAATGCCTCGACTTCGCTGCTGCCCAAGGTTGCCGGGTGACGCACACCGTGGAAACGGATGAAGGCACGAACCCAGTGGACATAAGCCTGTTCGGTTCGTAAGCTGTAATGCAAGTAGCGTATGCGCTCACGCAACTGGTCCAGAACCTTGACCGAACGCAGCGGTGGTAACGGCGCAGTGGCGGTTTTCATGGCTTGTTATGACTGTTTTTTTGGGGTACAGTCTATGCCTCGGGCATCCAAGCAGCAAGCGCGTTACGCCGTGGGTCGATGTTTGATGTTATGGAGCAGCAACGATGTTACGCAGCAGGGCAGTCGCCCTAAAACAAAGTTAAACATCATGAGGGAAGCGGTGATCGCCGAAGTATCGACTCAACTATCAGAGGTAGTTGGCGTCATCGAGCGCCATCTCGAACCGACGTTGCTGGCCGTACATTTGTACGGCTCCGCAGTGGATGGCGGCCTGAAGCCACACAGTGATATTGATTTGCTGGTTACGGTGACCGTAAGGCTTGATGAAACAACGCGGCGAGCTTTGATCAACGACCTTTTGGAAACTTCGGCTTCCCCTGGAGAGAGCGAGATTCTCCGCGCTGTAGAAGTCACCATTGTTGTGCACGACGACATCATTCCGTGGCGTTATCCAGCTAAGCGCGAACTGCAATTTGGAGAATGGCAGCGCAATGACATTCTTGCAGGTATCTTCGAGCCAGCCACGATCGACATTGATCTGGCTATCTTGCTGACAAAAGCAAGAGAACATAGCGTTGCCTTGGTAGGTCCAGCGGCGGAGGAACTCTTTGATCCGGTTCCTGAACAGGATCTATTTGAGGCGCTAAATGAAACCTTAACGCTATGGAACTCGCCGCCCGACTGGGCTGGCGATGAGCGAAATGTAGTGCTTACGTTGTCCCGCATTTGGTACAGCGCAGTAACCGGCAAAATCGCGCCGAAGGATGTCGCTGCCGACTGGGCAATGGAGCGCCTGCCGGCCCAGTATCAGCCCGTCATACTTGAAGCTAGACAGGCTTATCTTGGACAAGAAGAAGATCGCTTGGCCTCGCGCGCAGATCAGTTGGAAGAATTTGTCCACTACGTGAAAGGCGAGATCACCAAGGTAGTCGGCAAATAACCCTCGAGCCACCCATGACCAAAATCCCTTAACGTGAGTTACGCGTCGTTCCACTGAGCGTCAGACCCCGTAGAAAAGATCAAAGGATCTTCTTGAGATCCTTTTTTTCTGCGCGTAATCTGCTGCTTGCAAACAAAAAAACCACCGCTACCAGCGGTGGTTTGTTTGCCGGATCAAGAGCTACCAACTCTTTTTCCGAAGGTAACTGGCTTCAGCAGAGCGCAGATACCAAATACTGTCCTTCTAGTGTAGCCGTAGTTAGGCCACCACTTCAAGAACTCTGTAGCACCGCCTACATACCTCGCTCTGCTAATCCTGTTACCAGTGGCTGCTGCCAGTGGCGATAAGTCGTGTCTTACCGGGTTGGACTCAAGACGATAGTTACCGGATAAGGCGCAGCGGTCGGGCTGAACGGGGGGTTCGTGCACACAGCCCAGCTTGGAGCGAACGACCTACACCGAACTGAGATACCTACAGCGTGAGCATTGAGAAAGCGCCACGCTTCCCGAAGGGAGAAAGGCGGACAGGTATCCGGTAAGCGGCAGGGTCGGAACAGGAGAGCGCACGAGGGAGCTTCCAGGGGGAAACGCCTGGTATCTTTATAGTCCTGTCGGGTTTCGCCACCTCTGACTTGAGCGTCGATTTTTGTGATGCTCGTCAGGGGGGCGGAGCCTATGGAAAAACGCCAGCAACGCGGCCTTTTTACGGTTCCTGGCCTTTTGCTGGCCTTTTGCTCACATGTTCTTTCCTGCGTTATCCCCTGATTCTGTGGATAACCGTcctaggTGTAAAACGACGGCCAGTCTTAAGCTCGGGCCCCAAATAATGATTTTATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGgtatcacgaggcagaatttcagataaaaaaaatccttagctttcgctaaggatgatttctgGAATTCATGAGATCTTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCACGGATCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAAGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGACTCC", true);
-            templates.add(template);
-
-            String pdt = sim.run(oligo1, oligo2, templates);
-            System.out.println("\nOligos with 5' tails on a circular template over the origin:");
-            System.out.println(pdt);
-        }
-
-        //run a soeing reaction on 2 templates (works)
-        {
-            String oligo1 = "ccataGGATCCgtatcacgaggcagaatttcag";
-            String oligo2 = "cgtatGAATTCattaccgcctttgagtgagc";
-            List<Polynucleotide> templates = new ArrayList<>();
-            Polynucleotide frag1 = new Polynucleotide("TATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGgtatcacgaggcagaatttcagataaaaaaaatccttagctttcgctaaggatgatttctgGAATTCATGAGATCTTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCACGGATCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAAGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGAC");
-            Polynucleotide frag2 = new Polynucleotide("TGTTGTTACCGTTACCCAGGACTCCTCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGGATCTCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATAGGATCCtaaCTCGAcgtgcaggcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTG");
-            templates.add(frag1);
-            templates.add(frag2);
-
-            String pdt = sim.run(oligo1, oligo2, templates);
-            System.out.println("\nSOEing of two templates:");
-            System.out.println(pdt);
-        }
-
-        //run a soeing reaction on 4 templates out of order (works)
-        {
-            String oligo1 = "ccataGGATCCgtatcacgaggcagaatttcag";
-            String oligo2 = "cgtatGAATTCattaccgcctttgagtgagc";
-            List<Polynucleotide> templates = new ArrayList<>();
-            Polynucleotide frag1 = new Polynucleotide("TATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGgtatcacgaggcagaatttcagataaaaaaaatccttagctttcgctaaggatgatttctgGAATTCATGAGATCTTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCACGGATCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAG");
-            Polynucleotide frag2 = new Polynucleotide("TGTTGTTACCGTTACCCAGGACTCCTCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTA");
-            Polynucleotide frag3 = new Polynucleotide("ACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGGATCTCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATAGGATCCtaaCTCGAcgtgcaggcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTG");
-            Polynucleotide frag4 = new Polynucleotide("TTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAAGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGAC");
-
-            templates.add(frag1);
-            templates.add(frag2);
-            templates.add(frag3);
-            templates.add(frag4);
-
-            String pdt = sim.run(oligo1, oligo2, templates);
-            System.out.println("\nSOEing of 4 unordered templates:");
-            System.out.println(pdt);
-        }
-        
-//TODO: This one is failing
-        //run a PCA with many oligos as template and 2 oligos as primers (from genedesign)
-//        {
-//            String oligo1 = "ccataGGATCCgtatcacgaggcagaatttcag";
-//            String oligo2 = "cgtatGAATTCattaccgcctttgagtgagc";
-//            List<Polynucleotide> templates = new ArrayList<>();
-//            Polynucleotide[] temps = new Polynucleotide[46];
-//            temps[0] = new Polynucleotide("AAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACC", "", "", false, false, false);
-//            temps[1] = new Polynucleotide("AATCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTG", "", "", false, false, false);
-//            temps[2] = new Polynucleotide("AGCGAACGGCAGCGGACCACCTTTGGTAACTTTCAGTTTAGCGGTCTG", "", "", false, false, false);
-//            temps[3] = new Polynucleotide("AGGATCCTATAAACGCAGAAAGGCCCACCCGAAGGTGAGCCAGTGTGACTCT", "", "", false, false, false);
-//            temps[4] = new Polynucleotide("ATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGGTATCACGAGG", "", "", false, false, false);
-//            temps[5] = new Polynucleotide("ATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTG", "", "", false, false, false);
-//            temps[6] = new Polynucleotide("CAAATAATGATTTTATTTTGACTGAT", "", "", false, false, false);
-//            temps[7] = new Polynucleotide("CAGCCGGGTGTTTAACGTAAGCTTTGGAACCGTACTGGAACTGCGGGGACA", "", "", false, false, false);
-//            temps[8] = new Polynucleotide("CCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCG", "", "", false, false, false);
-//            temps[9] = new Polynucleotide("CCATAGATCCTTTCTCCTCTTTCAGATCCGTGCTCAGTATCTCTATCACTGATAG", "", "", false, false, false);
-//            temps[10] = new Polynucleotide("CCGGACCGTCGGACGGGAAGTTGGTACCACGCAGTTTAACTTTGTAGA", "", "", false, false, false);
-//            temps[11] = new Polynucleotide("CGTACGGACGACCTTCACCTTCACCTTCGATTTCGAACTCGTGACCGTTA", "", "", false, false, false);
-//            temps[12] = new Polynucleotide("CGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGA", "", "", false, false, false);
-//            temps[13] = new Polynucleotide("CTTAGCGAAAGCTAAGGATTTTTTTTATCTGAAATTCTGCCTCGTGATACCAATTCGGAGC", "", "", false, false, false);
-//            temps[14] = new Polynucleotide("CTTCAGCACGTTCGTACTGTTCAACGATGGTGTAGTCTTCGTTGTGGGAGGT", "", "", false, false, false);
-//            temps[15] = new Polynucleotide("GAACCTTCCATACGAACTTTGAAACGCATGAACTCTTTGATAACGTCTTCGCTAC", "", "", false, false, false);
-//            temps[16] = new Polynucleotide("GAACGACCGAGCGCAGCGAGTCAGTGAGCGAGGAAGCCTGCACGTCG", "", "", false, false, false);
-//            temps[17] = new Polynucleotide("GAAGTTCATAACACGTTCCCATTTGAAACCTTCCGGGAAGGACAGTTTCAGGTAGTCC", "", "", false, false, false);
-//            temps[18] = new Polynucleotide("GACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCG", "", "", false, false, false);
-//            temps[19] = new Polynucleotide("GAGAGCGTTCACCGACAAACAACAGATAAAACGAAAGGCCCAGTCTTTCGAC", "", "", false, false, false);
-//            temps[20] = new Polynucleotide("GATGTCAATCTCTATCACTGATAGGGAAGATCTCATGAATTCCAGAAATCATCCTTA", "", "", false, false, false);
-//            temps[21] = new Polynucleotide("GATGTCCAGTTTGATGTCGGTTTTGTAAGCACCCGGCAGCTGAACCGGTTTTTTAG", "", "", false, false, false);
-//            temps[22] = new Polynucleotide("GCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCG", "", "", false, false, false);
-//            temps[23] = new Polynucleotide("GCATTTTGATTTCACCTTTCAGAGCACCGTCTTCCGGGTACATACGTTCGGTGGA", "", "", false, false, false);
-//            temps[24] = new Polynucleotide("GCCTGCTTTTTTGTACAAAGTTGGCATTATAAAAAAGCATTGCTCATCAATTTGTTGC", "", "", false, false, false);
-//            temps[25] = new Polynucleotide("GCCTTTCGTTTTATTTGATGCCTGGAGATCCTTATTAAGCACCGGTGGAGTGA", "", "", false, false, false);
-//            temps[26] = new Polynucleotide("GCCTTTCTGCGTTTATAGGATCCTAACTCGACGTGCAGGCTTCCTCG", "", "", false, false, false);
-//            temps[27] = new Polynucleotide("GCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCC", "", "", false, false, false);
-//            temps[28] = new Polynucleotide("GGAAGCTTCCCAACCCATGGTTTTT", "", "", false, false, false);
-//            temps[29] = new Polynucleotide("GGACTCCTCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACC", "", "", false, false, false);
-//            temps[30] = new Polynucleotide("GTACAAGAAAGCTGGGTCGAATTGATTACCGCCTTTGAGTGAGCTGATACCGCTC", "", "", false, false, false);
-//            temps[31] = new Polynucleotide("GTAGGTGGTTTTAACTTCAGCGTCGTAGTGACCACCGTCTTTCAGTTTCAGA", "", "", false, false, false);
-//            temps[32] = new Polynucleotide("GTCTTGCAGGGAGGAGTCCTGGGTAACGGTAACAACACCACCGTCTTC", "", "", false, false, false);
-//            temps[33] = new Polynucleotide("GTGACCTGTTCGTTGCAACAAATTGATGAGCAATTATTTTTTATAATGCCAACTT", "", "", false, false, false);
-//            temps[34] = new Polynucleotide("GTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCA", "", "", false, false, false);
-//            temps[35] = new Polynucleotide("GTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCG", "", "", false, false, false);
-//            temps[36] = new Polynucleotide("TATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATG", "", "", false, false, false);
-//            temps[37] = new Polynucleotide("TCGCTGCGCTCGGTCGTTCGGCTGCGGCGAGCGGTATCAGCTCACTCAAAG", "", "", false, false, false);
-//            temps[38] = new Polynucleotide("TCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTC", "", "", false, false, false);
-//            temps[39] = new Polynucleotide("TGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTAC", "", "", false, false, false);
-//            temps[40] = new Polynucleotide("TGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTC", "", "", false, false, false);
-//            temps[41] = new Polynucleotide("TTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACAC", "", "", false, false, false);
-//            temps[42] = new Polynucleotide("TTCAGATAAAAAAAATCCTTAGCTTTCGCTAAGGATGATTTCTGGAATTCATGAGATCT", "", "", false, false, false);
-//            temps[43] = new Polynucleotide("TTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTC", "", "", false, false, false);
-//            temps[44] = new Polynucleotide("TTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCAC", "", "", false, false, false);
-//            temps[45] = new Polynucleotide("TTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGG", "", "", false, false, false);
-//            for (Polynucleotide poly : temps) {
-//                templates.add(poly);
-//            }
-//            String pdt = sim.run(oligo1, oligo2, templates);
-//            System.out.println("\nPCA of 46 oligos:");
-//            System.out.println(pdt);
-//        }
-
-        //run a wobble with 2 oligos no template (ser2 N5 lib, works)
-        {
-            String oligo1 = "CcatagaattcggagagatgccggagcggctgaacggaccggtNNNNNNNNaccggagtaggggcaactctacc";
-            String oligo2 = "gtcatctgcagtggcggagagagggggatttgaacccccggtagagttgcccctactccgg";
-            List<Polynucleotide> templates = new ArrayList<>();
-
-            String pdt = sim.run(oligo1, oligo2, templates);
-            System.out.println("\nOverlap extension of 2 oligos no template:");
-            System.out.println(pdt);
-        }
-
-//TODO: This one is failing
-//        //Run an ipcr (crispr example)
-//        {
-//            String oligo1 = "ccataACTAGTcatcgccgcagcggtttcaggttttagagctagaaatagcaag";
-//            String oligo2 = "ctcagACTAGTattatacctaggactgagctag";
-//            List<Polynucleotide> templates = new ArrayList<>();
-//            Polynucleotide template = new Polynucleotide("catgttctttcctgcgttatcccctgattctgtggataaccgtattaccgcctttgagtgagctgataccgctcgccgcagccgaacgaccgagcgcagcgagtcagtgagcgaggaagcggaagagcgcctgatgcggtattttctccttacgcatctgtgcggtatttcacaccgcatatgctggatccttgacagctagctcagtcctaggtataatactagtGGGTACATACGTTCGGTGGAgttttagagctagaaatagcaagttaaaataaggctagtccgttatcaacttgaaaaagtggcaccgagtcggtgctttttttgaattctctagagtcgacctgcagaagcttagatctattaccctgttatccctactcgagttcatgtgcagctccataagcaaaaggggatgataagtttatcaccaccgactatttgcaacagtgccgttgatcgtgctatgatcgactgatgtcatcagcggtggagtgcaatgtcatgagggaagcggtgatcgccgaagtatcgactcaactatcagaggtagttggcgtcatcgagcgccatctcgaaccgacgttgctggccgtacatttgtacggctccgcagtggatggcggcctgaagccacacagtgatattgatttgctggttacggtgaccgtaaggcttgatgaaacaacgcggcgagctttgatcaacgaccttttggaaacttcggcttcccctggagagagcgagattctccgcgctgtagaagtcaccattgttgtgcacgacgacatcattccgtggcgttatccagctaagcgcgaactgcaatttggagaatggcagcgcaatgacattcttgcaggtatcttcgagccagccacgatcgacattgatctggctatcttgctgacaaaagcaagagaacatagcgttgccttggtaggtccagcggcggaggaactctttgatccggttcctgaacaggatctatttgaggcgctaaatgaaaccttaacgctatggaactcgccgcccgactgggctggcgatgagcgaaatgtagtgcttacgttgtcccgcatttggtacagcgcagtaaccggcaaaatcgcgccgaaggatgtcgctgccgactgggcaatggagcgcctgccggcccagtatcagcccgtcatacttgaagctagacaggcttatcttggacaagaagaagatcgcttggcctcgcgcgcagatcagttggaagaatttgtccactacgtgaaaggcgagatcaccaaggtagtcggcaaataagatgccgctcgccagtcgattggctgagctcataagttcctattccgaagttccgcgaacgcgtaaaggatctaggtgaagatcctttttgataatctcatgaccaaaatcccttaacgtgagttttcgttccactgagcgtcagaccccgtagaaaagatcaaaggatcttcttgagatcctttttttctgcgcgtaatctgctgcttgcaaacaaaaaaaccaccgctaccagcggtggtttgtttgccggatcaagagctaccaactctttttccgaaggtaactggcttcagcagagcgcagataccaaatactgtccttctagtgtagccgtagttaggccaccacttcaagaactctgtagcaccgcctacatacctcgctctgctaatcctgttaccagtggctgctgccagtggcgataagtcgtgtcttaccgggttggactcaagacgatagttaccggataaggcgcagcggtcgggctgaacggggggttcgtgcacacagcccagcttggagcgaacgacctacaccgaactgagatacctacagcgtgagctatgagaaagcgccacgcttcccgaagggagaaaggcggacaggtatccggtaagcggcagggtcggaacaggagagcgcacgagggagcttccagggggaaacgcctggtatctttatagtcctgtcgggtttcgccacctctgacttgagcgtcgatttttgtgatgctcgtcaggggggcggagcctatggaaaaacgccagcaacgcggcctttttacggttcctggccttttgctggccttttgctca", true);
-//            templates.add(template);
-//
-//            String pdt = sim.run(oligo1, oligo2, templates);
-//            System.out.println("\niPCR including origin:");
-//            System.out.println(pdt);
-//        }
-//TODO: This one is failing
-//        //run a pcr with mutagenic oligos
-//        {
-//            String oligo1 = "ccataGGATCCgtatcacgaggcagGatttcag";
-//            String oligo2 = "cgtatGAATTCattaccgcctCtgagtgagc";
-//            List<Polynucleotide> templates = new ArrayList<>();
-//            Polynucleotide template = new Polynucleotide("TCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGGATCTCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATAGGATCCtaaCTCGAcgtgcaggcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTGCCATCCAGCTGATATCCCCTATAGTGAGTCGTATTACATGGTCATAGCTGTTTCCTGGCAGCTCTGGCCCGTGTCTCAAAATCTCTGATGTTACATTGCACAAGATAAAAATATATCATCATGCCTCCTCTAGACCAGCCAGGACAGAAATGCCTCGACTTCGCTGCTGCCCAAGGTTGCCGGGTGACGCACACCGTGGAAACGGATGAAGGCACGAACCCAGTGGACATAAGCCTGTTCGGTTCGTAAGCTGTAATGCAAGTAGCGTATGCGCTCACGCAACTGGTCCAGAACCTTGACCGAACGCAGCGGTGGTAACGGCGCAGTGGCGGTTTTCATGGCTTGTTATGACTGTTTTTTTGGGGTACAGTCTATGCCTCGGGCATCCAAGCAGCAAGCGCGTTACGCCGTGGGTCGATGTTTGATGTTATGGAGCAGCAACGATGTTACGCAGCAGGGCAGTCGCCCTAAAACAAAGTTAAACATCATGAGGGAAGCGGTGATCGCCGAAGTATCGACTCAACTATCAGAGGTAGTTGGCGTCATCGAGCGCCATCTCGAACCGACGTTGCTGGCCGTACATTTGTACGGCTCCGCAGTGGATGGCGGCCTGAAGCCACACAGTGATATTGATTTGCTGGTTACGGTGACCGTAAGGCTTGATGAAACAACGCGGCGAGCTTTGATCAACGACCTTTTGGAAACTTCGGCTTCCCCTGGAGAGAGCGAGATTCTCCGCGCTGTAGAAGTCACCATTGTTGTGCACGACGACATCATTCCGTGGCGTTATCCAGCTAAGCGCGAACTGCAATTTGGAGAATGGCAGCGCAATGACATTCTTGCAGGTATCTTCGAGCCAGCCACGATCGACATTGATCTGGCTATCTTGCTGACAAAAGCAAGAGAACATAGCGTTGCCTTGGTAGGTCCAGCGGCGGAGGAACTCTTTGATCCGGTTCCTGAACAGGATCTATTTGAGGCGCTAAATGAAACCTTAACGCTATGGAACTCGCCGCCCGACTGGGCTGGCGATGAGCGAAATGTAGTGCTTACGTTGTCCCGCATTTGGTACAGCGCAGTAACCGGCAAAATCGCGCCGAAGGATGTCGCTGCCGACTGGGCAATGGAGCGCCTGCCGGCCCAGTATCAGCCCGTCATACTTGAAGCTAGACAGGCTTATCTTGGACAAGAAGAAGATCGCTTGGCCTCGCGCGCAGATCAGTTGGAAGAATTTGTCCACTACGTGAAAGGCGAGATCACCAAGGTAGTCGGCAAATAACCCTCGAGCCACCCATGACCAAAATCCCTTAACGTGAGTTACGCGTCGTTCCACTGAGCGTCAGACCCCGTAGAAAAGATCAAAGGATCTTCTTGAGATCCTTTTTTTCTGCGCGTAATCTGCTGCTTGCAAACAAAAAAACCACCGCTACCAGCGGTGGTTTGTTTGCCGGATCAAGAGCTACCAACTCTTTTTCCGAAGGTAACTGGCTTCAGCAGAGCGCAGATACCAAATACTGTCCTTCTAGTGTAGCCGTAGTTAGGCCACCACTTCAAGAACTCTGTAGCACCGCCTACATACCTCGCTCTGCTAATCCTGTTACCAGTGGCTGCTGCCAGTGGCGATAAGTCGTGTCTTACCGGGTTGGACTCAAGACGATAGTTACCGGATAAGGCGCAGCGGTCGGGCTGAACGGGGGGTTCGTGCACACAGCCCAGCTTGGAGCGAACGACCTACACCGAACTGAGATACCTACAGCGTGAGCATTGAGAAAGCGCCACGCTTCCCGAAGGGAGAAAGGCGGACAGGTATCCGGTAAGCGGCAGGGTCGGAACAGGAGAGCGCACGAGGGAGCTTCCAGGGGGAAACGCCTGGTATCTTTATAGTCCTGTCGGGTTTCGCCACCTCTGACTTGAGCGTCGATTTTTGTGATGCTCGTCAGGGGGGCGGAGCCTATGGAAAAACGCCAGCAACGCGGCCTTTTTACGGTTCCTGGCCTTTTGCTGGCCTTTTGCTCACATGTTCTTTCCTGCGTTATCCCCTGATTCTGTGGATAACCGTcctaggTGTAAAACGACGGCCAGTCTTAAGCTCGGGCCCCAAATAATGATTTTATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGgtatcacgaggcagaatttcagataaaaaaaatccttagctttcgctaaggatgatttctgGAATTCATGAGATCTTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCACGGATCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAAGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGACTCC", true);
-//            templates.add(template);
-//
-//            String pdt = sim.run(oligo1, oligo2, templates);
-//            System.out.println("\nMutagenic oligos on a circular template over the origin:");
-//            System.out.println(pdt);
-//        }
-        
-        //run a pcr with degenerate oligos
-        //Run a quikchange
-        //run a hybrid with 2 oligos, and both oligo and ds templates
     }
 }
