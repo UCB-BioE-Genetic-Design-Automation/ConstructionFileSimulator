@@ -436,7 +436,7 @@ public class ParseConstructionFile {
     }
     
     
-    public String identifyRange(String input) throws Exception{
+    private String identifyRange(String input) throws Exception{
         
         String[] startEnd = input.split("-");
         
@@ -469,7 +469,7 @@ public class ParseConstructionFile {
         return output;
     }
     
-    public String[] rangeInString(String in) throws Exception{
+    private String[] rangeInString(String in) throws Exception{
         
         String[] parts = in.split(",");
         String expand = null;
