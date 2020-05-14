@@ -40,13 +40,10 @@ public class ConstructionFile {
         //>Construction of pTarg-amilGFP1
         String pdtName = "pTarg-amilGFP";
         
-        ////acquire oligo ca4238,ca4239
-        steps.add(new Acquisition("ca4238"));
-        steps.add(new Acquisition("ca4239"));
-        steps.add(new Acquisition("pTargetF"));
-        
         //pcr ca4238,ca4239 on pTargetF	(3927 bp, ipcr)
-        steps.add(new PCR("ca4238", "ca4239", "pTargetF", "ipcr"));
+        List<String> templates = new ArrayList();
+        templates.add("pTargetF");
+        steps.add(new PCR("ca4238", "ca4239", templates, "ipcr"));
         
         //cleanup ipcr	(pcr)
 //        steps.add(new Cleanup("ipcr", "pcr"));

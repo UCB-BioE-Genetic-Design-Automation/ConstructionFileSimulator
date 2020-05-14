@@ -44,7 +44,11 @@ public class SerializeConstructionFile {
                     break;
                 case pcr:
                     PCR pcr = (PCR) astep;
-                    sb.append(op.toString()).append(" ").append(pcr.getOligo1()).append(",").append(pcr.getOligo1()).append(" on ").append(pcr.getTemplate()).append("\t(").append(pcr.getProduct()).append(")").append("\n");
+                    sb.append(op.toString()).append(" ").append(pcr.getOligo1()).append(",").append(pcr.getOligo1()).append(" on ");
+                    for(String temp : pcr.getTemplates()) {
+                        sb.append(temp).append(",");
+                    }
+                    sb.append("\t(").append(pcr.getProduct()).append(")").append("\n");
                     break;
                 case pca:
                     PCA pca = (PCA) astep;

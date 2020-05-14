@@ -18,23 +18,21 @@ import org.ucb.c5.constructionfile.model.Transformation;
  * @author J. Christopher Anderson
  */
 public class CrisprConstructionFactory {
-    private final String template = "pTargetF";
+    private final List<String> templates = new ArrayList<>();
     private final String strain = "DH10B";
     private final Antibiotic antibiotic = Antibiotic.Spec;
     
-    public void initiate() throws Exception {}
+    public void initiate() throws Exception {
+        templates.add("pTargetF");
+    }
 
     public ConstructionFile run(String oligo1name, String oligo2name, String pdtName) throws Exception {
         //Hard-code a ConstructionFile describing a CRISPR Experiment
         List<Step> steps = new ArrayList<>();
         
-        ////acquire oligo ca4238,ca4239
-        steps.add(new Acquisition(oligo1name));
-        steps.add(new Acquisition(oligo2name));
-        steps.add(new Acquisition(template));
         
         //pcr ca4238,ca4239 on pTargetF	(3927 bp, ipcr)
-        steps.add(new PCR(oligo1name, oligo2name, template, "ipcr"));
+        steps.add(new PCR(oligo1name, oligo2name, templates, "ipcr"));
         
         //cleanup ipcr	(pcr)
 //        steps.add(new Cleanup("ipcr", "pcr"));

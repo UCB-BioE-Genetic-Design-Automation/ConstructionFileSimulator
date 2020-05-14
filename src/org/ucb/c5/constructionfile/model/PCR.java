@@ -6,6 +6,8 @@
 
 package org.ucb.c5.constructionfile.model;
 
+import java.util.List;
+
 /**
  *
  * @author J. Christopher Anderson
@@ -14,13 +16,13 @@ public class PCR implements Step {
     //Loose-coupled references by name
     private final String oligo1;
     private final String oligo2;
-    private final String template;
+    private final List<String> templates;
     private final String product;
 
-    public PCR(String oligo1, String oligo2, String template, String product) {
+    public PCR(String oligo1, String oligo2, List<String> templates, String product) {
         this.oligo1 = oligo1;
         this.oligo2 = oligo2;
-        this.template = template;
+        this.templates = templates;
         this.product = product;
     }
     
@@ -33,8 +35,8 @@ public class PCR implements Step {
         return oligo2;
     }
 
-    public String getTemplate() {
-        return template;
+    public List<String> getTemplates() {
+        return templates;
     }
     
     @Override
@@ -51,7 +53,11 @@ public class PCR implements Step {
     public String toString() {
         String out = "Oligo1: " + this.oligo1;
         out += "\nOligo2: " + this.oligo2;
-        out += "\ntemplate: " + this.template;
+        
+        out += "\ntemplate:";
+        for(String template : templates) {
+            out+= "\n\t" + template;
+        }
         out += "\nproduct: " + this.product;
         return out;
     }

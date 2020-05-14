@@ -53,7 +53,7 @@ public class BluntingSimulator {
         return product;
     }
     
-    public Polynucleotide Exonuclease(Polynucleotide sub){
+    private Polynucleotide Exonuclease(Polynucleotide sub){
         String sequence = sub.getSequence();
 
         String remaining = sequence;

@@ -87,8 +87,16 @@ public class SimulateConstructionFile {
     }
 
     private void simulatePCR(PCR pcr, Map<String, Polynucleotide> fragments) throws Exception{
-        Log.info("Simulating PCR (o1,o2,template,pdt): " + pcr.getOligo1() + ", " + pcr.getOligo2() + ", " + pcr.getTemplate() + ", " + pcr.getProduct());
+        StringBuilder msg = new StringBuilder();
+        msg.append("Simulating PCR (o1,o2,template(s),pdt): ");
+        msg.append(pcr.getOligo1()).append(", ").append(pcr.getOligo2()).append(", ");
+        for(String temp : pcr.getTemplates()) {
+            msg.append(temp).append(", ");
+        }
+        msg.append(pcr.getProduct());
+        Log.info(msg.toString());
         PCRSimulator PCRSimulator = new PCRSimulator();
+        PCRSimulator.initiate();
         PCRSimulator.run(pcr, fragments);
     }
 
@@ -195,7 +203,6 @@ public class SimulateConstructionFile {
         Polynucleotide substrate = fragments.get(blunting.getSubstrate());
         Polynucleotide bluntingProduct = bluntSimulator.run(substrate, type);
         fragments.put(blunting.getProduct(), bluntingProduct);
-        
     }
     
     public static void main(String[] args) throws Exception {
@@ -203,7 +210,6 @@ public class SimulateConstructionFile {
         ParseConstructionFile pCF = new ParseConstructionFile();
         pCF.initiate();
         String text = FileUtils.readResourceFile("constructionfile/data/pcrtest.txt");
-//        String text = FileUtils.readFile("/Users/jca20n/Pimar/experiments/2020_02_04-Lycopene6/eden/Construction of pLYC31E.txt");
         ConstructionFile cf = pCF.run(text);
         
         //Simulate the construction file

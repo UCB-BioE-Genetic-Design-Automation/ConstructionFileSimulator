@@ -188,24 +188,24 @@ public class ParseConstructionFile {
         switch (op) {
             
             case pcr://pcr oligo1,oligo2 on template \t (size bp,product) 
-                               
-                //split content w/i and w/o ()
+                //Separate the oligos, templates, and product info
+                //First split between oligos+templates and product info
                 String[] parenPCR = lineNoOP.split("\\(");
-                //split oligo and plasmid
+                //Then split the oligos from the templates
                 String[] oligoPlasmidPCR = parenPCR[0].split(" on ");
                 
                 //trim and split oligos
+                //TODO:  This could be more explicit:  there are 2 and and only 2 oligos in PCR
                 String oligosPCR0 = oligoPlasmidPCR[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",");
                 //evoke rangeInString to split oligos
                 String[] oligosPCR = rangeInString(oligosPCR0);
-  
-                //extract plasmid
-                String templatePCR = oligoPlasmidPCR[1].trim();
-                
+
+                //identify product and its size (if available)
                 //eliminate ()
                 String sizeProductPCR = parenPCR[1].trim();
                 sizeProductPCR = sizeProductPCR.replaceAll("\\(", "");
                 sizeProductPCR = sizeProductPCR.replaceAll("\\)", "");
+                
                 //split by "bp,"
                 String sizePCR;
                 String productPCR;
@@ -216,11 +216,20 @@ public class ParseConstructionFile {
                 }else{
                     sizePCR = null;
                     productPCR = sizeProductPCR.trim();
-                }                
+                }   
+                
+                //extract the list of templates
+                String templateStr = oligoPlasmidPCR[1].trim();
+                String[] templates = rangeInString(templateStr);
+                List<String> templateList = new ArrayList<>();
+                for(String template : templates) {
+                    templateList.add(template);
+                }
+                
                 //evoke createPCR and return
                 return createPCR(
                         oligosPCR,
-                        templatePCR,
+                        templateList,
                         sizePCR,
                         productPCR
                 );
@@ -380,8 +389,8 @@ public class ParseConstructionFile {
         }
     }
 
-    private Step createPCR(String[] oligos, String template, String size, String product) {    
-        return new PCR(oligos[0], oligos[1], template, product);
+    private Step createPCR(String[] oligos, List<String> templates, String size, String product) {    
+        return new PCR(oligos[0], oligos[1], templates, product);
     }
     
     private Step createPCA(String[] oligos, String product) {

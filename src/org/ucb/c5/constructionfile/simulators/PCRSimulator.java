@@ -1,257 +1,281 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package org.ucb.c5.constructionfile.simulators;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.ucb.c5.constructionfile.model.PCR;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 import org.ucb.c5.sequtils.CalcEditDistance;
-import org.ucb.c5.genbank.model.RevComp;
+import org.ucb.c5.sequtils.PolyRevComp;
+import org.ucb.c5.sequtils.RevComp;
 import org.ucb.c5.sequtils.StringRotater;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import org.ucb.c5.utils.Log;
-
+/**
+ *
+ * @author J. Christopher Anderson
+ */
 public class PCRSimulator {
-    /*
-     PF2a	BR2a
-     BF2a	PR2a
-     ok
-	
-     PF3a	BR3a
-     BF3a	PR3a
-	
-     PF4a	BR4a
-     BF4a	PR4a
-	
-     PF5a	BR5a
-     BF5a	PR5a
-	
-     PF6a	BR6a
-     BF6a	PR6a
-     */
 
-    public static void main(String[] args) throws Exception {
-        String template = "ggcagttattggtgcctagaaatattttatctgattaataagatgatcttcttgagatcgttttggtctgcgcgtaatctcttgctctgaaaacgaaaaaaccgccttgcagggcggtttttcgaaggttctctgagctaccaactctttgaaccgaggtaactggcttggaggagcgcagtcaccaaaacttgtcctttcagtttagccttaaccggcgcatgacttcaagactaactcctctaaatcaattaccagtggctgctgccagtggtgcttttgcatgtctttccgggttggactcaagacgatagttaccggataaggcgcagcggtcggactgaacggggggttcgtgcatacagtccagcttggagcgaactgcctacccggaactgagtgtcaggcgtggaatgagacaaacgcggccataacagcggaatgacaccggtaaaccgaaaggcaggaacaggagagcgcacgagggagccgccagggggaaacgcctggtatctttatagtcctgtcgggtttcgccaccactgatttgagcgtcagatttcgtgatgcttgtcaggggggcggagcctatggaaaaacggctttgccgcggccctctcacttccctgttaagtatcttcctggcatcttccaggaaatctccgccccgttcgtaagccatttccgctcgccgcagtcgaacgaccgagcgtagcgagtcagtgagcgaggaagcggaatatatcctgtatcacatattctgctgacgcaccggtgcagccttttttctcctgccacatgaagcacttcactgacaccctcatcagtgcCAACATAGTAAGCCAGTATACACTCCGCTACAGCCACGTATCGCCAGATGTTCCAGACTAGAATAAAGAAAAAGGGAGCCCATGGGCTCCCTTAATTTAAAATGGTTGTCTTAAGAACGACTTCTTTACATTTTTGCTTCCGTGTGGTATTATGGGAGCAGTAGGTCTACGGTTAACTGATACTAAAAGACAATTCAGCGGGTAACCTTGCAATGGTGAGTGGCAGTAAAGCGGGCGTTTCGCCTCATCGCGAAATAGAAGTAATGAGACAATCCATTGACGATCACCTGGCTGGCCTGTTACCTGAAACCGACAGCCAGGATATCGTCAGCCTTGCGATGCGTGAAGGCGTCATGGCACCCGGTAAACGGATCCGTCCGCTGCTGATGCTGCTGGCCGCCCGCGACCTCCGCTACCAGGGCAGTATGCCTACGCTGCTCGATCTCGCCTGCGCCGTTGAACTGACCCATACCGCGTCGCTGATGCTCGACGACATGCCCTGCATGGACAACGCCGAGCTGCGCCGCGGTCAGCCCACTACCCACAAAAAATTTGGTGAGAGCGTGGCGATCCTTGCCTCCGTTGGGCTGCTCTCTAAAGCCTTTGGTCTGATCGCCGCCACCGGCGATCTGCCGGGGGAGAGGCGTGCCCAGGCGGTCAACGAGCTCTCTACCGCCGTGGGCGTGCAGGGCCTGGTACTGGGGCAGTTTCGCGATCTTAACGATGCCGCCCTCGACCGTACCCCTGACGCTATCCTCAGCACCAACCACCTCAAGACCGGCATTCTGTTCAGCGCGATGCTGCAGATCGTCGCCATTGCTTCCGCCTCGTCGCCGAGCACGCGAGAGACGCTGCacgccttcgccctcgacttcggccaggcgtttcaactgctggacgatctgcgtgacgatcacccggaaaccggtaaagatcgcaataaggacgcgggaaaatcgacgctggtcaaccggctgggcgcagacgcggcccggcaaaagctgcgcgagcatattgattccgccgacaaacacctcacttttgcctgtccgcagggcggcgccatccgacagtttatgcatctgtggtttggccatcaccttgccgactggtcaccggtcatgaaaatcgcctgataccgcccttttgggttcaagcagtacataacgatggaaccacattacaggagtagtgatgaatgaaggacgagcgccttgttcagcgtaagaacgatcatctggatatcgttctcgacccccgtcgcgccgtaactcaggctagcgcaggttttgagcgctggcgctttacccactgcgccctgccagagctgaattttagcgacatcacgctggaaaccaccttcctgaatcggcagctacaggctccgctgctgatcagctccatgaccggcggcgttgagcgctcgcgccatatcaaccgccacctcgccgaggcggcgcaggtgctaaaaattgcgatgggggtgggctcccagcgcgtcgccattgagagcgacgcgggcttagggctggataaaaccctgcggcagctggctccggacgtgccgctgctggcgaacctcggcgcggcgcagctgaccggcagaaaaggtattgattacgcccgacgggccgtggagatgatcgaggcggatgcgctgattgtgcacctaaacccgctgcaggaggcgctacagcccggcggcgatcgcgactggcgcggacggctggcggctattgaaactctggtccgcgagctgcccgttccgctggtggtgaaagaggtgggagccggtatctcccgaaccgtggccgggcagctgatcgatgccggcgttaccgtgattgacgtcgcgggcgcgggcggcaccagctgggccgccgttgaaggcgagcgggcggccaccgagcagcagcgcagcgtggccaacgtctttgccgactgggggatccccaccgctgaggcgctggttgacattgccgaggcctggccgcagatgccccttattgcctcgggaatgcgggctgggctatttcaccctaccactggctattcgctgccgctggcggtggcccttgccgacgcgattgccgacagcccgcggctgggcagcgttccgctctatcagctcacccggcagtttgccgaacgccactggcgcaggcagggattcttccgcctgctgaaccggatgcttttcctggccgggcgcgaggagaaccgctggcgggtgatgcagcgcttttatgggctgccggagcccaccgtagagcgcttttacgccggtcggctctctctctttgataaggcccgcattttgacgggcaagccaccggttccgctgggcgaagcctggcgggcggcgctgaaccattttcctgacagacgagataaaggatgaaaaaaaccgttgtgattggcgcaggctttggtggcctggcgctggcgattcgcctgcaggcggcagggatcccaaccgtactgctggagcagcgggacaagcccggcggtcgggcctacgtctggcatgaccagggctttacctttgacgccgggccgacggtgatcaccgatcctaccgcgcttgaggcgctgttcaccctggccggcaggcgcatggaggattacgtcaggctgctgccggtaaaacccttctaccgactctgctgggagtccgggaagaccctcgactatgctaacgacagcgccgagcttgaggcgcagattacccagttcaacccccgcgacgtcgagggctaccggcgctttctggcttactcccaggcggtattccaggagggatatttgcgcctcggcagcgtgccgttcctctcttttcgcgacatgctgcgcgccgggccgcagctgcttaagctccaggcgtggcagagcgtctaccagtcggtttcgcgctttattgaggatgagcatctgcggcaggccttctcgttccactccctgctggtaggcggcaaccccttcaccacctcgtccatctacaccctgatccacgcccttgagcgggagtggggggtctggttccctgagggcggcaccggggcgctggtgaacggcatggtgaagctgtttaccgatctgggcggggagatcgaactcaacgcccgggtcgaagagctggtggtggccgataaccgcgtaagccaggtccggctggcggatggtcggatctttgacaccgacgccgtagcctcgaacgctgacgtggtgaacacctataaaaagctgctcggccaccatccggtggggcagaagcgggcggcagcgctggagcgcaagagcatgagcaactcgctgtttgtgctctacttcggcctgaaccagcctcattcccagctggcgcaccataccatctgttttggtccccgctaccgggagctgatcgacgagatctttaccggcagcgcgctggcggatgacttctcgctctacctgcactcgccctgcgtgaccgatccctcgctcgcgcctcccggctgcgccagcttctacgtgctggccccggtgccgcatcttggcaacgcgccgctggactgggcgcaggaggggccgaagctgcgcgaccgcatctttgactaccttgaagagcgctatatgcccggcctgcgtagccagctggtgacccagcggatctttaccccggcagacttccacgacacgctggatgcgcatctgggatcggccttctccatcgagccgctgctgacccaaagcgcctggttccgcccgcacaaccgcgacagcgacattgccaacctctacctggtgggcgcaggtactcaccctggggcgggcattcctggcgtagtggcctcggcgaaagccaccgccagcctgatgattgaggatctgcaatgagccaaccgccgctgcttgaccacgccacgcagaccatggccaacggctcgaaaagttttgccaccgctgcgaagctgttcgacccggccacccgccgtagcgtgctgatgctctacacctggtgccgccactgcgatgacgtcattgacgaccagacccacggcttcgccagcgaggccgcggcggaggaggaggccacccagcgcctggcccggctgcgcacgctgaccctggcggcgtttgaaggggccgagatgcaggatccggccttcgctgcctttcaggaggtggcgctgacccacggtattacgccccgcatggcgctcgatcacctcgacggctttgcgatggacgtggctcagacccgctatgtcacctttgaggatacgctgcgctactgctatcacgtggcgggcgtggtgggtctgatgatggccagggtgatgggcgtgcgggatgagcgggtgctggatcgcgcctgcgatctggggctggccttccagctgacgaatatcgcccgggatattattgacgatgcggctattgaccgctgctatctgcccgccgagtggctgcaggatgccgggctgaccccggagaactatgccgcgcgggagaatcgggccgcgctggcgcgggtggcggagcggcttattgatgccgcagagccgtactacatctcctcccaggccgggctacacgatctgccgccgcgctgcgcctgggcgatcgccaccgcccgcagcgtctaccgggagatcggtattaaggtaaaagcggcgggaggcagcgcctgggatcgccgccagcacaccagcaaaggtgaaaaaattgccatgctgatggcggcaccggggcaggttattcgggcgaagacgacgagggtgacgccgcgtccggccggtctttggcagcgtcccgtttaggcgggcggccatgacgttcacgcaggatcagtcgcctgtaggtcggcaggcttgggaagctgtggtatggctgtgcaggtcgtaaatcactgcataattcgtgtcgctcaaggcgcactcccgttctggataatgttttttgcgccgacatcataacggttctggcaaatattctgaaatgagctgttgacaattaatcatccggctcgtataatgtgtggaattgtgagcggataacaatttcacacaggaaacagcgccgctgagaaaaagcgaagcggcactgctctttaacaatttatcagacaatctgtgtgggcactcgaccggaattatcgattaactttattattaaaaattaaagaggtatatattaatgtatcgattaaataaggaggaataaaccatgtcgagatctgcagctggtaccgctatgacagatactaaagatgctggtatggatgctgttcagagacgtctcatgtttgaggatgaatgcattcttgttgatgaaactgatcgtgttgtggggcatgacagcaagtataattgtcatctgatggaaaatattgaagccaagaatttgctgcacagggcttttagtgtatttttattcaactcgaagtatgagttgcttctccagcaaaggtcaaacacaaaggttacgttccctctagtgtggactaacacttgttgcagccatcctctttaccgtgaatcagagcttatccaggacaatgcactaggtgtgaggaatgctgcacaaagaaagcttctcgatgagcttggtattgtagctgaagatgtaccagtcgatgagttcactcccttgggacgtatgctgtacaaggctccttctgatggcaaatggggagagcatgaacttgattacttgctcttcatcgtgcgagacgtgaaggttcaaccaaacccagatgaagtagctgagatcaagtatgtgagccgggaagagctgaaggagctggtgaagaaagcagatgcaggtgaggaaggtttgaaactgtcaccatggttcagattggtggtggacaatttcttgatgaagtggtgggatcatgttgagaaaggaactttggttgaagctatagacatgaaaaccatccacaaactctgaacatctttttttaaagtttttaaatcaatcaactttctcttcatcatttttatcttttcgatgataataatttgggatatgtgagacacttacaaaacttccaaggtctgcggggcaaaacaatcgataaatcagcccgggaattaacatggcaaccactcatttggatgtttgcgccgtggttccggcggccggatttggccgtcgaatgcaaacggaatgtcctaagcaatatctctcaatcggtaatcaaaccattcttgaacactcggtgcatgcgctgctggcgcatccccgggtgaaacgtgtcgtcattgccataagtcctggcgatagccgttttgcacaacttcctctggcgaatcatccgcaaatcaccgttgtagatggcggtgatgagcgtgccgattccgtgctggcaggtctgaaagccgctggcgacgcgcagtgggtattggtgcatgacgccgctcgtccttgtttgcatcaggatgacctcgcgcgattgttggcgttgagcgaaaccagccgcacgggggggatcctcgccgcaccagtgcgcgatactatgaaacgtgccgaaccgggcaaaaatgccattgctcataccgttgatcgcaacggcttatggcacgcgctgacgccgcaatttttccctcgtgagctgttacatgactgtctgacgcgcgctctaaatgaaggcgcgactattaccgacgaagcctcggcgctggaatattgcggattccatcctcagttggtcgaaggccgtgcggataacattaaagtcacgcgcccggaagatttggcactggccgagttttacctcacccgaaccatccatcaggagaatacataatgcgaattggacacggttttgacgtacatgcctttggcggtgaaggcccaattatcattggtggcgtacgcattccttacgaaaaaggattgctggcgcattctgatggcgacgtggcgctccatgcgttgaccgatgcattgcttggcgcggcggcgctgggggatatcggcaagctgttcccggataccgatccggcatttaaaggtgccgatagccgcgagctgctacgcgaagcctggcgtcgtattcaggcgaagggttatacccttggcaacgtcgatgtcactatcatcgctcaggcaccgaagatgttgccgcacattccacaaatgcgcgtgtttattgccgaagatctcggctgccatatggatgatgttaacgtgaaagccactactacggaaaaactgggatttaccggacgtggggaagggattgcctgtgaagcggtggcgctactcattaaggcaacaaaatgattgagtttgataatctcacttacctccacggtaaaccgcacctcaggcaataataaagtttgcggccgcgaattcctgcagcccgggggatccactagttctagagcggccgccaccgcggtggagctccagcttttgttccctttagtgagggttaatttcgagcttggcgtaatcatggtcatagctgtttcctgtgtggtggtagatcctctacgccggacgcatcgtggccggcatcaccggcgccacaggtgcggttgctggcgcctatatcgccgacatcacccagaaatcatccttagcgaaagctaaggattttttttatctgaaattctgcctcgtgatacgcctatttttataggttaatgtcatgataataatggtttcttagacgtcaggtggcacttttcggggaaatgtgcgcggaacccctatttgtttatttttctaaatacattcaaatatgtatccgctcatgagacaataaccctgataaatgcttcaataatattgaaaaaggaagagtatgagtattcaacatttccgtgtcgcccttattcccttttttgcggcattttgccttcctgtttttgctcacccagaaacgctggtgaaagtaaaagatgctgaagatcagttgggtgcacgagtgggttacatcgaactggatctcaacagcggtaagatccttgagagttttcgccccgaagaacgttttccaatgatgagcacttttaaagttctgctatgtggcgcggtattatcccgtattgacgccgggcaagagcaactcggtcgccgcatacactattctcagaatgacttggttgagtactcaccagtcacagaaaagcatcttacggatggcatgacagtaagagaattatgcagtgctgccataaccatgagtgataacactgcggccaacttacttctgacaacgatcggaggaccgaaggagctaaccgcttttttgcacaacatgggggatcatgtaactcgccttgatcgttgggaaccggagctgaatgaagccataccaaacgacgagcgtgacaccacgatgcctgtagcaatggcaacaacgttgcgcaaactattaactggcgaactacttactctagcttcccggcaacaattaatagactggatggaggcggataaagttgcaggaccacttctgcgctcggcccttccggctggctggtttattgctgataaatctggagccggtgagcgtggctctcgcggtatcattgcagcactggggccagatggtaagccctcccgtatcgtagttatctacacgacggggagtcaggcaactatggatgaacgaaatagacagatcgctgagataggtgcctcactgattaagcattggtaatttttttaa";
+    private CalcEditDistance ced;
+    private PolyRevComp revcomp;
+    private StringRotater rotator;
+    private RevComp rc;
 
-        PCR pcr = new PCR("BF6a", "PR6a", "template", "pcrpdt");
-
-        PCRSimulator sim = new PCRSimulator();
-        sim.initiate();
-
-        Map<String, Polynucleotide> frags = new HashMap<>();
-        frags.put("template", new Polynucleotide(template));
-
-        frags.put("PF2a", new Polynucleotide("ccataGGTCTCTgtagcataacgatggaaccacattacag"));
-        frags.put("PF3a", new Polynucleotide("ccataGGTCTCTgtagccgcgcttgaggcgctgttc"));
-        frags.put("PF4a", new Polynucleotide("ccataGGTCTCTgtagccgccgctgcttgaccacgc"));
-        frags.put("PF5a", new Polynucleotide("ccataGGTCTCTgtaggaggtatatattaatgtatcg"));
-        frags.put("PF6a", new Polynucleotide("ccataGGTCTCTgtaggtctgcggggcaaaacaatcg"));
-
-        frags.put("PR2a", new Polynucleotide("cagttGGTCTCActggctgcttgaacccaaaagggcgg"));
-        frags.put("PR3a", new Polynucleotide("cagttGGTCTCActgggcctgcgccaatcacaacgg"));
-        frags.put("PR4a", new Polynucleotide("cagttGGTCTCActggggttggctcattgcagatcc"));
-        frags.put("PR5a", new Polynucleotide("cagttGGTCTCActgggcgtgaacgtcatggccgcc"));
-        frags.put("PR6a", new Polynucleotide("cagttGGTCTCActgggatgttcagagtttgtggatg"));
-
-        frags.put("BF2a", new Polynucleotide("ccataGGTCTCTgatggcaaatggggagagcatg"));
-        frags.put("BF3a", new Polynucleotide("ccataGGTCTCTgatgttgccgcacattccac"));
-        frags.put("BF4a", new Polynucleotide("ccataGGTCTCTgatggtaagccctcccgtatcgt"));
-        frags.put("BF5a", new Polynucleotide("ccataGGTCTCTGATGCGTGAAGGCGTCATGGC"));
-        frags.put("BF6a", new Polynucleotide("ccataGGTCTCTgatgggggtgggctcccagcg"));
-        frags.put("BR2a", new Polynucleotide("cagttGGTCTCAcatcagaaggagccttgtacag"));
-        frags.put("BR3a", new Polynucleotide("cagttGGTCTCAcatcttcggtgcctgagcgatg"));
-        frags.put("BR4a", new Polynucleotide("cagttGGTCTCAcatctggccccagtgctgcaatg"));
-        frags.put("BR5a", new Polynucleotide("cagttGGTCTCACATCGCAAGGCTGACGATATCC"));
-        frags.put("BR6a", new Polynucleotide("cagttGGTCTCAcatcgcaatttttagcacctgc"));
-
-        sim.run(pcr, frags);
-
-        Polynucleotide pdt = frags.get("pcrpdt");
-        System.out.println(pdt.getSequence());
-    }
-
-    public void initiate() {
+    public void initiate() throws Exception {
+        revcomp = new PolyRevComp();
+        revcomp.initiate();
+        rc = new RevComp();
+        rc.initiate();
+        rotator = new StringRotater();
+        rotator.initiate();
+        ced = new CalcEditDistance();
+        ced.initiate();
     }
 
     public void run(PCR pcr, Map<String, Polynucleotide> fragments) throws Exception {
-        
-        String oligo1Seq = null;
+        //String oligo1, String oligo2, List<Polynucleotide> templates
+        String oligo1 = null;
         try {
-            oligo1Seq = fragments.get(pcr.getOligo1()).getSequence().toLowerCase(); // Check local Map for oligo1
+            Polynucleotide poly = fragments.get(pcr.getOligo1());
+            oligo1 = poly.getSequence().toUpperCase();
         } catch (Exception err) {
-            Log.severe("Sequence " + pcr.getOligo1() + " is missing");
-            throw err;
+            throw new IllegalArgumentException("Oligo " + oligo1 + " is missing");
         }
 
-        String oligo2Seq = null;
+        //String oligo1, String oligo2, List<Polynucleotide> templates
+        String oligo2 = null;
         try {
-            oligo2Seq = fragments.get(pcr.getOligo2()).getSequence().toLowerCase(); // Check local Map for oligo2
+            Polynucleotide poly = fragments.get(pcr.getOligo2());
+            oligo2 = poly.getSequence().toUpperCase();
         } catch (Exception err) {
-            Log.severe("Sequence " + pcr.getOligo2() + " is missing");
-            throw err;
+            throw new IllegalArgumentException("Oligo " + oligo2 + " is missing");
         }
 
-        String templateSeq = null;
-        try {
-            templateSeq = fragments.get(pcr.getTemplate()).getSequence().toLowerCase(); // Check local Map for template sequence
-        } catch (Exception err) {
-            Log.severe("Sequence " + pcr.getTemplate() + " is missing");
-            throw err;
-        }
-
-        try {
-            String productSeq = fragments.get(pcr.getProduct()).getSequence().toLowerCase(); // Check local Map for product (probably not given in CF)
-        } catch (Exception NullPointerException) {
-            String productSeq = null;
-        }
-        // Check validity of sequences
-        validateSequence(oligo1Seq);
-        validateSequence(oligo2Seq);
-        validateSequence(templateSeq);
-
-        // Create util objects
-        RevComp revcomp = new RevComp();
-        revcomp.initiate();
-        StringRotater stringRotater = new StringRotater();
-        CalcEditDistance calcEditDistance = new CalcEditDistance();
-        // Find indices of sequences starting with the last 6 bases 5' to 3' of oligo1 (or the first 6 bases 3' to 5' rev comp of the sequence)
-        String lastSixOligo1Seq = oligo1Seq.substring(oligo1Seq.length() - 6); // Last six bases of 5' to 3' oligo1
-        String revFirstSixOligo1Seq = revcomp.run(oligo1Seq).substring(0, 6); // First six bases of 3' to 5' revcompOligo1
-        ArrayList<Integer> forwardIndicesOligo1 = new ArrayList<>(); // Last indices of 5' to 3' matching sequences
-        ArrayList<Integer> revIndicesOligo1 = new ArrayList<>(); // First indices of 3' to 5' reverse complement matching sequences
-        for (int i = -1; (i = templateSeq.indexOf(lastSixOligo1Seq, i + 1)) != -1; i++) {
-            forwardIndicesOligo1.add(i + 6); // If the six bp matching sequence is found starting at index i, add the index of the last 5' to 3' bp (i+6)
-        }
-        for (int i = -1; (i = templateSeq.indexOf(revFirstSixOligo1Seq, i + 1)) != -1; i++) {
-            revIndicesOligo1.add(i); // If the six bp matching revcomp sequence is found starting at index i, add the index of the first 3' to 5' bp (i)
-        }
-        // Check that a 6 bp match was found
-        if (forwardIndicesOligo1.size() == 0 && revIndicesOligo1.size() == 0) {
-            throw new Exception("There was no matching 6 bp sequence for the provided oligo1");
-        }
-
-        // Sanity Check:
-        // forwardIndicesOligo1 contains the indices (on the 5' to 3' template sequence) of the END of 5' to 3' sequences potentially matching oligo1
-        // revIndicesOligo1 contains the indices (on the 5' to 3' template sequence) of the FIRST index of 3' to 5' sequences potentially matching revOligo1
-        int lowestForwardEditDistanceOligo1SeqIndex = 0; // Will be assigned to the END index (on the 5' to 3' template seq) of the 5' to 3' sequence that best matches oligo1
-        int lowestForwardEditDistanceOligo1 = Integer.MAX_VALUE;
-        for (int i : forwardIndicesOligo1) {
-            int offset = i - oligo1Seq.length(); // Offset assigned to the index of the FIRST index of the 5' to 3' sequence potentially matching oligo1
-            String tempRotatedTemplateSeq = stringRotater.run(templateSeq, offset); // Rotate the string such that the first bp of the 5' to 3' matching seq is at index 0
-            String potentialMatchSeq = tempRotatedTemplateSeq.substring(Math.max(0, oligo1Seq.length() - 25), oligo1Seq.length()); // Select the last 25 bases of the potential matching seq, or all bases if less than 25 bp long
-            String annealingRegionOligo1 = oligo1Seq.substring(Math.max(0, oligo1Seq.length() - 25), oligo1Seq.length()); // Select the last 25 bases of oligo1, or all bases if less than 25 bp long
-            int tempEditDistance = calcEditDistance.run(potentialMatchSeq, annealingRegionOligo1);
-            if (tempEditDistance < lowestForwardEditDistanceOligo1) {
-                lowestForwardEditDistanceOligo1SeqIndex = i;
-                lowestForwardEditDistanceOligo1 = tempEditDistance;
+        List<Polynucleotide> templates = new ArrayList<>();
+        for (String temp : pcr.getTemplates()) {
+            Polynucleotide poly = fragments.get(temp);
+            if (poly == null) {
+                throw new IllegalArgumentException("Template " + temp + " is missing");
             }
-        }
-        int lowestRevEditDistanceOligo1SeqIndex = 0; // Will be assigned to the FIRST index (on the 5' to 3' template seq) of the 3' to 5' sequence that best matches oligo1
-        int lowestRevEditDistanceOligo1 = Integer.MAX_VALUE;
-        for (int i : revIndicesOligo1) {
-            String tempRotatedTemplateSeq = stringRotater.run(templateSeq, i); // Rotate such that the matching 3' to 5' seq head is at index 0
-            String potentialMatchSeq = tempRotatedTemplateSeq.substring(Math.max(0, oligo1Seq.length() - 25), oligo1Seq.length()); // Select the last 25 bases, or all bases if less than 25 bp long
-            String revPotentialMatchSeq = revcomp.run(potentialMatchSeq); // Reverse complement the 5' to 3' sequence to find the potentially matching 3' to 5' seq
-            String revOligo1Seq = revcomp.run(oligo1Seq); // Reverse complement oligo1
-            String revAnnealingRegionOligo1 = revOligo1Seq.substring(0, Math.min(25, revOligo1Seq.length())); // Select the last 25 bases of rev comp oligo1, or all bases if less than 25 bp long
-            int tempEditDistance = calcEditDistance.run(revPotentialMatchSeq, revAnnealingRegionOligo1);
-
-            if (tempEditDistance < lowestRevEditDistanceOligo1) {
-                lowestRevEditDistanceOligo1SeqIndex = i;
-                lowestRevEditDistanceOligo1 = tempEditDistance;
-            }
+            templates.add(poly);
         }
 
-        // Sanity Check:
-        // lowestForwardEditDistanceOligo1SeqIndex is now assigned to the END index (on the 5' to 3' template sequence) of the 5' to 3' sequence that has the best match with oligo1
-        // lowestRevEditDistanceOligo1SeqIndex is now assigned to the FIRST index (on the 5' to 3' template sequence) of the 3' to 5' sequence that has the best match with oligo1
-        boolean oligo1Forward = true;
-        if (lowestForwardEditDistanceOligo1 < lowestRevEditDistanceOligo1) { // If the forward direction has a lower edit distance
-            templateSeq = stringRotater.run(templateSeq, lowestForwardEditDistanceOligo1SeqIndex); // Rotate the template such that oligo1 is at the very end
-        } else {
-            templateSeq = stringRotater.run(templateSeq, lowestRevEditDistanceOligo1SeqIndex);  // Rotate the template such that revcomp of oligo1 ends at the first index
-            templateSeq = revcomp.run(templateSeq); // Rev comp the entire template seq such that the revcomp of oligo1 starts at the very end
-            oligo1Forward = false;
-        }
-        int endIndexOligo1 = 0;
-        // Sanity Check:
-        // After the above steps, the template sequence should now either end with oligo1 or with the reverse complement of oligo1,
-        // and the end index of the oligo1 seq is saved as endIndexOligo1
-        // Find indices of sequences starting with the first 6 bases of oligo2 (or the rev comp of the sequence)
-
-        String lastSixOligo2Seq = oligo2Seq.substring(oligo2Seq.length() - 6); // Last six bases of 5' to 3' oligo2
-        String revFirstSixOligo2Seq = revcomp.run(oligo2Seq).substring(0, 6);  // First six bases of 3' to 5' revcompOligo2
-        ArrayList<Integer> forwardIndicesOligo2 = new ArrayList<>(); // Last indices of 5' to 3' matching sequences
-        ArrayList<Integer> revIndicesOligo2 = new ArrayList<>(); // First indices of 3' to 5' reverse complement matching sequences
-        for (int i = -1; (i = templateSeq.indexOf(lastSixOligo2Seq, i + 1)) != -1; i++) {
-            forwardIndicesOligo2.add(i + 6); // If the six bp matching sequence is found starting at index i, add the index of the last 5' to 3' bp (i+6)
-        }
-        for (int i = -1; (i = templateSeq.indexOf(revFirstSixOligo2Seq, i + 1)) != -1; i++) {
-            revIndicesOligo2.add(i); // If the six bp matching revcomp sequence is found starting at index i, add the index of the first 3' to 5' bp (i)
-        }
-        // Check that a 6 bp match was found
-        if (forwardIndicesOligo2.size() == 0 && revIndicesOligo2.size() == 0) {
-            throw new Exception("There was no matching 6 bp sequence for the provided oligo2");
-        }
-
-        int startIndexOligo2;
-        int lowestForwardEditDistanceOligo2SeqIndex = 0; // Will be assigned to the END index (on the 5' to 3' template seq) of the 5' to 3' sequence that best matches oligo2
-        int lowestForwardEditDistanceOligo2 = Integer.MAX_VALUE;
-        for (int i : forwardIndicesOligo2) {
-            String potentialMatchSeq = templateSeq.substring(Math.max(0, i - 25), i); // Select the last 25 bases of the potential matching seq, or all bases if less than 25 bp long
-            String annealingRegionOligo2 = oligo2Seq.substring(Math.max(0, oligo1Seq.length() - 25), oligo2Seq.length()); // Select the last 25 bases of oligo2, or all bases if less than 25 bp long
-            int tempEditDistance = calcEditDistance.run(potentialMatchSeq, annealingRegionOligo2);
-            if (tempEditDistance < lowestForwardEditDistanceOligo2) {
-                lowestForwardEditDistanceOligo2SeqIndex = i;
-                lowestForwardEditDistanceOligo2 = tempEditDistance;
-            }
-        }
-        int lowestRevEditDistanceOligo2SeqIndex = 0; // Will be assigned to the FIRST index (on the 5' to 3' template seq) of the 3' to 5' sequence that best matches oligo2
-        int lowestRevEditDistanceOligo2 = Integer.MAX_VALUE;
-        for (int i : revIndicesOligo2) {
-            String potentialMatchSeq = templateSeq.substring(i, Math.min(i + 25, templateSeq.length())); // Select the last 25 bases of the potential matching seq, or all bases if less than 25 bp long
-            String revOligo2Seq = revcomp.run(oligo2Seq);
-            String revAnnealingRegionOligo2 = revOligo2Seq.substring(0, Math.min(25, revOligo2Seq.length())); // Select the last 25 bases of rev comp oligo2, or all bases if less than 25 bp long
-            int tempEditDistance = calcEditDistance.run(potentialMatchSeq, revAnnealingRegionOligo2);
-            if (tempEditDistance < lowestRevEditDistanceOligo2) {
-                lowestRevEditDistanceOligo2SeqIndex = i;
-                lowestRevEditDistanceOligo2 = tempEditDistance;
-            }
-        }
-
-        boolean oligo2Forward = true;
-        if (lowestForwardEditDistanceOligo2 < lowestRevEditDistanceOligo2) {
-            startIndexOligo2 = lowestForwardEditDistanceOligo2SeqIndex - oligo2Seq.length();
-        } else {
-            startIndexOligo2 = lowestRevEditDistanceOligo2SeqIndex;
-            oligo2Forward = false;
-        }
-        // Sanity Check:
-        // StartIndexOligo2 should now be assigned to the FIRST index (on the 5' to 3' template) of the sequence that best matches oligo2 (whether 5' to 3' OR 3' to 5')
-
-        // Check if the oligos will anneal in the same directions
-        if (oligo1Forward == oligo2Forward) {
-            throw new Exception("The provided oligos will both anneal in the same direction for:\n" + pcr.toString());
-        }
-
-        String flankedRegion = templateSeq.substring(endIndexOligo1, startIndexOligo2); // Region between the two oligos that does not contain bp from either
-        String pcrPdt = oligo1Seq + flankedRegion + revcomp.run(oligo2Seq);
-        /*if (productSeq != null && !(pcrPdt.equals(productSeq)) && !(revcomp.run(pcrPdt).equals(productSeq))) { // If a product sequence was explicitly given in the CF and our simulated product does not match it, throw error
-         throw new Exception("The product sequence given in this construction file does not match the sequence that will be generated by the reaction"));
-         }*/
-
-        fragments.put(pcr.getProduct(), new Polynucleotide(pcrPdt));
+        String pdtSeq = run(oligo1, oligo2, templates);
+        Polynucleotide pdtPoly = new Polynucleotide(pdtSeq);
+        fragments.put(pcr.getProduct(), pdtPoly);
     }
 
-    private void validateSequence(String seq) throws Exception {
-        if (seq == null) {
-            throw new Exception("A provided sequence was not specified in the construction file");
-        }
-        for (int i = 0; i < seq.length(); i++) {
-            char c = seq.charAt(i);
-            if (c != 'a' && c != 'c' && c != 'g' && c != 't') {
-                throw new Exception("A provided sequence contains invalid characters");
+    public String run(String oligo1, String oligo2, List<Polynucleotide> templates) throws Exception {
+        oligo1 = oligo1.toUpperCase();
+        oligo2 = oligo2.toUpperCase();
+        
+        //Combine all the species in a set and denature them
+        Set<Polynucleotide> species = new HashSet<>();
+        species.addAll(templates);
+        Set<String> singleStrands = simulateDissociation(oligo1, oligo2, species);
+
+        //Create another set for storing the previous round strands
+        Set<String> oldStrands = new HashSet<>();
+
+        //Simulate thermocycling
+        int breaker = 0;
+        while (true) {
+            //Abort if exceeded 30 cycles
+            if (breaker > 30) {
+                throw new IllegalArgumentException("PCRSimulator stuck in a loop");
             }
+            breaker++;
+
+            //Add oligos then anneal and polymerize
+            singleStrands.add(oligo1);
+            singleStrands.add(oligo2);
+            singleStrands = simulateAnneal(singleStrands);
+
+            //End loop if this last round of single strands is unchanged from last round
+            if (singleStrands.equals(oldStrands)) {
+                break;
+            }
+            oldStrands.clear();
+            oldStrands.addAll(singleStrands);
+        }
+
+        //Determine which of the species is the PCR product
+        String rc2 = rc.run(oligo2);
+        for (String seq : singleStrands) {
+            if (seq.startsWith(oligo1) && seq.endsWith(rc2)) {
+                return seq;
+            }
+        }
+
+        throw new IllegalArgumentException("No PCR product generated");
+    }
+
+    private Set<String> simulateDissociation(String oligo1, String oligo2, Set<Polynucleotide> species) throws Exception {
+        Set<String> newspecies = new HashSet<>();
+        for (Polynucleotide poly : species) {
+            //Handle if it is circular
+            if (poly.isIsCircular()) {
+                String plas = poly.getSequence().toUpperCase();
+                String fpdt = anneal(oligo1, plas);
+                if (fpdt != null) {
+                    String fpdt2 = fpdt.substring(oligo1.length());
+                    String fpdt3 = rc.run(fpdt2);
+                    int start = plas.indexOf(fpdt3) + fpdt3.length() + oligo1.length();
+                    String rotated = rotator.run(plas, start);
+                    String rotRC = rc.run(rotated);
+                    poly = new Polynucleotide(rotRC);
+                } else {
+                    String rpdt = anneal(oligo2, plas);
+                    if (rpdt != null) {
+                        String rpdt2 = rpdt.substring(oligo2.length());
+                        String rpdt3 = rc.run(rpdt2);
+                        int start = plas.indexOf(rpdt3) + rpdt3.length() + oligo2.length();
+                        String rotated = rotator.run(plas, start);
+                        poly = new Polynucleotide(rotated);
+                    } else {
+                        throw new IllegalArgumentException("Could not handle circular template");
+                    }
+                }
+            }
+
+            //Handle as linear, double stranded
+            String forstrand = dissociate(poly);
+            Polynucleotide rev = revcomp.run(poly);
+            newspecies.add(forstrand);
+
+            //If it's already single stranded, no need to do anything
+            if (!poly.isIsDoubleStranded()) {
+                continue;
+            }
+
+            //Handle the reverse strand
+            String revstrand = dissociate(rev);
+            newspecies.add(revstrand);
+        }
+        return newspecies;
+    }
+
+    private String dissociate(Polynucleotide poly) {
+        String forstrand = poly.getSequence();
+
+        if (!poly.getExt5().startsWith("-")) {
+            forstrand = poly.getExt5() + forstrand;
+        }
+
+        if (poly.getExt3().startsWith("-")) {
+            forstrand += poly.getExt3();
+        }
+
+        return forstrand.toUpperCase();
+    }
+
+    private Set<String> simulateAnneal(Set<String> singlestrands) throws Exception {
+        Set<String> species = new HashSet<>();
+
+        //Try all comparisons of any two oligos considering if the first one will anneal and polymerize
+        for (String oligoA : singlestrands) {
+            for (String oligoB : singlestrands) {
+                String pdt = anneal(oligoA, oligoB);
+                if (pdt != null) {
+                    species.add(pdt);
+                }
+            }
+        }
+
+        return species;
+    }
+
+    private String anneal(String oligoA, String oligoB) throws Exception {
+        //Reverse complement oligoB
+        String rcB = rc.run(oligoB);
+
+        //If oligoA and oligoB are identical, terminate
+        if (oligoA.equals(oligoB)) {
+            return null;
+        }
+
+        //If oligoA and oligoB are partner strands, terminate
+        if (oligoA.equals(rcB)) {
+            return null;
+        }
+
+        //Grab the last 6bp of oligoA
+        String sixbp = oligoA.substring(oligoA.length() - 6);
+
+        //Scan through and find the best annealing index (bestIndex) if any
+        int index = 11; //index + 6 = 17, the first site it could be
+        int bestSimilarity = 17;  //17 is one short of the cutoff of 18
+        int bestIndex = -1;
+        int breaker = 0;
+        while (true) {
+            //Abort if exceeded excessive cycles
+            if (breaker > 5000) {
+                throw new IllegalArgumentException("PCRSimulator anneal stuck in a loop");
+            }
+            breaker++;
+
+            //Find the next 6bp match, quit if there are no more
+            index = rcB.indexOf(sixbp, index + 1);
+            if (index == -1) {
+                break;
+            }
+
+            //Find the 30bp (or less) region of oligoA
+            int startA = 0;
+            if (oligoA.length() > 30) {
+                startA = oligoA.length() - 30;
+            }
+            String annealA = oligoA.substring(startA);
+
+            //Find the 30bp (or less) region ending in index+6
+            int startB = (index + 6) - 30;
+            if (startB < 0) {
+                startB = 0;
+            }
+            String annealB = rcB.substring(startB, index + 6);
+            int maxlength = Math.max(annealA.length(), annealB.length());
+
+            //Find the edit distance
+            int distance = ced.run(annealA, annealB);
+            int similarity = maxlength - distance;
+            if (similarity > bestSimilarity) {
+                bestIndex = index;
+                bestSimilarity = similarity;
+            }
+        }  //end while
+
+        //If bestIndex was not updated, no 15+ annealing site was found
+        if (bestIndex < 0) {
+            return null;
+        }
+
+        //If gets here there is a match, so construct the extension product
+        String pdt = oligoA + rcB.substring(bestIndex + 6);
+        return pdt;
+    }
+
+    public static void main(String[] args) throws Exception {
+        PCRSimulator sim = new PCRSimulator();
+        sim.initiate();
+
+        //run a regular pcr (works)
+        {
+            String oligo1 = "gtatcacgaggcagaatttcag";
+            String oligo2 = "attaccgcctttgagtgagc";
+            List<Polynucleotide> templates = new ArrayList<>();
+            Polynucleotide template = new Polynucleotide("TATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGgtatcacgaggcagaatttcagataaaaaaaatccttagctttcgctaaggatgatttctgGAATTCATGAGATCTTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCACGGATCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAAGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGACTCCTCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGGATCTCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATAGGATCCtaaCTCGAcgtgcaggcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTG");
+            templates.add(template);
+
+            String pdt = sim.run(oligo1, oligo2, templates);
+            System.out.println("Exact match oligos on single template:");
+            System.out.println(pdt);
         }
     }
 }

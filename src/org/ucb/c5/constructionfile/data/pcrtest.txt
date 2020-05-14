@@ -1,8 +1,4 @@
 >Construction of q1product
-Acquire oligo q1oligo1
-Acquire oligo q1oligo2
-Acquire plasmid pTargetF
-Acquire plasmid p20N5
 PCR q1oligo1,q1oligo2 on p20N5 (1672 bp, pcrpdt)
 Digest pcrpdt with XhoI,BamHI (pcrdig)
 Digest pTargetF with BamHI,XhoI (vectdig)

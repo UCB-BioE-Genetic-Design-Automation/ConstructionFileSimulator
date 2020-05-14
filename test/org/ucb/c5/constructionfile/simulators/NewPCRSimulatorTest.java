@@ -13,11 +13,11 @@ import org.junit.Test;
 
 public class NewPCRSimulatorTest {
 
-    NewPCRSimulator sim;
+    PCRSimulator sim;
 
     @Before
     public void initializeNewPCRSimulatorTest() throws Exception {
-        sim = new NewPCRSimulator();
+        sim = new PCRSimulator();
         sim.initiate();
     }
 
