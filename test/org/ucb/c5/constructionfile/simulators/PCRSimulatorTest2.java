@@ -10,8 +10,12 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
-
-public class PCRSimulatorTest {
+/**
+ * Tests of PCRSimulator using PCR objects
+ * 
+ * @author J. Christopher Anderson
+ */
+public class PCRSimulatorTest2 {
     @Test
     public void testSimplePCR() throws Exception {
         String oligo1 = "oligo1";

@@ -1,17 +1,20 @@
 package org.ucb.c5.constructionfile.simulators;
 
 import java.util.ArrayList;
-import org.ucb.c5.constructionfile.model.PCR;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-public class NewPCRSimulatorTest {
+/**
+ * Direct testing of the PCR Simulator on all imagined use cases
+ * of PCR including basic cloning, IPCR, SOEing, PCA, overlap extension,
+ * degenerate oligonucleotides, etc.
+ * 
+ * @author J. Christopher Anderson
+ */
+public class PCRSimulatorTest1 {
 
     PCRSimulator sim;
 
