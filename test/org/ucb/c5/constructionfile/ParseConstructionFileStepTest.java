@@ -106,6 +106,146 @@ public class ParseConstructionFileStepTest {
     
     
     @Test
+    public void testPCRMultiPla() throws Exception {
+        String rawText = 
+                "pcr a1,a2 on A1,A2\t(S1 bp,N1)\n" +
+                "pcr b3,b4   on B4 B5 \t( S2 bp,N2)\n" +
+                "pcr c23,c24  on  C7\tC8\t (S3 bp, N3)\n"+
+                "pcr d2 d3 on  D11   D12 (S4 bp, N4)\n"+
+                "pcr e9   e10\ton  E76 and E77 \t (S5 bp, N5)\n"+
+                "pcr f23\tf24 on\tF99/F100     (S6 bp, N6)\n"+
+                "pcr g99   and g100\ton\tG999\tand     G1000 (    S7 bp,   N7    )"
+                ;
+        
+        ParseConstructionFile pcf = new ParseConstructionFile();
+        pcf.initiate();
+        ConstructionFile CF = pcf.run(rawText);
+        
+        List<Step> steps = CF.getSteps();
+        
+        PCR pcr0 = (PCR) steps.get(0);
+        assert(pcr0.getOligo1().equals("a1"));
+        assert(pcr0.getOligo2().equals("a2"));
+        assert(pcr0.getTemplates().get(0).equals("A1"));
+        assert(pcr0.getTemplates().get(1).equals("A2"));
+        assert(pcr0.getProduct().equals("N1"));
+        
+        PCR pcr1 = (PCR) steps.get(1);
+        assert(pcr1.getOligo1().equals("b3"));
+        assert(pcr1.getOligo2().equals("b4"));
+        assert(pcr1.getTemplates().get(0).equals("B4"));
+        assert(pcr1.getTemplates().get(1).equals("B5"));
+        assert(pcr1.getProduct().equals("N2"));
+        
+        PCR pcr2 = (PCR) steps.get(2);
+        assert(pcr2.getOligo1().equals("c23"));
+        assert(pcr2.getOligo2().equals("c24"));
+        assert(pcr2.getTemplates().get(0).equals("C7"));
+        assert(pcr2.getTemplates().get(1).equals("C8"));
+        assert(pcr2.getProduct().equals("N3"));
+        
+        PCR pcr3 = (PCR) steps.get(3);
+        assert(pcr3.getOligo1().equals("d2"));
+        assert(pcr3.getOligo2().equals("d3"));
+        assert(pcr3.getTemplates().get(0).equals("D11"));
+        assert(pcr3.getTemplates().get(1).equals("D12"));
+        assert(pcr3.getProduct().equals("N4"));
+        
+        PCR pcr4 = (PCR) steps.get(4);
+        assert(pcr4.getOligo1().equals("e9"));
+        assert(pcr4.getOligo2().equals("e10"));
+        assert(pcr4.getTemplates().get(0).equals("E76"));
+        assert(pcr4.getTemplates().get(1).equals("E77"));
+        assert(pcr4.getProduct().equals("N5"));
+        
+        PCR pcr5 = (PCR) steps.get(5);
+        assert(pcr5.getOligo1().equals("f23"));
+        assert(pcr5.getOligo2().equals("f24"));
+        assert(pcr5.getTemplates().get(0).equals("F99"));
+        assert(pcr5.getTemplates().get(1).equals("F100"));
+        assert(pcr5.getProduct().equals("N6"));
+        
+        PCR pcr6 = (PCR) steps.get(6);
+        assert(pcr6.getOligo1().equals("g99"));
+        assert(pcr6.getOligo2().equals("g100"));
+        assert(pcr6.getTemplates().get(0).equals("G999"));
+        assert(pcr6.getTemplates().get(1).equals("G1000"));
+        assert(pcr6.getProduct().equals("N7"));
+                       
+    }
+    
+    
+    @Test
+    public void testPCRMultiPlaRange() throws Exception {
+        String rawText = 
+                "pcr a1-a2 on A1-A2\t(S1 bp,N1)\n" +
+                "pcr b3-b4   on B4-B5 \t( S2 bp,N2)\n" +
+                "pcr c23-c24  on  C7-C8\t (S3 bp, N3)\n"+
+                "pcr d2-d3 on  D11-D12 (S4 bp, N4)\n"+
+                "pcr e9-e10\ton  E76-E77 \t (S5 bp, N5)\n"+
+                "pcr f23-f24 on\tF99-F100     (S6 bp, N6)\n"+
+                "pcr g99-g100\ton\tG999-G1000 (    S7 bp,   N7    )"
+                ;
+        
+        ParseConstructionFile pcf = new ParseConstructionFile();
+        pcf.initiate();
+        ConstructionFile CF = pcf.run(rawText);
+        
+        List<Step> steps = CF.getSteps();
+        
+        PCR pcr0 = (PCR) steps.get(0);
+        assert(pcr0.getOligo1().equals("a1"));
+        assert(pcr0.getOligo2().equals("a2"));
+        assert(pcr0.getTemplates().get(0).equals("A1"));
+        assert(pcr0.getTemplates().get(1).equals("A2"));
+        assert(pcr0.getProduct().equals("N1"));
+        
+        PCR pcr1 = (PCR) steps.get(1);
+        assert(pcr1.getOligo1().equals("b3"));
+        assert(pcr1.getOligo2().equals("b4"));
+        assert(pcr1.getTemplates().get(0).equals("B4"));
+        assert(pcr1.getTemplates().get(1).equals("B5"));
+        assert(pcr1.getProduct().equals("N2"));
+        
+        PCR pcr2 = (PCR) steps.get(2);
+        assert(pcr2.getOligo1().equals("c23"));
+        assert(pcr2.getOligo2().equals("c24"));
+        assert(pcr2.getTemplates().get(0).equals("C7"));
+        assert(pcr2.getTemplates().get(1).equals("C8"));
+        assert(pcr2.getProduct().equals("N3"));
+        
+        PCR pcr3 = (PCR) steps.get(3);
+        assert(pcr3.getOligo1().equals("d2"));
+        assert(pcr3.getOligo2().equals("d3"));
+        assert(pcr3.getTemplates().get(0).equals("D11"));
+        assert(pcr3.getTemplates().get(1).equals("D12"));
+        assert(pcr3.getProduct().equals("N4"));
+        
+        PCR pcr4 = (PCR) steps.get(4);
+        assert(pcr4.getOligo1().equals("e9"));
+        assert(pcr4.getOligo2().equals("e10"));
+        assert(pcr4.getTemplates().get(0).equals("E76"));
+        assert(pcr4.getTemplates().get(1).equals("E77"));
+        assert(pcr4.getProduct().equals("N5"));
+        
+        PCR pcr5 = (PCR) steps.get(5);
+        assert(pcr5.getOligo1().equals("f23"));
+        assert(pcr5.getOligo2().equals("f24"));
+        assert(pcr5.getTemplates().get(0).equals("F99"));
+        assert(pcr5.getTemplates().get(1).equals("F100"));
+        assert(pcr5.getProduct().equals("N6"));
+        
+        PCR pcr6 = (PCR) steps.get(6);
+        assert(pcr6.getOligo1().equals("g99"));
+        assert(pcr6.getOligo2().equals("g100"));
+        assert(pcr6.getTemplates().get(0).equals("G999"));
+        assert(pcr6.getTemplates().get(1).equals("G1000"));
+        assert(pcr6.getProduct().equals("N7"));
+                       
+    }
+    
+    
+    @Test
     public void testPCA() throws Exception {
         String rawText = 
                 "pca a1,b1\t(c1)\n" +

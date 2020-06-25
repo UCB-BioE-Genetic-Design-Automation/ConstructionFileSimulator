@@ -192,7 +192,7 @@ public class ParseConstructionFile {
                 //First split between oligos+templates and product info
                 String[] parenPCR = lineNoOP.split("\\(");
                 //Then split the oligos from the templates
-                String[] oligoPlasmidPCR = parenPCR[0].split(" on ");
+                String[] oligoPlasmidPCR = parenPCR[0].split("\\s+on\\s+");
                 
                 //trim and split oligos
                 //TODO:  This could be more explicit:  there are 2 and and only 2 oligos in PCR
@@ -219,7 +219,7 @@ public class ParseConstructionFile {
                 }   
                 
                 //extract the list of templates
-                String templateStr = oligoPlasmidPCR[1].trim();
+                String templateStr = oligoPlasmidPCR[1].trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",");
                 String[] templates = rangeInString(templateStr);
                 List<String> templateList = new ArrayList<>();
                 for(String template : templates) {
@@ -256,7 +256,7 @@ public class ParseConstructionFile {
                 //split ()
                 String[] parenDig = lineNoOP.split("\\(");
                 //split oligo and enzyme
-                String[] oligoEnzyDig = parenDig[0].trim().split(" with ");
+                String[] oligoEnzyDig = parenDig[0].trim().split("\\s+with\\s+");
                 //extract oligos
                 String subDig = oligoEnzyDig[0].trim();
                 //extract enzyme
@@ -472,7 +472,8 @@ public class ParseConstructionFile {
                 output = output + "," + baseName + j;
             }
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid name range described. Must have same base name and only differ by integer values at the end.");
+            return input;//original str
+            //throw new IllegalArgumentException("Invalid name range described. Must have same base name and only differ by integer values at the end.");
         }
         
         return output;
