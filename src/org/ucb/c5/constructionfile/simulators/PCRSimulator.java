@@ -69,6 +69,7 @@ public class PCRSimulator {
 
         String pdtSeq = run(oligo1, oligo2, templates);
         Polynucleotide pdtPoly = new Polynucleotide(pdtSeq);
+//        System.out.println(pcr.getProduct() + "\t" + pdtSeq);
         fragments.put(pcr.getProduct(), pdtPoly);
     }
 
