@@ -6,14 +6,11 @@ package org.ucb.c5.constructionfile.model;
  */
 public enum Enzyme {
     DpnI,
+    
+    //Type II Enzymes
     SpeI,
     XbaI,
     XhoI,
-    BsaI,
-    BsmBI,
-    Gibson,
-    AarI,
-    BbsI,
     EcoRI,
     BamHI,
     BglII,
@@ -21,5 +18,14 @@ public enum Enzyme {
     PstI,
     SphI,
     HindIII,
-    BseRI
+    
+    //Type IIS/G enzymes
+    BsaI,
+    BsmBI,
+    AarI,
+    BbsI,
+    BseRI,
+    
+    //Assembly Chemistries
+    Gibson
     }
