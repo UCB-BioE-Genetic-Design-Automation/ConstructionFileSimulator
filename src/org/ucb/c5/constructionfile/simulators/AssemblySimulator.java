@@ -81,10 +81,10 @@ public class AssemblySimulator {
         //Confirm that all the validFrags have sticky ends
         for (Polynucleotide dig : validFrags) {
             if (dig.getExt5().isEmpty()) {
-                throw new IllegalArgumentException("Goldent Gate digestion fragment has no 5' end extension:\n" + dig.toString());
+                throw new IllegalArgumentException("Golden Gate digestion fragment has no 5' end extension:\n" + dig.toString());
             }
             if (dig.getExt3().isEmpty()) {
-                throw new IllegalArgumentException("Goldent Gate digestion fragment has no 3' end extension:\n" + dig.toString());
+                throw new IllegalArgumentException("Golden Gate digestion fragment has no 3' end extension:\n" + dig.toString());
             }
         }
 
@@ -160,6 +160,7 @@ public class AssemblySimulator {
     public static void main(String[] args) throws Exception {
         ParseConstructionFile pCF = new ParseConstructionFile();
         pCF.initiate();
+        //Example should throw an exception, can be replaced (in an ExceptionTest)
         String text = "PCR ZH17,ZH2R on pLYC33K	(5087 bp, pcrA)\n"
                 + "PCR ZH2,ZH18R on pLYC33K	(4900 bp, pcrB)\n"
                 + "PCR MBS18,MBS17R on MG1655_dxs	(1976 bp, pcrC)\n"
