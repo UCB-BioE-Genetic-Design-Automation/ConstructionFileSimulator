@@ -263,11 +263,15 @@ public class ParseConstructionFile {
                 String enzDig = oligoEnzyDig[1].trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",");
                 String[] enzyDig = enzDig.split(",");
                 //extract product
-                String productDig = parenDig[1].replaceAll("\\(", "").replaceAll("\\)", "").trim();                
+                String pdtsection = parenDig[1].replaceAll("\\(", "").replaceAll("\\)", "").trim();
+                String[] pdtsplit = pdtsection.split(",\\s+");
+                String fragsel = pdtsplit[0];
+                String productDig = pdtsplit[1];
                 //evoke createDigest and return
                 return createDigest(
                         subDig,
                         enzyDig,
+                        fragsel,
                         productDig
                 );
                 
@@ -401,7 +405,7 @@ public class ParseConstructionFile {
         return new PCA(frags, product);
     }
     
-    private Step createDigest(String substrate, String[] enzymes, String product) {
+    private Step createDigest(String substrate, String[] enzymes, String fragsel, String product) {
         List<Enzyme> enzList = new ArrayList<>();
         for (String enz : enzymes) {
             Enzyme enzyme;
@@ -413,7 +417,8 @@ public class ParseConstructionFile {
             }
             enzList.add(enzyme);
         }
-        return new Digestion(substrate, enzList, product);
+        int fragSelect = Integer.parseInt(fragsel);
+        return new Digestion(substrate, enzList, fragSelect, product);
     }
 
     private Step createLigation(String[] fragments, String product) {

@@ -61,8 +61,9 @@ public class LigateSimulator {
     }
 
     private Polynucleotide ligateEnds(Polynucleotide poly) throws Exception {
-        if (!poly.getExt3().equals(poly.getExt5())) {
-            return null;
+        if (!poly.getExt3().toUpperCase().equals(poly.getExt5().toUpperCase())) {
+//            return null;
+            throw new Exception("Ends of fragment don't ligate together");
         }
 
         String newseq = null;
@@ -91,18 +92,18 @@ public class LigateSimulator {
         Polynucleotide poly1 = null;
         Polynucleotide poly2 = null;
 
-        if (p1.getExt3().equals(p2.getExt5())) {
+        if (p1.getExt3().toUpperCase().equals(p2.getExt5().toUpperCase())) {
             poly1 = p1;
             poly2 = p2;
-        } else if (p1.getExt5().equals(p2.getExt3())) {
+        } else if (p1.getExt5().toUpperCase().equals(p2.getExt3().toUpperCase())) {
             poly1 = p2;
             poly2 = p1;
         } else {
             Polynucleotide p2rc = revcomp.run(p2);
-            if (p1.getExt3().equals(p2rc.getExt5())) {
+            if (p1.getExt3().toUpperCase().equals(p2rc.getExt5().toUpperCase())) {
                 poly1 = p1;
                 poly2 = p2rc;
-            } else if (p1.getExt5().equals(p2rc.getExt3())) {
+            } else if (p1.getExt5().toUpperCase().equals(p2rc.getExt3().toUpperCase())) {
                 poly1 = p2rc;
                 poly2 = p1;
 

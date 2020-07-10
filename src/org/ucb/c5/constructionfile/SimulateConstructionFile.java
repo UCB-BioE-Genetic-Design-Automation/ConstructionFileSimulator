@@ -118,39 +118,8 @@ public class SimulateConstructionFile {
         DigestSimulator digestSimulator = new DigestSimulator();
         digestSimulator.initiate();
         
-        Polynucleotide substrate;
-        try {
-            substrate = fragments.get(digestion.getSubstrate());
-        } catch(NullPointerException err) {
-            Log.severe("Sequence " + digestion.getSubstrate() + " is missing");
-            throw err;
-        }
-        
-        List<Enzyme> enzymeList = digestion.getEnzymes();
-        String productName = digestion.getProduct();
-
-        RestrictionEnzymeFactory rezfactory = new RestrictionEnzymeFactory();
-        rezfactory.initiate();
-        List<RestrictionEnzyme> restrictionEnzymeList = new ArrayList<>();
-        for (Enzyme enzname: enzymeList) {
-            restrictionEnzymeList.add(rezfactory.run(enzname));
-        }
-        List<Polynucleotide> products = digestSimulator.run(substrate, restrictionEnzymeList);
-        // Figure out which of the products is the desired one and save in fragments
-        int longest = 0;
-        Polynucleotide poly = null;
-        for (Polynucleotide polyTemp : products) {
-            if (polyTemp.getSequence().length() > longest) {
-                longest = polyTemp.getSequence().length();
-                poly = polyTemp;
-            }
-        }
-        if (poly != null) {
-            fragments.put(productName, poly);
-        }
-        else {
-            throw new Exception("There were no products generated from the digestion reaction");
-        }
+        Polynucleotide product = digestSimulator.run(digestion, fragments);
+        fragments.put(digestion.getProduct(), product);
     }
 
     private void simulateLigate(Ligation ligation, Map<String, Polynucleotide> fragments) throws Exception{

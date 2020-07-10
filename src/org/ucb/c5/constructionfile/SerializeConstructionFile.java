@@ -2,7 +2,6 @@ package org.ucb.c5.constructionfile;
 
 import java.util.List;
 import org.ucb.c5.constructionfile.model.*;
-import org.ucb.c5.utils.CrisprConstructionFactory;
 
 /**
  *
@@ -115,17 +114,17 @@ public class SerializeConstructionFile {
     }
     
     public static void main(String[] args) throws Exception {
-        //Initializze the Function
-        SerializeConstructionFile serilaizer = new SerializeConstructionFile();
-        serilaizer.initiate();
-        CrisprConstructionFactory factory = new CrisprConstructionFactory();
-        factory.initiate();
-        
-        //Run the factory
-        ConstructionFile constf = factory.run("fb21", "fb22", "pTarg-amilGFP");
-    
-        //Serilizae
-        String text = serilaizer.run(constf);
-        System.out.println(text);
+//        //Initializze the Function
+//        SerializeConstructionFile serilaizer = new SerializeConstructionFile();
+//        serilaizer.initiate();
+//        CrisprConstructionFactory factory = new CrisprConstructionFactory();
+//        factory.initiate();
+//        
+//        //Run the factory
+//        ConstructionFile constf = factory.run("fb21", "fb22", "pTarg-amilGFP");
+//    
+//        //Serilizae
+//        String text = serilaizer.run(constf);
+//        System.out.println(text);
     }
 }
