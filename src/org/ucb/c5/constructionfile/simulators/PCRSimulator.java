@@ -108,12 +108,24 @@ public class PCRSimulator {
         }
 
         //Determine which of the species is the PCR product
-        String rc2 = rc.run(oligo2);
+         String rc2 = rc.run(oligo2);
+         Set<String> ans = new HashSet<>();
         for (String seq : singleStrands) {
             if (seq.startsWith(oligo1) && seq.endsWith(rc2)) {
-                return seq;
+                ans.add(seq);
+            }
+            String rcseq = rc.run(seq);
+            if (rcseq.startsWith(oligo1) && rcseq.endsWith(rc2)) {
+                ans.add(seq);
             }
         }
+        if (ans.size() > 1){
+            throw new IllegalArgumentException("Multiple PCR products");
+        } 
+        if (ans.size() ==1){
+            return ans.toString();
+        }
+        
 
         throw new IllegalArgumentException("No PCR product generated");
     }

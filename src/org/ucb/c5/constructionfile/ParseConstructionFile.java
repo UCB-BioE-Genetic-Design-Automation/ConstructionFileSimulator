@@ -135,8 +135,8 @@ public class ParseConstructionFile {
                 String[] lines = f.trim().split("\\r|\\r?\\n");
                 String[] spaces = lines[0].split("\\s+");
                 String name = spaces[0];
-                String seq = lines[1];
-                if(!seq.toUpperCase().matches("[ATCG]+")) {
+                String seq = lines[1].toUpperCase();
+                if(!seq.matches("[ATCG]+")) {
                     throw new IllegalArgumentException("Sequence:\n" + seq + "\ncontains non-DNA sequences in:\n" + f);
                 }
                 sequences.put(name, createPoly(seq));
@@ -159,8 +159,8 @@ public class ParseConstructionFile {
 
                 String[] tabs = line.split("\t");
                 String name = tabs[0];
-                String seq = tabs[1];
-                if(!seq.toUpperCase().matches("[ATCG]+")) {
+                String seq = tabs[1].toUpperCase();
+                if(!seq.matches("[ATCG]+")) {
                     throw new IllegalArgumentException("Sequence:\n" + seq + "\ncontains non-DNA sequences in:\n" + line);
                 }
                 sequences.put(name, createPoly(seq));
