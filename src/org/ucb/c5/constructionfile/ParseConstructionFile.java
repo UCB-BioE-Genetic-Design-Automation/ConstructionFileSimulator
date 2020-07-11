@@ -136,7 +136,7 @@ public class ParseConstructionFile {
                 String[] spaces = lines[0].split("\\s+");
                 String name = spaces[0];
                 String seq = lines[1];
-                if(!seq.toUpperCase().matches("[ATCG]+")) {
+                if(!seq.toUpperCase().matches("[ACGTRYSWKMBDHVNacgtryswkmbdhvn]+")) {
                     throw new IllegalArgumentException("Sequence:\n" + seq + "\ncontains non-DNA sequences in:\n" + f);
                 }
                 sequences.put(name, createPoly(seq));
