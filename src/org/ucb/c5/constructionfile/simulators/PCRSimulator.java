@@ -116,14 +116,14 @@ public class PCRSimulator {
             }
             String rcseq = rc.run(seq);
             if (rcseq.startsWith(oligo1) && rcseq.endsWith(rc2)) {
-                ans.add(seq);
+                ans.add(rcseq);
             }
         }
         if (ans.size() > 1){
             throw new IllegalArgumentException("Multiple PCR products");
         } 
-        if (ans.size() ==1){
-            return ans.toString();
+        if (ans.size() == 1){
+            return ans.iterator().next();
         }
         
 
