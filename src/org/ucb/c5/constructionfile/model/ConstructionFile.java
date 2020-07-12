@@ -52,7 +52,7 @@ public class ConstructionFile {
         List<Enzyme> enzymes = new ArrayList<>();
         enzymes.add(Enzyme.SpeI);
         enzymes.add(Enzyme.DpnI);
-        steps.add(new Digestion("pcr", enzymes, "spedig"));
+        steps.add(new Digestion("pcr", enzymes, 1, "spedig"));
         
         //cleanup spedig	(dig)
 //        steps.add(new Cleanup("spedig", "dig"));

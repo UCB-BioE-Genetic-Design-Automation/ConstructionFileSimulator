@@ -43,12 +43,9 @@ public class AssemblySimulator {
         Enzyme enzyme = assembly.getEnzyme();
         if (enzyme == Enzyme.BsmBI || enzyme == Enzyme.BsaI) {
             return simGoldenGate(enzyme, assemblyFragments);
-        } 
-
-        // Test multiple fragment assembly
+        } // Test multiple fragment assembly
         // Test homologous region is on reverse comp
         // Test common errors and throw errors correctly (doesn't recombine correctly, 20 bp are revcomp)
-        
         else if (enzyme == Enzyme.Gibson) { // Gibson
             return simGibson(assemblyFragments);
         } else {
@@ -81,6 +78,16 @@ public class AssemblySimulator {
             }
         }
 
+        //Confirm that all the validFrags have sticky ends
+        for (Polynucleotide dig : validFrags) {
+            if (dig.getExt5().isEmpty()) {
+                throw new IllegalArgumentException("Golden Gate digestion fragment has no 5' end extension:\n" + dig.toString());
+            }
+            if (dig.getExt3().isEmpty()) {
+                throw new IllegalArgumentException("Golden Gate digestion fragment has no 3' end extension:\n" + dig.toString());
+            }
+        }
+
         // Ligate the valid fragments together
         Polynucleotide ligationProduct;
         ligationProduct = ligateSimulator.run(validFrags);
@@ -98,16 +105,14 @@ public class AssemblySimulator {
             int matchedHomologousRegionEndIndex = 0; // Index on matchedFrag of the end of the homologous region (including 20 bp)
             for (Polynucleotide tempFrag : assemblyFragments) {
                 int currLen = currFrag.getSequence().length();
-                
+
                 // If there is a match between the last 20 bp of currFrag and the forward strand of tempFrag
                 if (tempFrag.getSequence().contains(currFrag.getSequence().substring(currLen - 20))) {
                     matchedFrag = tempFrag;
                     matchedHomologousRegionEndIndex = 20 + tempFrag.getSequence().indexOf(currFrag.getSequence().substring(currLen - 20));
                     assemblyFragments.remove(tempFrag);
                     break;
-                } 
-
-                // Else if there is a match between the last 20 bp of currFrag and the backwards strand of tempFrag
+                } // Else if there is a match between the last 20 bp of currFrag and the backwards strand of tempFrag
                 else if (revComp.run(tempFrag.getSequence()).contains(currFrag.getSequence().substring(currLen - 20))) {
                     matchedFrag = new Polynucleotide(revComp.run(tempFrag.getSequence()));
                     matchedHomologousRegionEndIndex = 20 + revComp.run(tempFrag.getSequence()).indexOf(currFrag.getSequence().substring(currLen - 20));
@@ -132,7 +137,7 @@ public class AssemblySimulator {
              currHomologousRegionStartIndex--;
              matchedHomologousRegionStartIndex--;
              } */
-                // Sanity Check: currHomologousRegionStartIndex now points to the index on the current fragment that heads the
+            // Sanity Check: currHomologousRegionStartIndex now points to the index on the current fragment that heads the
             // homologous region, matchedHomologousRegionStartIndex now points to the index on the matched fragment that heads
             // the homologous region, and matchedHomologousRegionEndIndex now points to the last index (including 6 bp matching seq)
             // of the homologous region on the matching strand
@@ -151,7 +156,7 @@ public class AssemblySimulator {
         Polynucleotide circularProduct = new Polynucleotide(forwardStrand.substring(firstIndex, forwardStrand.length() - 20), true);
         return circularProduct;
     }
-    
+
     public static void main(String[] args) throws Exception {
         //JBAG BsmBI golden gate example
         ParseConstructionFile pCF = new ParseConstructionFile();
