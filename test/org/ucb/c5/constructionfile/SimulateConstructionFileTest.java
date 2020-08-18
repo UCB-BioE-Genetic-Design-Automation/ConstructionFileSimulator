@@ -6,6 +6,14 @@ import org.ucb.c5.constructionfile.model.Polynucleotide;
 import org.ucb.c5.utils.FileUtils;
 import org.junit.Test;
 
+
+/**
+ *
+ * @author Zihang Shao
+ * 
+ * Broken: aspC1: PCR
+ */
+
 public class SimulateConstructionFileTest {
     @Test
     public void testaspC1() throws Exception {

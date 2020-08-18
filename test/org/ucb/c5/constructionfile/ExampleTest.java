@@ -9,6 +9,10 @@ import org.junit.Test;
 /**
  *
  * @author Hanxiao Zhang
+ * @edit Zihang Shao
+ * 
+ * Need to re-test after PCR fixed
+ * Broken:EIPCR1,2,3,GoldenGate
  */
 public class ExampleTest {
 
@@ -181,7 +185,7 @@ public class ExampleTest {
                 + "acquire oligo pTargRev\n"
                 + "acquire plasmid pTargetF\n"
                 + "pcr aspC1,pTargRev on pTargetF	(3927 bp, ipcr)\n"
-                + "digest ipcr with SpeI	(spedig)\n"
+                + "digest ipcr with SpeI	(0,spedig)\n"
                 + "ligate spedig	(lig)\n"
                 + "transform lig	(Mach1, Spec)\n"
                 + "\n"
@@ -211,7 +215,7 @@ public class ExampleTest {
                 + "acquire oligo pTargRev\n"
                 + "acquire plasmid pTargetF\n"
                 + "pcr aspC2,pTargRev on pTargetF	(3927 bp, ipcr)\n"
-                + "digest ipcr with SpeI	(spedig)\n"
+                + "digest ipcr with SpeI	(0,spedig)\n"
                 + "ligate spedig	(lig)\n"
                 + "transform lig	(Mach1, Spec)\n"
                 + "\n"
@@ -242,7 +246,7 @@ public class ExampleTest {
                 + "acquire oligo pTargRev\n"
                 + "acquire plasmid pTargetF\n"
                 + "pcr aspC3,pTargRev on pTargetF	(3927 bp, ipcr)\n"
-                + "digest ipcr with SpeI	(spedig)\n"
+                + "digest ipcr with SpeI	(0,spedig)\n"
                 + "ligate spedig	(lig)\n"
                 + "transform lig	(Mach1, Spec)\n"
                 + "\n"

@@ -315,13 +315,13 @@ public class ParseConstructionFileStepTest {
     @Test
     public void testDigestion() throws Exception {
         String rawText = 
-                "digest a1 with DpnI,SpeI\t(d1)\n" +
-                "digest a2 with XbaI, XhoI \t( d2)\n"+
-                "digest a3 with BsaI\tBsmBI\t (d3 )\n"+
-                "digest a4 with Gibson AarI \t ( d4 )\n"+
-                "digest a5 with BbsI    EcoRI (  d5)\n"+
-                "digest a6 with BamHI and BglII   (d6   )\n"+
-                "digest a7 with MfeI/PstI  (   d7   )\n"
+                "digest a1 with DpnI,SpeI\t(1,d1)\n" +
+                "digest a2 with XbaI, XhoI \t( 2, d2)\n"+
+                "digest a3 with BsaI\tBsmBI\t (3 ,d3 )\n"+
+                "digest a4 with Gibson AarI \t ( 4   ,d4 )\n"+
+                "digest a5 with BbsI    EcoRI (  5 ,  d5)\n"+
+                "digest a6 with BamHI and BglII   (6\t,d6   )\n"+
+                "digest a7 with MfeI/PstI  (   7\t,\td7   )\n"
                 ;
                 
         List[] ezlist = new List[7];
@@ -343,6 +343,7 @@ public class ParseConstructionFileStepTest {
             Digestion digest = (Digestion) steps.get(i-1);
             assert(digest.getSubstrate().equals("a"+i));
             assert(digest.getEnzymes().equals(ezlist[i-1]));
+            assert(digest.getFragSelection()+1==i);
             assert(digest.getProduct().equals("d"+i));
             
         }

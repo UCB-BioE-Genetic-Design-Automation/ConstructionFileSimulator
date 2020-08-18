@@ -197,7 +197,7 @@ public class ParseConstructionFile {
                 
                 //trim and split oligos
                 //TODO:  This could be more explicit:  there are 2 and and only 2 oligos in PCR
-                String oligosPCR0 = oligoPlasmidPCR[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",");
+                String oligosPCR0 = oligoPlasmidPCR[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+,", ",").replaceAll("\\s+", ",");
                 //evoke rangeInString to split oligos
                 String[] oligosPCR = rangeInString(oligosPCR0);
 
@@ -220,7 +220,7 @@ public class ParseConstructionFile {
                 }   
                 
                 //extract the list of templates
-                String templateStr = oligoPlasmidPCR[1].trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",");
+                String templateStr = oligoPlasmidPCR[1].trim().replaceAll(",\\s+",",").replaceAll("\\s+,", ",").replaceAll("\\s+", ",");
                 String[] templates = rangeInString(templateStr);
                 List<String> templateList = new ArrayList<>();
                 for(String template : templates) {
@@ -240,7 +240,7 @@ public class ParseConstructionFile {
                 
                 String[] parenPCA = lineNoOP.split("\\(");
                 //extract oligos
-                String oliPCA = parenPCA[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+",",");
+                String oliPCA = parenPCA[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+,", ",").replaceAll("\\s+",",");
                 //split oligos
                 String[] oligosPCA = rangeInString(oliPCA);                
                 //eliminate (), extract product
@@ -261,11 +261,11 @@ public class ParseConstructionFile {
                 //extract oligos
                 String subDig = oligoEnzyDig[0].trim();
                 //extract enzyme
-                String enzDig = oligoEnzyDig[1].trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",");
-                String[] enzyDig = enzDig.split(",");
+                String enzDig = oligoEnzyDig[1].trim().replaceAll(",\\s+",",").replaceAll("\\s+,", ",").replaceAll("\\s+", ",");
+                String[] enzyDig = enzDig.split("\\,");
                 //extract product
-                String pdtsection = parenDig[1].replaceAll("\\(", "").replaceAll("\\)", "").trim();
-                String[] pdtsplit = pdtsection.split(",\\s+");
+                String pdtsection = parenDig[1].replaceAll("\\(", "").replaceAll("\\)", "").trim().replaceAll(",\\s+",",").replaceAll("\\s+,", ",").replaceAll("\\s+", ",");
+                String[] pdtsplit = pdtsection.split(",");
                 String fragsel = pdtsplit[0];
                 String productDig = pdtsplit[1];
                 //evoke createDigest and return
@@ -282,7 +282,7 @@ public class ParseConstructionFile {
                 //split()
                 String[] segLig = lineNoOP.split("\\(");                               
                 //extract frag
-                String fragLig = segLig[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+",",");
+                String fragLig = segLig[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+,", ",").replaceAll("\\s+",",");
                 //split fragments
                 String[] fragsLig = rangeInString(fragLig);                
                 //extract product
@@ -302,7 +302,7 @@ public class ParseConstructionFile {
                 String subTrans = parenTrans[0].trim();
                 
                 //split strain, antibiotic, product(if there is)
-                String[] parenInTrans = parenTrans[1].replaceAll("\\(", "").replaceAll("\\)", "").trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",").split(",");
+                String[] parenInTrans = parenTrans[1].replaceAll("\\(", "").replaceAll("\\)", "").trim().replaceAll(",\\s+",",").replaceAll("\\s+,", ",").replaceAll("\\s+", ",").split(",");
                 //extract strain, antibiotic
                 String strainTrans = parenInTrans[0].trim();
                 String antibioticTrans = parenInTrans[1].trim();
@@ -347,13 +347,13 @@ public class ParseConstructionFile {
                 String[] parenASB = lineNoOP.split("\\(");
                 
                 //extract fragments
-                String fragASB = parenASB[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+", ",");
+                String fragASB = parenASB[0].trim().replaceAll(",\\s+",",").replaceAll("\\s+,", ",").replaceAll("\\s+", ",");
                 //split fragments
                 String[] fragsASB = rangeInString(fragASB);
                 
                 //split enzyme and product
                 String parenInASB = parenASB[1].replaceAll("\\(","").replaceAll("\\)", "").trim();
-                String[] enzyProdASB = parenInASB.replaceAll(",\\s+",",").replaceAll("\\s+", ",").split(",");
+                String[] enzyProdASB = parenInASB.replaceAll(",\\s+",",").replaceAll("\\s+,", ",").replaceAll("\\s+", ",").split(",");
                 //extract enzyme and product
                 String enzymeASB = enzyProdASB[0].trim();
                 String productASB = enzyProdASB[1].trim();
@@ -376,7 +376,7 @@ public class ParseConstructionFile {
                 
                 //split type and product
                 String parenInBlu = parenBlu[1].replaceAll("\\(","").replaceAll("\\)", "").trim();
-                String[] typeProdBlu = parenInBlu.replaceAll(",\\s+",",").replaceAll("\\s+", ",").split(",");
+                String[] typeProdBlu = parenInBlu.replaceAll(",\\s+",",").replaceAll("\\s+,", ",").replaceAll("\\s+", ",").split(",");
                 
                 //extract type
                 String typeBlu = typeProdBlu[0].trim();
@@ -418,7 +418,7 @@ public class ParseConstructionFile {
             }
             enzList.add(enzyme);
         }
-        int fragSelect = Integer.parseInt(fragsel);
+        int fragSelect = Integer.parseInt(fragsel) - 1;
         return new Digestion(substrate, enzList, fragSelect, product);
     }
 
