@@ -21,13 +21,12 @@ import org.ucb.c5.sequtils.StringRotater;
  *
  * @author J. Christopher Anderson
  */
-public class PCRSimulator {
+public class PCRSimulator_old {
 
     private CalcEditDistance ced;
     private PolyRevComp revcomp;
     private StringRotater rotator;
     private RevComp rc;
-    private ExtensionSimulator exSim;
 
     public void initiate() throws Exception {
         revcomp = new PolyRevComp();
@@ -38,8 +37,6 @@ public class PCRSimulator {
         rotator.initiate();
         ced = new CalcEditDistance();
         ced.initiate();
-        exSim = new ExtensionSimulator();
-        exSim.initiate();
     }
 
     public void run(PCR pcr, Map<String, Polynucleotide> fragments) throws Exception {
@@ -79,11 +76,11 @@ public class PCRSimulator {
     public String run(String oligo1, String oligo2, List<Polynucleotide> templates) throws Exception {
         oligo1 = oligo1.toUpperCase();
         oligo2 = oligo2.toUpperCase();
-
+        
         //Combine all the species in a set and denature them
         Set<Polynucleotide> species = new HashSet<>();
         species.addAll(templates);
-        Set<String> singleStrands = initialDissociation(oligo1, oligo2, species);
+        Set<String> singleStrands = simulateDissociation(oligo1, oligo2, species);
 
         //Create another set for storing the previous round strands
         Set<String> oldStrands = new HashSet<>();
@@ -111,8 +108,8 @@ public class PCRSimulator {
         }
 
         //Determine which of the species is the PCR product
-        String rc2 = rc.run(oligo2);
-        Set<String> ans = new HashSet<>();
+         String rc2 = rc.run(oligo2);
+         Set<String> ans = new HashSet<>();
         for (String seq : singleStrands) {
             if (seq.startsWith(oligo1) && seq.endsWith(rc2)) {
                 ans.add(seq);
@@ -122,27 +119,24 @@ public class PCRSimulator {
                 ans.add(rcseq);
             }
         }
-        if (ans.size() > 1) {
+        if (ans.size() > 1){
             throw new IllegalArgumentException("Multiple PCR products");
-        }
-        if (ans.size() == 1) {
+        } 
+        if (ans.size() == 1){
             return ans.iterator().next();
         }
+        
 
         throw new IllegalArgumentException("No PCR product generated");
     }
 
-    private Set<String> initialDissociation(String oligo1, String oligo2, Set<Polynucleotide> species) throws Exception {
+    private Set<String> simulateDissociation(String oligo1, String oligo2, Set<Polynucleotide> species) throws Exception {
         Set<String> newspecies = new HashSet<>();
-        Set<String> forspecies = new HashSet<>();
-        Set<String> revspecies = new HashSet<>();
         for (Polynucleotide poly : species) {
             //Handle if it is circular
             if (poly.isIsCircular()) {
                 String plas = poly.getSequence().toUpperCase();
                 String fpdt = anneal(oligo1, plas);
-
-                //If there is an anneal with the forward oligo
                 if (fpdt != null) {
                     String fpdt2 = fpdt.substring(oligo1.length());
                     String fpdt3 = rc.run(fpdt2);
@@ -150,8 +144,6 @@ public class PCRSimulator {
                     String rotated = rotator.run(plas, start);
                     String rotRC = rc.run(rotated);
                     poly = new Polynucleotide(rotRC);
-
-                    //Otherwise see if anneals to the reverse oligo
                 } else {
                     String rpdt = anneal(oligo2, plas);
                     if (rpdt != null) {
@@ -161,14 +153,14 @@ public class PCRSimulator {
                         String rotated = rotator.run(plas, start);
                         poly = new Polynucleotide(rotated);
                     } else {
-                        //If it gets here, the oligos do not anneal to either strand
-                        throw new IllegalArgumentException("Could not anneal oligos to circular template");
+                        throw new IllegalArgumentException("Could not handle circular template");
                     }
                 }
             }
 
             //Handle as linear, double stranded
             String forstrand = dissociate(poly);
+            Polynucleotide rev = revcomp.run(poly);
             newspecies.add(forstrand);
 
             //If it's already single stranded, no need to do anything
@@ -177,22 +169,12 @@ public class PCRSimulator {
             }
 
             //Handle the reverse strand
-            Polynucleotide rev = revcomp.run(poly);
             String revstrand = dissociate(rev);
             newspecies.add(revstrand);
         }
-
-        //Truncate each single-stranded specie with the reverse oligo
         return newspecies;
     }
 
-    /**
-     * Dissociates the forward strand of a linear Polynucleotide and returns it
-     * as a String
-     *
-     * @param poly
-     * @return
-     */
     private String dissociate(Polynucleotide poly) {
         String forstrand = poly.getSequence();
 
@@ -237,22 +219,58 @@ public class PCRSimulator {
             return null;
         }
 
-        //Scan through and find the best annealing index (bestIndex) if any
-        int bestIndex = exSim.run(oligoA, oligoB);
-        
+        //Grab the last 6bp of oligoA
+        String sixbp = oligoA.substring(oligoA.length() - 6);
 
-        //If ExtensionSimulator returns error code -1, no anneal > 40degC was found
-        if (bestIndex == -1) {
+        //Scan through and find the best annealing index (bestIndex) if any
+        int index = 11; //index + 6 = 17, the first site it could be
+        int bestSimilarity = 17;  //17 is one short of the cutoff of 18
+        int bestIndex = -1;
+        int breaker = 0;
+        while (true) {
+            //Abort if exceeded excessive cycles
+            if (breaker > 5000) {
+                throw new IllegalArgumentException("PCRSimulator anneal stuck in a loop");
+            }
+            breaker++;
+
+            //Find the next 6bp match, quit if there are no more
+            index = rcB.indexOf(sixbp, index + 1);
+            if (index == -1) {
+                break;
+            }
+
+            //Find the 30bp (or less) region of oligoA
+            int startA = 0;
+            if (oligoA.length() > 30) {
+                startA = oligoA.length() - 30;
+            }
+            String annealA = oligoA.substring(startA);
+
+            //Find the 30bp (or less) region ending in index+6
+            int startB = (index + 6) - 30;
+            if (startB < 0) {
+                startB = 0;
+            }
+            String annealB = rcB.substring(startB, index + 6);
+            int maxlength = Math.max(annealA.length(), annealB.length());
+
+            //Find the edit distance
+            int distance = ced.run(annealA, annealB);
+            int similarity = maxlength - distance;
+            if (similarity > bestSimilarity) {
+                bestIndex = index;
+                bestSimilarity = similarity;
+            }
+        }  //end while
+
+        //If bestIndex was not updated, no 15+ annealing site was found
+        if (bestIndex < 0) {
             return null;
-        }
-        
-        //If ExtensionSimulator gives -2, then there are multiple annealing sites, abort
-        if(bestIndex == -2) {
-            throw new IllegalArgumentException("Multiple annealing sites >55degC for:\noligoA: " + oligoA + "\ntemplate: " + oligoB);
         }
 
         //If gets here there is a match, so construct the extension product
-        String pdt = oligoA + rcB.substring(bestIndex);
+        String pdt = oligoA + rcB.substring(bestIndex + 6);
         return pdt;
     }
 
@@ -264,11 +282,8 @@ public class PCRSimulator {
         {
             String oligo1 = "gtatcacgaggcagaatttcag";
             String oligo2 = "attaccgcctttgagtgagc";
- //          String oligo1 = "ctctggaattcatgAGATCTGCGATCCCGCGAAGAACC";
- //          String oligo2 = "gacattggcgaAatctacttcatg";
             List<Polynucleotide> templates = new ArrayList<>();
-//            Polynucleotide template = new Polynucleotide("TATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGgtatcacgaggcagaatttcagataaaaaaaatccttagctttcgctaaggatgatttctgGAATTCATGAGATCTTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCACGGATCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAAGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGACTCCTCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGGATCTCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATAGGATCCtaaCTCGAcgtgcaggcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTG");
-            Polynucleotide template = new Polynucleotide("AAAGTATCACGAGGCAGAATTTCAGAAAGCTCACTCAAAGGCGGTAATAAA");
+            Polynucleotide template = new Polynucleotide("TATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGgtatcacgaggcagaatttcagataaaaaaaatccttagctttcgctaaggatgatttctgGAATTCATGAGATCTTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCACGGATCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAAGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGACTCCTCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGGATCTCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATAGGATCCtaaCTCGAcgtgcaggcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTG");
             templates.add(template);
 
             String pdt = sim.run(oligo1, oligo2, templates);

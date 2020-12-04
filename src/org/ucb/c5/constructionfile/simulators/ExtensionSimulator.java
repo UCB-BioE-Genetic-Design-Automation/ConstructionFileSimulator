@@ -9,6 +9,7 @@ import jaligner.Alignment;
 import jaligner.Sequence;
 import jaligner.SmithWatermanGotoh;
 import jaligner.formats.Pair;
+import jaligner.matrix.Matrix;
 import jaligner.matrix.MatrixLoader;
 import org.ucb.c5.sequtils.CalcEditDistance;
 import org.ucb.c5.sequtils.PolyRevComp;
@@ -65,9 +66,9 @@ public class ExtensionSimulator {
         String sixbp = oligo.substring(oligo.length() - 6);
 
         int index = 11; //index + 6 = 17, the first site it could be
-
+        int num55 = 0;
         int bestIndex = -1;
-        double bestscore = -1.0;
+        double bestTm = -1.0;
         String rcB = rc.run(template);
         while (true) {
 
@@ -87,24 +88,28 @@ public class ExtensionSimulator {
 
             //Use a modified EDNAFULL matrix to align and force the U's to align
             Alignment alignment = SmithWatermanGotoh.align(s1, s2, MatrixLoader.load("EDNAFULL_1"), 10f, 0.5f);
-            double score = alignment.getScore();
-            if (score > bestscore) {
-                bestscore = score;
+            Matrix matrix = alignment.getMatrix();
+
+            char[] S1 = alignment.getSequence1();
+            char[] S2 = alignment.getSequence2();
+        
+            TmCalculator tmCalculator = new TmCalculator();
+            tmCalculator.initiate();
+            double Tm = tmCalculator.run(S1,S2);
+            if (Tm > 55 ) 
+                num55++;
+            if (Tm > bestTm) {
+                bestTm = Tm;
                 bestIndex = index;
             }
-            System.out.println(alignment.getSummary());
-            System.out.println(new Pair().format(alignment));
-
-            System.out.println(oligo);
-            System.out.println(oligoX);
-            System.out.println(rcB);
-            System.out.println(rcX);
         }  //end while
 
-        System.out.println("bestscore" + bestscore);
-        System.out.println("bestIndex" + bestIndex);
-        //the two temperature constraints
-
+        //return error code -1, if the best annealling Tm is less than 40 degrees
+        if (bestTm < 40)
+            return -1;
+        if(num55 >1)
+            return -2;
+        
         //Return the position on the template for the 3' end of the oligo
         return bestIndex + 6;
     }
@@ -112,8 +117,13 @@ public class ExtensionSimulator {
     public static void main(String[] args) throws Exception {
         ExtensionSimulator sim = new ExtensionSimulator();
         sim.initiate();
-        /*
-         {
+        
+        {
+         System.out.println("Correct duplex of 22 mers");
+         int result = sim.run("GTATCACGAGGCAGAATTTCAGAAAGCTCACTCAAAGGCGGTAATTCAAAGGCGGTAATCGAGGCAGAAGTATCACGAGGCAGAATTTCAGAAAGCTCACTCAAAGGCGGTAAT", "ATTACCGCCTTTGAGTGAGCTTTCTGAAATTCTGCCTCGTGATACTTCTGCCTCGTGATACGCCTTTGAATTACCGCCTTTGAGTGAGCTTTCTGAAATTCTGCCTCGTGATAC");
+         System.out.println(result);
+         }
+        /* {
          System.out.println("Correct duplex of 22 mers");
          int result = sim.run("GTATCACGAGGCAGAATTTCAG", "CTGAAATTCTGCCTCGTGATAC");
          System.out.println(result);
@@ -128,9 +138,10 @@ public class ExtensionSimulator {
          int result = sim.run("GGATCCCGTGGCAGTATTTAAG", "CTGAAATTCTGCCTCGTGATAC");
          System.out.println(result);
         
-         */
+         
         System.out.println("Correct duplex of 22 mers");
         int result = sim.run("cgtatGAATTCattaccgcctttgagtgagc".toUpperCase(), "TATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGgtatcacgaggcagaatttcagataaaaaaaatccttagctttcgctaaggatgatttctgGAATTCATGAGATCTTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCACGGATCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAAGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGACTCCTCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGGATCTCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATAGGATCCtaaCTCGAcgtgcaggcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTG".toUpperCase());
-        System.out.println(result);
+        System.out.println("final result"+ result);
+        */
     }
 }
