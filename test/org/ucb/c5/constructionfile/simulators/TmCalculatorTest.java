@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.ucb.c5.constructionfile;
+package org.ucb.c5.constructionfile.simulators;
 
 import java.util.HashMap;
 import org.junit.Test;

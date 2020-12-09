@@ -6,6 +6,7 @@
 package org.ucb.c5.constructionfile.simulators;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +80,7 @@ public class PCRSimulator {
     public String run(String oligo1, String oligo2, List<Polynucleotide> templates) throws Exception {
         oligo1 = oligo1.toUpperCase();
         oligo2 = oligo2.toUpperCase();
-
+        
         //Combine all the species in a set and denature them
         Set<Polynucleotide> species = new HashSet<>();
         species.addAll(templates);
@@ -224,6 +225,9 @@ public class PCRSimulator {
     }
 
     private String anneal(String oligoA, String oligoB) throws Exception {
+        oligoA = oligoA.toUpperCase();
+        oligoB = oligoB.toUpperCase();
+        
         //Reverse complement oligoB
         String rcB = rc.run(oligoB);
 
@@ -237,17 +241,20 @@ public class PCRSimulator {
             return null;
         }
 
+        //Replace any degenerate bases with 'A' and all-caps
+        String oligoAn = replaceDegenerateBase(oligoA);
+        String oligoBn = replaceDegenerateBase(oligoB);
+
         //Scan through and find the best annealing index (bestIndex) if any
-        int bestIndex = exSim.run(oligoA, oligoB);
-        
+        int bestIndex = exSim.run(oligoAn, oligoBn);
 
         //If ExtensionSimulator returns error code -1, no anneal > 40degC was found
         if (bestIndex == -1) {
             return null;
         }
-        
+
         //If ExtensionSimulator gives -2, then there are multiple annealing sites, abort
-        if(bestIndex == -2) {
+        if (bestIndex == -2) {
             throw new IllegalArgumentException("Multiple annealing sites >55degC for:\noligoA: " + oligoA + "\ntemplate: " + oligoB);
         }
 
@@ -256,24 +263,51 @@ public class PCRSimulator {
         return pdt;
     }
 
+    private String replaceDegenerateBase(String oligoA) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < oligoA.length(); i++) {
+            char base = oligoA.charAt(i);
+            if (base != 'A' && base != 'T' && base != 'C' && base != 'G') {
+                sb.append("A");
+            } else {
+                sb.append(base);
+            }
+        }
+        return sb.toString();
+    }
+
     public static void main(String[] args) throws Exception {
         PCRSimulator sim = new PCRSimulator();
         sim.initiate();
 
         //run a regular pcr (works)
+//        {
+//            String oligo1 = "gtatcacgaggcagaatttcag";
+//            String oligo2 = "attaccgcctttgagtgagc";
+// //          String oligo1 = "ctctggaattcatgAGATCTGCGATCCCGCGAAGAACC";
+//            //          String oligo2 = "gacattggcgaAatctacttcatg";
+//            List<Polynucleotide> templates = new ArrayList<>();
+////            Polynucleotide template = new Polynucleotide("TATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGgtatcacgaggcagaatttcagataaaaaaaatccttagctttcgctaaggatgatttctgGAATTCATGAGATCTTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCACGGATCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAAGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGACTCCTCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGGATCTCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATAGGATCCtaaCTCGAcgtgcaggcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTG");
+//            Polynucleotide template = new Polynucleotide("AAAGTATCACGAGGCAGAATTTCAGAAAGCTCACTCAAAGGCGGTAATAAA");
+//            templates.add(template);
+//
+//            String pdt = sim.run(oligo1, oligo2, templates);
+//            System.out.println("Exact match oligos on single template:");
+//            System.out.println(pdt);
+//        }
         {
-            String oligo1 = "gtatcacgaggcagaatttcag";
-            String oligo2 = "attaccgcctttgagtgagc";
- //          String oligo1 = "ctctggaattcatgAGATCTGCGATCCCGCGAAGAACC";
- //          String oligo2 = "gacattggcgaAatctacttcatg";
-            List<Polynucleotide> templates = new ArrayList<>();
-//            Polynucleotide template = new Polynucleotide("TATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGgtatcacgaggcagaatttcagataaaaaaaatccttagctttcgctaaggatgatttctgGAATTCATGAGATCTTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCACGGATCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAAGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGACTCCTCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGGATCTCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATAGGATCCtaaCTCGAcgtgcaggcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTG");
-            Polynucleotide template = new Polynucleotide("AAAGTATCACGAGGCAGAATTTCAGAAAGCTCACTCAAAGGCGGTAATAAA");
-            templates.add(template);
-
-            String pdt = sim.run(oligo1, oligo2, templates);
-            System.out.println("Exact match oligos on single template:");
-            System.out.println(pdt);
+                    String oligo1 = "gaattcgcggccgcttctag";
+        String oligo2 = "gtatataaacgcagaaaggcc";
+        List<Polynucleotide> templates = new ArrayList<>();
+        Polynucleotide template = new Polynucleotide("gaagacggtggtgttgttaccgttacccaggactcctccctgcaagacggtgagttcatctacaaagttaaactgcgtggtaccaacttcccgtccgacggtccggttatgcagaaaaaaaccatgggttgggaagcttccaccgaacgtatgtacccggaagacggtgctctgaaaggtgaaatcaaaatgcgtctgaaactgaaagacggtggtcactacgacgctgaagttaaaaccacctacatggctaaaaaaccggttcagctgccgggtgcttacaaaaccgacatcaaactggacatcacctcccacaacgaagactacaccatcgttgaacagtacgaacgtgctgaaggtcgtcactccaccggtgcttaataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttatatactagtagcggccgctgcagaaaaaagaattcgcggccgcttctagagtccctatcagtgatagagattgacatccctatcagtgatagagatactgagcactactagagaaagaggagaaatactagatggcttcctccgaagacgttatcaaagagttcatgcgtttcaaagttcgtatggaaggttccgttaacggtcacgagttcgaaatcgaaggtgaaggtgaaggtcgtccgtacgaaggtacccagaccgctaaactgaaagttaccaaaggtggtccgctgccgttcgcttgggacatcctgtccccgcagttccagtacggttccaaagcttacgttaaacacccggctgacatcccggactacctgaaactgtccttcccggaaggtttcaaatgggaacgtgttatgaacttc",true);
+        templates.add(template);
+        String product = "gaattcgcggccgcttctagagtccctatcagtgatagagattgacatccctatcagtgatagagatactgagcactactagagaaagaggagaaatactagatggcttcctccgaagacgttatcaaagagttcatgcgtttcaaagttcgtatggaaggttccgttaacggtcacgagttcgaaatcgaaggtgaaggtgaaggtcgtccgtacgaaggtacccagaccgctaaactgaaagttaccaaaggtggtccgctgccgttcgcttgggacatcctgtccccgcagttccagtacggttccaaagcttacgttaaacacccggctgacatcccggactacctgaaactgtccttcccggaaggtttcaaatgggaacgtgttatgaacttcgaagacggtggtgttgttaccgttacccaggactcctccctgcaagacggtgagttcatctacaaagttaaactgcgtggtaccaacttcccgtccgacggtccggttatgcagaaaaaaaccatgggttgggaagcttccaccgaacgtatgtacccggaagacggtgctctgaaaggtgaaatcaaaatgcgtctgaaactgaaagacggtggtcactacgacgctgaagttaaaaccacctacatggctaaaaaaccggttcagctgccgggtgcttacaaaaccgacatcaaactggacatcacctcccacaacgaagactacaccatcgttgaacagtacgaacgtgctgaaggtcgtcactccaccggtgcttaataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttatatac";
+        PCRSimulator pcrSimulator = new PCRSimulator();
+        pcrSimulator.initiate();
+        String productSeq = pcrSimulator.run(oligo1, oligo2, templates);
+            System.out.println(productSeq);
+            System.out.println(product.toUpperCase());
         }
+
     }
 }

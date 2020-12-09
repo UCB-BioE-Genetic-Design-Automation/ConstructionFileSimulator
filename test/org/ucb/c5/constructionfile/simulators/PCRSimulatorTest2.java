@@ -19,7 +19,7 @@ import org.junit.Test;
  */
 public class PCRSimulatorTest2 {
 
-    @Test
+    @Test(timeout = 3000)
     public void testSimplePCR() throws Exception {
         String oligo1 = "oligo1";
         String oligo1Seq = "gaattcgcggccgcttctag";
@@ -44,10 +44,11 @@ public class PCRSimulatorTest2 {
         PCRSimulator pcrSimulator = new PCRSimulator();
         pcrSimulator.initiate();
         pcrSimulator.run(pcr, polys);
-        assertEquals(productSeq.toUpperCase(), polys.get(product).getSequence().toUpperCase());
+        String prediction = polys.get(product).getSequence().toUpperCase();
+        assertEquals(productSeq.toUpperCase(), prediction);
     }
 
-    @Test
+    @Test(timeout = 3000)
     public void testOrdinaryPCR() throws Exception {
         String oligo1 = "oligo1";
         String oligo1Seq = "ccataggatccgaattcgcggccgcttctag";
@@ -75,7 +76,7 @@ public class PCRSimulatorTest2 {
         assertEquals(productSeq.toUpperCase(), polys.get(product).getSequence().toUpperCase());
     }
 
-    @Test
+    @Test(timeout = 3000)
     ////product seq is expected seq, however the simlator seq contains a large insertion. we need to dedug the simulator
     public void testDistinguishes() throws Exception {
         String oligo1 = "oligo1";
@@ -111,7 +112,7 @@ public class PCRSimulatorTest2 {
     }
 //product seq is expected seq, however the simlator seq contains a large insertion. we need to dedug the simulator
 
-    @Test
+    @Test(timeout = 3000)
     public void testRespectsSixBases() throws Exception {
         String oligo1 = "oligo1";
         String oligo1Seq = "gaattcgcggccgcttctag";
@@ -144,7 +145,7 @@ public class PCRSimulatorTest2 {
         assertEquals(pseq, simseq);
     }
 
-    @Test
+    @Test(timeout = 3000)
     public void testBubble() throws Exception {
         String oligo1 = "oligo1";
         String oligo1Seq = "gaattcgcgatagccgcttctag";
@@ -175,7 +176,7 @@ public class PCRSimulatorTest2 {
 //        assertEquals(productSeq, polys.get(product).getSequence());
     }
 
-    @Test
+    @Test(timeout = 3000)
     public void testCircular() throws Exception {
         String oligo1 = "gaattcgcggccgcttctag";
         String oligo2 = "gtatataaacgcagaaaggcc";
@@ -190,7 +191,7 @@ public class PCRSimulatorTest2 {
         assertEquals(productSeq, product.toUpperCase());
     }
 
-    @Test
+    @Test(timeout = 3000)
     public void testIndependent() throws Exception {
         String oligo1 = "oligo1";
         String oligo1Seq = "gaattcgcggccgcttctag";
@@ -218,7 +219,7 @@ public class PCRSimulatorTest2 {
         assertEquals(productSeq.toUpperCase(), polys.get(product).getSequence().toUpperCase());
     }
 
-    @Test
+    @Test(timeout = 3000)
     public void testRevcomp() throws Exception {
         String oligo1 = "oligo1";
         String oligo1Seq = "gaattcgcggccgcttctag";
@@ -245,7 +246,7 @@ public class PCRSimulatorTest2 {
 //        assertThrows(Exception.class, () -> {pcrSimulator.run(pcr, polys);});
     }
 
-    @Test
+    @Test(timeout = 3000)
     public void testReversed() throws Exception {
         String oligo1 = "oligo1";
         String oligo1Seq = "gaattcgcggccgcttctag";
@@ -272,7 +273,7 @@ public class PCRSimulatorTest2 {
 //        assertThrows(Exception.class, () -> {pcrSimulator.run(pcr, polys);});
     }
 
-    @Test
+    @Test(timeout = 3000)
     public void testSixBP() throws Exception {
         String oligo1 = "oligo1";
         String oligo1Seq = "gaattcgcggccgcttatag";
@@ -299,7 +300,7 @@ public class PCRSimulatorTest2 {
 //        assertThrows(Exception.class, () -> {pcrSimulator.run(pcr, polys);});
     }
 
-    @Test
+    @Test(timeout = 3000)
     public void testIllegalArgument() throws Exception {
         String oligo1 = "oligo1";
         String oligo1Seq = "gaattcgcggccgcttatag";

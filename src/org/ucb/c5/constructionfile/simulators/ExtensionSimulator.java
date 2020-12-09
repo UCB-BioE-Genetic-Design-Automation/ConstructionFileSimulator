@@ -31,6 +31,8 @@ public class ExtensionSimulator {
     private PolyRevComp revcomp;
     private StringRotater rotator;
     private RevComp rc;
+    private TmCalculator tmCalculator;
+    private Matrix ednafull;
 
     public void initiate() throws Exception {
         revcomp = new PolyRevComp();
@@ -41,6 +43,10 @@ public class ExtensionSimulator {
         rotator.initiate();
         ced = new CalcEditDistance();
         ced.initiate();
+        tmCalculator = new TmCalculator();
+        tmCalculator.initiate();
+        
+        ednafull = MatrixLoader.load("EDNAFULL_1");
     }
 
     /**
@@ -79,25 +85,39 @@ public class ExtensionSimulator {
             }
 
             //replace the last 6 bases with U          
-            String oligoX = oligo.substring(0, oligo.length() - 6) + "UUUUUU";
-            String rcX = rcB.substring(0, index) + "UUUUUU";
+            String oligoU = oligo.substring(0, oligo.length() - 6) + "UUUUUU";
+            String rcU = rcB.substring(0, index) + "UUUUUU";
 
-            //align the sequences with Jaligner and print out the score  	
-            Sequence s1 = new Sequence(oligoX.toUpperCase());
-            Sequence s2 = new Sequence(rcX.toUpperCase());
+            //Consider only the last ~40 bp of the oligo if it's long
+            if (oligoU.length() > 40) {
+                oligoU = oligoU.substring(oligoU.length() - 40);
+            }
+            if (rcU.length() > 40) {
+                rcU = rcU.substring(rcU.length() - 40);
+            }
+
+            //align the sequences with Jaligner
+            Sequence s1 = new Sequence(oligoU);
+            Sequence s2 = new Sequence(rcU);
 
             //Use a modified EDNAFULL matrix to align and force the U's to align
-            Alignment alignment = SmithWatermanGotoh.align(s1, s2, MatrixLoader.load("EDNAFULL_1"), 10f, 0.5f);
+            Alignment alignment = SmithWatermanGotoh.align(s1, s2, ednafull, 10f, 0.5f);
             Matrix matrix = alignment.getMatrix();
 
             char[] S1 = alignment.getSequence1();
             char[] S2 = alignment.getSequence2();
-        
-            TmCalculator tmCalculator = new TmCalculator();
-            tmCalculator.initiate();
-            double Tm = tmCalculator.run(S1,S2);
-            if (Tm > 55 ) 
+            
+            //Put the sixbp back into the ends to replace U's
+            for(int i=0; i<6; i++) {
+                S1[S1.length - 6 + i] = sixbp.charAt(i);
+                S2[S2.length - 6 + i] = sixbp.charAt(i);
+            }
+
+            //Calculate the melting temperature of the duplex
+            double Tm = tmCalculator.run(S1, S2);
+            if (Tm > 75) {
                 num55++;
+            }
             if (Tm > bestTm) {
                 bestTm = Tm;
                 bestIndex = index;
@@ -105,11 +125,13 @@ public class ExtensionSimulator {
         }  //end while
 
         //return error code -1, if the best annealling Tm is less than 40 degrees
-        if (bestTm < 40)
+        if (bestTm < 30) {
             return -1;
-        if(num55 >1)
+        }
+        if (num55 > 1) {
             return -2;
-        
+        }
+
         //Return the position on the template for the 3' end of the oligo
         return bestIndex + 6;
     }
@@ -117,12 +139,12 @@ public class ExtensionSimulator {
     public static void main(String[] args) throws Exception {
         ExtensionSimulator sim = new ExtensionSimulator();
         sim.initiate();
-        
+
         {
-         System.out.println("Correct duplex of 22 mers");
-         int result = sim.run("GTATCACGAGGCAGAATTTCAGAAAGCTCACTCAAAGGCGGTAATTCAAAGGCGGTAATCGAGGCAGAAGTATCACGAGGCAGAATTTCAGAAAGCTCACTCAAAGGCGGTAAT", "ATTACCGCCTTTGAGTGAGCTTTCTGAAATTCTGCCTCGTGATACTTCTGCCTCGTGATACGCCTTTGAATTACCGCCTTTGAGTGAGCTTTCTGAAATTCTGCCTCGTGATAC");
-         System.out.println(result);
-         }
+            System.out.println("Correct duplex of 22 mers");
+            int result = sim.run("GTATCACGAGGCAGAATTTCAGAAAGCTCACTCAAAGGCGGTAATTCAAAGGCGGTAATCGAGGCAGAAGTATCACGAGGCAGAATTTCAGAAAGCTCACTCAAAGGCGGTAAT", "ATTACCGCCTTTGAGTGAGCTTTCTGAAATTCTGCCTCGTGATACTTCTGCCTCGTGATACGCCTTTGAATTACCGCCTTTGAGTGAGCTTTCTGAAATTCTGCCTCGTGATAC");
+            System.out.println(result);
+        }
         /* {
          System.out.println("Correct duplex of 22 mers");
          int result = sim.run("GTATCACGAGGCAGAATTTCAG", "CTGAAATTCTGCCTCGTGATAC");
@@ -139,9 +161,9 @@ public class ExtensionSimulator {
          System.out.println(result);
         
          
-        System.out.println("Correct duplex of 22 mers");
-        int result = sim.run("cgtatGAATTCattaccgcctttgagtgagc".toUpperCase(), "TATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGgtatcacgaggcagaatttcagataaaaaaaatccttagctttcgctaaggatgatttctgGAATTCATGAGATCTTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCACGGATCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAAGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGACTCCTCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGGATCTCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATAGGATCCtaaCTCGAcgtgcaggcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTG".toUpperCase());
-        System.out.println("final result"+ result);
-        */
+         System.out.println("Correct duplex of 22 mers");
+         int result = sim.run("cgtatGAATTCattaccgcctttgagtgagc".toUpperCase(), "TATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGgtatcacgaggcagaatttcagataaaaaaaatccttagctttcgctaaggatgatttctgGAATTCATGAGATCTTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCACGGATCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAAGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGACTCCTCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGGATCTCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATAGGATCCtaaCTCGAcgtgcaggcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTG".toUpperCase());
+         System.out.println("final result"+ result);
+         */
     }
 }
