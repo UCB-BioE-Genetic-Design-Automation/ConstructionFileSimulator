@@ -29,6 +29,7 @@ public class RevComp {
         baseToRC.put('N', "N");
         baseToRC.put('R', "Y");
         baseToRC.put('S', "S");
+        baseToRC.put('M', "K");
         baseToRC.put('V', "B");
         baseToRC.put('W', "W");
         baseToRC.put('Y', "R");
@@ -42,6 +43,7 @@ public class RevComp {
         baseToRC.put('v', "b");
         baseToRC.put('w', "w");
         baseToRC.put('y', "r");
+        baseToRC.put('m', "k");
     }
     
     /**
@@ -55,7 +57,11 @@ public class RevComp {
         StringBuilder sb = new StringBuilder();
         for (int i = dna.length() - 1; i >= 0; i--) {
             char achar = dna.charAt(i);
-            sb.append(baseToRC.get(achar));
+            String base = baseToRC.get(achar);
+            if(base==null) {
+                throw new IllegalArgumentException("Invalid base " + achar + " in " + dna);
+            }
+            sb.append(base);
         }
 
         return sb.toString();
