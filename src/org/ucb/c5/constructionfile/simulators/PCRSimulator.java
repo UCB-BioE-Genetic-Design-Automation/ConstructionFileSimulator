@@ -81,7 +81,9 @@ public class PCRSimulator {
     public String run(String oligo1, String oligo2, List<Polynucleotide> templates) throws Exception {
         oligo1 = oligo1.toUpperCase();
         oligo2 = oligo2.toUpperCase();
-        
+        String rc2 = rc.run(oligo2);
+        String rc1 = rc.run(oligo1);
+
         //Combine all the species in a set and denature them
         Set<Polynucleotide> species = new HashSet<>();
         species.addAll(templates);
@@ -92,10 +94,10 @@ public class PCRSimulator {
 
         //Simulate thermocycling
         int breaker = 0;
-        
+
         //Keep track of sequences already compared
-        Set<Pair<String,String>> alreadyTried = new HashSet<>();
-        
+        Set<Pair<String, String>> alreadyTried = new HashSet<>();
+
         while (true) {
             //Abort if exceeded 30 cycles
             if (breaker > 30) {
@@ -106,37 +108,22 @@ public class PCRSimulator {
             //Add oligos then anneal and polymerize
             singleStrands.add(oligo1);
             singleStrands.add(oligo2);
-            
+
             singleStrands = simulateAnneal(singleStrands, alreadyTried);
 
-            //End loop if this last round of single strands is unchanged from last round
-            if (singleStrands.equals(oldStrands)) {
-                break;
+            //End loop if a PCR product is generated
+            for (String seq : singleStrands) {
+                if (seq.startsWith(oligo1) && seq.endsWith(rc2)) {
+                    return seq;
+                }
+                if (seq.startsWith(oligo2) && seq.endsWith(rc1)) {
+                    return seq;
+                }
             }
+
             oldStrands.clear();
             oldStrands.addAll(singleStrands);
         }
-
-        //Determine which of the species is the PCR product
-        String rc2 = rc.run(oligo2);
-        Set<String> ans = new HashSet<>();
-        for (String seq : singleStrands) {
-            if (seq.startsWith(oligo1) && seq.endsWith(rc2)) {
-                ans.add(seq);
-            }
-            String rcseq = rc.run(seq);
-            if (rcseq.startsWith(oligo1) && rcseq.endsWith(rc2)) {
-                ans.add(rcseq);
-            }
-        }
-        if (ans.size() > 1) {
-            throw new IllegalArgumentException("Multiple PCR products");
-        }
-        if (ans.size() == 1) {
-            return ans.iterator().next();
-        }
-
-        throw new IllegalArgumentException("No PCR product generated");
     }
 
     private Set<String> initialDissociation(String oligo1, String oligo2, Set<Polynucleotide> species) throws Exception {
@@ -214,14 +201,14 @@ public class PCRSimulator {
         return forstrand.toUpperCase();
     }
 
-    private Set<String> simulateAnneal(Set<String> singlestrands, Set<Pair<String,String>> alreadyTried) throws Exception {
+    private Set<String> simulateAnneal(Set<String> singlestrands, Set<Pair<String, String>> alreadyTried) throws Exception {
         Set<String> species = new HashSet<>();
 
         //Try all comparisons of any two oligos considering if the first one will anneal and polymerize
         for (String oligoA : singlestrands) {
             for (String oligoB : singlestrands) {
                 Pair currpair = new Pair(oligoA, oligoB);
-                if(alreadyTried.contains(currpair)) {
+                if (alreadyTried.contains(currpair)) {
                     continue;
                 }
                 alreadyTried.add(currpair);
@@ -238,7 +225,7 @@ public class PCRSimulator {
     private String anneal(String oligoA, String oligoB) throws Exception {
         oligoA = oligoA.toUpperCase();
         oligoB = oligoB.toUpperCase();
-        
+
         //Reverse complement oligoB
         String rcB = rc.run(oligoB);
 
@@ -291,15 +278,16 @@ public class PCRSimulator {
     public static void main(String[] args) throws Exception {
         PCRSimulator sim = new PCRSimulator();
         sim.initiate();
-        //run a pcr with very long 5' tails on a linear template
-        String oligo1 = "ccataACTAGTcatcgccgcagcggtttcaggttttagagctagaaatagcaag";
-        String oligo2 = "ctcagACTAGTattatacctaggactgagctag";
+       String oligo1 = "ccataGGATCCgtatcacgaggcagaatttcag";
+        String oligo2 = "cgtatGAATTCattaccgcctttgagtgagc";
         List<Polynucleotide> templates = new ArrayList<>();
-        Polynucleotide template = new Polynucleotide("agtGGGTACATACGTTCGGTGGAgttttagagctagaaatagcaagttaaaataaggctagtccgttatcaacttgaaaaagtggcaccgagtcggtgctttttttgaattctctagagtcgacctgcagaagcttagatctattaccctgttatccctactcgagttcatgtgcagctccataagcaaaaggggatgataagtttatcaccaccgactatttgcaacagtgccgttgatcgtgctatgatcgactgatgtcatcagcggtggagtgcaatgtcatgagggaagcggtgatcgccgaagtatcgactcaactatcagaggtagttggcgtcatcgagcgccatctcgaaccgacgttgctggccgtacatttgtacggctccgcagtggatggcggcctgaagccacacagtgatattgatttgctggttacggtgaccgtaaggcttgatgaaacaacgcggcgagctttgatcaacgaccttttggaaacttcggcttcccctggagagagcgagattctccgcgctgtagaagtcaccattgttgtgcacgacgacatcattccgtggcgttatccagctaagcgcgaactgcaatttggagaatggcagcgcaatgacattcttgcaggtatcttcgagccagccacgatcgacattgatctggctatcttgctgacaaaagcaagagaacatagcgttgccttggtaggtccagcggcggaggaactctttgatccggttcctgaacaggatctatttgaggcgctaaatgaaaccttaacgctatggaactcgccgcccgactgggctggcgatgagcgaaatgtagtgcttacgttgtcccgcatttggtacagcgcagtaaccggcaaaatcgcgccgaaggatgtcgctgccgactgggcaatggagcgcctgccggcccagtatcagcccgtcatacttgaagctagacaggcttatcttggacaagaagaagatcgcttggcctcgcgcgcagatcagttggaagaatttgtccactacgtgaaaggcgagatcaccaaggtagtcggcaaataagatgccgctcgccagtcgattggctgagctcataagttcctattccgaagttccgcgaacgcgtaaaggatctaggtgaagatcctttttgataatctcatgaccaaaatcccttaacgtgagttttcgttccactgagcgtcagaccccgtagaaaagatcaaaggatcttcttgagatcctttttttctgcgcgtaatctgctgcttgcaaacaaaaaaaccaccgctaccagcggtggtttgtttgccggatcaagagctaccaactctttttccgaaggtaactggcttcagcagagcgcagataccaaatactgtccttctagtgtagccgtagttaggccaccacttcaagaactctgtagcaccgcctacatacctcgctctgctaatcctgttaccagtggctgctgccagtggcgataagtcgtgtcttaccgggttggactcaagacgatagttaccggataaggcgcagcggtcgggctgaacggggggttcgtgcacacagcccagcttggagcgaacgacctacaccgaactgagatacctacagcgtgagctatgagaaagcgccacgcttcccgaagggagaaaggcggacaggtatccggtaagcggcagggtcggaacaggagagcgcacgagggagcttccagggggaaacgcctggtatctttatagtcctgtcgggtttcgccacctctgacttgagcgtcgatttttgtgatgctcgtcaggggggcggagcctatggaaaaacgccagcaacgcggcctttttacggttcctggccttttgctggccttttgctcacatgttctttcctgcgttatcccctgattctgtggataaccgtattaccgcctttgagtgagctgataccgctcgccgcagccgaacgaccgagcgcagcgagtcagtgagcgaggaagcggaagagcgcctgatgcggtattttctccttacgcatctgtgcggtatttcacaccgcatatgctggatccttgacagctagctcagtcctaggtataatact",true);
-        templates.add(template);
+        Polynucleotide frag1 = new Polynucleotide("TATTTTGACTGATAGTGACCTGTTCGTTGCAACAAATTGATGAGCAATGCTTTTTTATAATGCCAACTTTGTACAAAAAAGCAGGCTCCGAATTGgtatcacgaggcagaatttcagataaaaaaaatccttagctttcgctaaggatgatttctgGAATTCATGAGATCTTCCCTATCAGTGATAGAGATTGACATCCCTATCAGTGATAGAGATACTGAGCACGGATCTGAAAGAGGAGAAAGGATCTATGGCAAGTAGCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAAGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGAC");
+        Polynucleotide frag2 = new Polynucleotide("TGTTGTTACCGTTACCCAGGACTCCTCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAAGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAATAAGGATCTCCAGGCATCAAATAAAACGAAAGGCTCAGTCGAAAGACTGGGCCTTTCGTTTTATCTGTTGTTTGTCGGTGAACGCTCTCTACTAGAGTCACACTGGCTCACCTTCGGGTGGGCCTTTCTGCGTTTATAGGATCCtaaCTCGAcgtgcaggcttcctcgctcactgactcgctgcgctcggtcgttcggctgcggcgagcggtatcagctcactcaaaggcggtaatCAATTCGACCCAGCTTTCTTGTACAAAGTTGGCATTATAAAAAATAATTGCTCATCAATTTGTTGCAACGAACAGGTCACTATCAGTCAAAATAAAATCATTATTTG");
+        templates.add(frag1);
+        templates.add(frag2);
 
         String pdt = sim.run(oligo1, oligo2, templates);
-        
+
         System.out.println(pdt);
     }
 }
