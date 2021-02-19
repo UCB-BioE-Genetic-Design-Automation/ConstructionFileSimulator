@@ -206,7 +206,7 @@ public class Polynucleotide {
             if (thisSeq.equals(cSeq) && this3.equals(c3) && this5.equals(c5)) {
                 return true;
             }
-            return (thisSeqRev.equals(c.getSequence()) && this3.equals(c3) && this5.equals(c5));
+            return (thisSeqRev.equals(cSeq) && this3.equals(c3) && this5.equals(c5));
         }
         // circular case
         else {
