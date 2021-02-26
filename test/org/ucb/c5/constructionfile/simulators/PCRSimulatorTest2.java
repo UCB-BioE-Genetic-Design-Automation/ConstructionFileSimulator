@@ -44,8 +44,9 @@ public class PCRSimulatorTest2 {
         PCRSimulator pcrSimulator = new PCRSimulator();
         pcrSimulator.initiate();
         pcrSimulator.run(pcr, polys);
-        String prediction = polys.get(product).getSequence().toUpperCase();
-        assertEquals(productSeq.toUpperCase(), prediction);
+        Polynucleotide prediction = polys.get(product);
+        Polynucleotide expected = new Polynucleotide(productSeq);
+        assert(prediction.equals(expected));
     }
 
     @Test(timeout = 3000)
@@ -73,7 +74,9 @@ public class PCRSimulatorTest2 {
         PCRSimulator pcrSimulator = new PCRSimulator();
         pcrSimulator.initiate();
         pcrSimulator.run(pcr, polys);
-        assertEquals(productSeq.toUpperCase(), polys.get(product).getSequence().toUpperCase());
+        Polynucleotide prediction = polys.get(product);
+        Polynucleotide expected = new Polynucleotide(productSeq);
+        assert(prediction.equals(expected));
     }
 
     @Test(timeout = 3000)
@@ -105,10 +108,9 @@ public class PCRSimulatorTest2 {
         PCRSimulator pcrSimulator = new PCRSimulator();
         pcrSimulator.initiate();
         pcrSimulator.run(pcr, polys);
-        String pseq = productSeq.toUpperCase();
-        String simseq = polys.get(product).getSequence().toUpperCase();
-        System.out.println(simseq);
-        assertEquals(pseq, simseq);
+        Polynucleotide prediction = polys.get(product);
+        Polynucleotide expected = new Polynucleotide(productSeq);
+        assert(prediction.equals(expected));
     }
 //product seq is expected seq, however the simlator seq contains a large insertion. we need to dedug the simulator
 
@@ -140,9 +142,9 @@ public class PCRSimulatorTest2 {
         PCRSimulator pcrSimulator = new PCRSimulator();
         pcrSimulator.initiate();
         pcrSimulator.run(pcr, polys);
-        String pseq = productSeq.toUpperCase();
-        String simseq = polys.get(product).getSequence().toUpperCase();
-        assertEquals(pseq, simseq);
+        Polynucleotide prediction = polys.get(product);
+        Polynucleotide expected = new Polynucleotide(productSeq);
+        assert(prediction.equals(expected));
     }
 
     @Test(timeout = 3000)
@@ -170,25 +172,31 @@ public class PCRSimulatorTest2 {
         PCRSimulator pcrSimulator = new PCRSimulator();
         pcrSimulator.initiate();
         pcrSimulator.run(pcr, polys);
-        String pseq = productSeq.toUpperCase();
-        String simseq = polys.get(product).getSequence().toUpperCase();
-        assertEquals(pseq, simseq);
-//        assertEquals(productSeq, polys.get(product).getSequence());
+        Polynucleotide prediction = polys.get(product);
+        Polynucleotide expected = new Polynucleotide(productSeq);
+        assert(prediction.equals(expected));
     }
 
     @Test(timeout = 3000)
     public void testCircular() throws Exception {
         String oligo1 = "gaattcgcggccgcttctag";
         String oligo2 = "gtatataaacgcagaaaggcc";
-        List<Polynucleotide> templates = new ArrayList<>();
-        Polynucleotide template = new Polynucleotide("gaagacggtggtgttgttaccgttacccaggactcctccctgcaagacggtgagttcatctacaaagttaaactgcgtggtaccaacttcccgtccgacggtccggttatgcagaaaaaaaccatgggttgggaagcttccaccgaacgtatgtacccggaagacggtgctctgaaaggtgaaatcaaaatgcgtctgaaactgaaagacggtggtcactacgacgctgaagttaaaaccacctacatggctaaaaaaccggttcagctgccgggtgcttacaaaaccgacatcaaactggacatcacctcccacaacgaagactacaccatcgttgaacagtacgaacgtgctgaaggtcgtcactccaccggtgcttaataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttatatactagtagcggccgctgcagaaaaaagaattcgcggccgcttctagagtccctatcagtgatagagattgacatccctatcagtgatagagatactgagcactactagagaaagaggagaaatactagatggcttcctccgaagacgttatcaaagagttcatgcgtttcaaagttcgtatggaaggttccgttaacggtcacgagttcgaaatcgaaggtgaaggtgaaggtcgtccgtacgaaggtacccagaccgctaaactgaaagttaccaaaggtggtccgctgccgttcgcttgggacatcctgtccccgcagttccagtacggttccaaagcttacgttaaacacccggctgacatcccggactacctgaaactgtccttcccggaaggtttcaaatgggaacgtgttatgaacttc",true);
-        templates.add(template);
+        List<String> templates = new ArrayList<>();
+        String template = "gaagacggtggtgttgttaccgttacccaggactcctccctgcaagacggtgagttcatctacaaagttaaactgcgtggtaccaacttcccgtccgacggtccggttatgcagaaaaaaaccatgggttgggaagcttccaccgaacgtatgtacccggaagacggtgctctgaaaggtgaaatcaaaatgcgtctgaaactgaaagacggtggtcactacgacgctgaagttaaaaccacctacatggctaaaaaaccggttcagctgccgggtgcttacaaaaccgacatcaaactggacatcacctcccacaacgaagactacaccatcgttgaacagtacgaacgtgctgaaggtcgtcactccaccggtgcttaataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttatatactagtagcggccgctgcagaaaaaagaattcgcggccgcttctagagtccctatcagtgatagagattgacatccctatcagtgatagagatactgagcactactagagaaagaggagaaatactagatggcttcctccgaagacgttatcaaagagttcatgcgtttcaaagttcgtatggaaggttccgttaacggtcacgagttcgaaatcgaaggtgaaggtgaaggtcgtccgtacgaaggtacccagaccgctaaactgaaagttaccaaaggtggtccgctgccgttcgcttgggacatcctgtccccgcagttccagtacggttccaaagcttacgttaaacacccggctgacatcccggactacctgaaactgtccttcccggaaggtttcaaatgggaacgtgttatgaacttc";
+        templates.add("template");
         String product = "gaattcgcggccgcttctagagtccctatcagtgatagagattgacatccctatcagtgatagagatactgagcactactagagaaagaggagaaatactagatggcttcctccgaagacgttatcaaagagttcatgcgtttcaaagttcgtatggaaggttccgttaacggtcacgagttcgaaatcgaaggtgaaggtgaaggtcgtccgtacgaaggtacccagaccgctaaactgaaagttaccaaaggtggtccgctgccgttcgcttgggacatcctgtccccgcagttccagtacggttccaaagcttacgttaaacacccggctgacatcccggactacctgaaactgtccttcccggaaggtttcaaatgggaacgtgttatgaacttcgaagacggtggtgttgttaccgttacccaggactcctccctgcaagacggtgagttcatctacaaagttaaactgcgtggtaccaacttcccgtccgacggtccggttatgcagaaaaaaaccatgggttgggaagcttccaccgaacgtatgtacccggaagacggtgctctgaaaggtgaaatcaaaatgcgtctgaaactgaaagacggtggtcactacgacgctgaagttaaaaccacctacatggctaaaaaaccggttcagctgccgggtgcttacaaaaccgacatcaaactggacatcacctcccacaacgaagactacaccatcgttgaacagtacgaacgtgctgaaggtcgtcactccaccggtgcttaataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttatatac";
+        PCR pcr = new PCR("Primer1", "Primer2", templates, "pdt");
+    
+        Map<String, Polynucleotide> polys = new HashMap<>();
+        polys.put("template",new Polynucleotide(template,true));
+        polys.put("Primer1",new Polynucleotide(oligo1, "","",false,false,false));
+        polys.put("Primer2",new Polynucleotide(oligo2, "","",false,false,false));
         PCRSimulator pcrSimulator = new PCRSimulator();
         pcrSimulator.initiate();
-        String productSeq = pcrSimulator.run(oligo1, oligo2, templates);
-        System.out.println(productSeq);
-        assertEquals(productSeq, product.toUpperCase());
+        pcrSimulator.run(pcr, polys);
+        Polynucleotide prediction = polys.get("pdt");
+        Polynucleotide expected = new Polynucleotide(product);
+        assert(prediction.equals(expected)); 
     }
 
     @Test(timeout = 3000)
@@ -216,7 +224,9 @@ public class PCRSimulatorTest2 {
         PCRSimulator pcrSimulator = new PCRSimulator();
         pcrSimulator.initiate();
         pcrSimulator.run(pcr, polys);
-        assertEquals(productSeq.toUpperCase(), polys.get(product).getSequence().toUpperCase());
+        Polynucleotide prediction = polys.get(product);
+        Polynucleotide expected = new Polynucleotide(productSeq);
+        assert(prediction.equals(expected));
     }
 
     @Test(timeout = 3000)
@@ -243,7 +253,12 @@ public class PCRSimulatorTest2 {
         }
         PCRSimulator pcrSimulator = new PCRSimulator();
         pcrSimulator.initiate();
-//        assertThrows(Exception.class, () -> {pcrSimulator.run(pcr, polys);});
+        try { 
+            pcrSimulator.run(pcr, polys);
+            assert(false);
+        } catch(Exception err){
+        assert(true);
+        }
     }
 
     @Test(timeout = 3000)
@@ -270,7 +285,12 @@ public class PCRSimulatorTest2 {
         }
         PCRSimulator pcrSimulator = new PCRSimulator();
         pcrSimulator.initiate();
-//        assertThrows(Exception.class, () -> {pcrSimulator.run(pcr, polys);});
+        try { 
+            pcrSimulator.run(pcr, polys);
+            assert(false);
+        } catch(Exception err){
+        assert(true);
+        }
     }
 
     @Test(timeout = 3000)
@@ -297,7 +317,12 @@ public class PCRSimulatorTest2 {
         }
         PCRSimulator pcrSimulator = new PCRSimulator();
         pcrSimulator.initiate();
-//        assertThrows(Exception.class, () -> {pcrSimulator.run(pcr, polys);});
+        try { 
+            pcrSimulator.run(pcr, polys);
+            assert(false);
+        } catch(Exception err){
+        assert(true);
+        }
     }
 
     @Test(timeout = 3000)
@@ -324,6 +349,12 @@ public class PCRSimulatorTest2 {
         }
         PCRSimulator pcrSimulator = new PCRSimulator();
         pcrSimulator.initiate();
-//        assertThrows(Exception.class, () -> {pcrSimulator.run(pcr, polys);});
+        try { 
+            pcrSimulator.run(pcr, polys);
+            assert(false);
+        } catch(Exception err){
+        assert(true);
+        }
+        
     }
 }
