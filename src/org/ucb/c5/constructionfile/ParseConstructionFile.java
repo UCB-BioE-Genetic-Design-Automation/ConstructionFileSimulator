@@ -45,11 +45,7 @@ public class ParseConstructionFile {
         if(gtLocus > -1) {
             String stepSection = rawText.substring(0,gtLocus);
             String seqSection = rawText.substring(gtLocus);
-            try {
-                processSteps(stepSection, steps);
-            } catch(Exception err) {
-                throw new IllegalArgumentException("Could not parse steps before fasta in:\n" + stepSection);
-            }
+            processSteps(stepSection, steps);
             try {
                 processSequences(seqSection, sequences);
             } catch (Exception err) {
@@ -118,6 +114,7 @@ public class ParseConstructionFile {
                 Step parsedStep = parseLine(op, lineNoOP);
                 steps.add(parsedStep);
             } catch(Exception err) {
+                err.printStackTrace();
                 Log.severe(err.getMessage());
                 throw new IllegalArgumentException("Could not parse the line:\n" + aline + "\nin text:\n" + rawText);
             }
