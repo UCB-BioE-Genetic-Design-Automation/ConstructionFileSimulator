@@ -185,7 +185,7 @@ public class ExampleTest {
                 + "acquire oligo pTargRev\n"
                 + "acquire plasmid pTargetF\n"
                 + "pcr aspC1,pTargRev on pTargetF	(3927 bp, ipcr)\n"
-                + "digest ipcr with SpeI	(0,spedig)\n"
+                + "digest ipcr 	(SpeI,1, spedig)\n"
                 + "ligate spedig	(lig)\n"
                 + "transform lig	(Mach1, Spec)\n"
                 + "\n"
