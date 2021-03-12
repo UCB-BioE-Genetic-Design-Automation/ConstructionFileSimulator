@@ -415,7 +415,7 @@ public class ParseConstructionFile {
             }
             enzList.add(enzyme);
         }
-        int fragSelect = Integer.parseInt(fragsel) - 1;
+        int fragSelect = Integer.parseInt(fragsel);
         return new Digestion(substrate, enzList, fragSelect, product);
     }
 
