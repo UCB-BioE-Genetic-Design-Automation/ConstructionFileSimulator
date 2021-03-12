@@ -66,7 +66,7 @@ public class AutoAnnotate {
         for(String line : lines) {
             String[] tabs = line.split("\t");
             String name = tabs[0];
-            String seq = tabs[1].toUpperCase();
+            String seq = tabs[1].toUpperCase().replaceAll("[^ATCGRYSWKMBDHVN]", "");
             String color = tabs[3];
             Annotation annot = new Annotation(name, color, 0, 0, false);
             Annotation annotrc = new Annotation(name, color, 0, 0, true);
