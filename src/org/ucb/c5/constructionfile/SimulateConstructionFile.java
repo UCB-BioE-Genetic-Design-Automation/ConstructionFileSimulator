@@ -25,7 +25,12 @@ public class SimulateConstructionFile {
         Map<String, Polynucleotide> CFMap = CF.getSequences();
         fragments.putAll(CFMap);
         for (Step step : CF.getSteps()) {
-            processStep(step, CFMap, fragments, CF.getPdtName());
+            try {
+                processStep(step, CFMap, fragments, CF.getPdtName());
+            } catch(Exception err) {
+                Log.severe(err.getMessage());
+                throw err;
+            }
             // curr = processStep(step, curr, CF.getSequences()); // Update the Map
         }
         String pdtName = CF.getPdtName();
