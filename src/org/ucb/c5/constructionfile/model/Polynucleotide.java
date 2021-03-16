@@ -111,6 +111,19 @@ public class Polynucleotide {
     public boolean isIsCircular() {
         return isCircular;
     }
+    
+    
+    public String getForwardStrand() {
+        StringBuilder out = new StringBuilder();
+        if(!ext5.startsWith("-")) {
+            out.append(ext5);
+        }
+        out.append(this.sequence);
+        if(!ext3.startsWith("-")) {
+            out.append(ext3);
+        }
+        return out.toString();
+    }
 
     public String toString() {
         String separator = "-";

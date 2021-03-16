@@ -1,7 +1,7 @@
 >Construction of q1product
 PCR q1oligo1,q1oligo2 on p20N5 (1672 bp, pcrpdt)
-Digest pcrpdt with XhoI,BamHI (pcrdig)
-Digest pTargetF with BamHI,XhoI (vectdig)
+Digest pcrpdt with XhoI,BamHI (1, pcrdig)
+Digest pTargetF with BamHI,XhoI (1, vectdig)
 Ligate pcrdig,vectdig (q1product)
 
 >q1oligo1

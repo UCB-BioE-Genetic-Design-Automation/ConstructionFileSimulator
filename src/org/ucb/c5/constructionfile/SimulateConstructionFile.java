@@ -28,8 +28,11 @@ public class SimulateConstructionFile {
             processStep(step, CFMap, fragments, CF.getPdtName());
             // curr = processStep(step, curr, CF.getSequences()); // Update the Map
         }
-        String PdtName = CF.getPdtName();
-        return fragments.get(PdtName);
+        String pdtName = CF.getPdtName();
+        Polynucleotide poly = fragments.get(pdtName);
+        Log.seq(pdtName, poly.getForwardStrand(), "Final product");
+        Log.info(pdtName + " successfully simulated!!!");
+        return poly;
     }
 
     // Process an individual step
@@ -70,6 +73,17 @@ public class SimulateConstructionFile {
                 
             default:
                 throw new RuntimeException("Not implemented " + step.getOperation());
+        }
+        String stepPdt = step.getProduct();
+        Polynucleotide pseq = CFMap.get(stepPdt);
+        if(pseq == null) {
+            pseq = fragments.get(stepPdt);
+        }
+        if(pseq == null) {
+            Log.seq(stepPdt, "", "No sequence available");
+        } else {
+            String seq = pseq.getForwardStrand();
+            Log.seq(stepPdt, seq, "Product of " + step.getOperation() + " step");
         }
     }
 
@@ -178,7 +192,7 @@ public class SimulateConstructionFile {
         //Parse an example file
         ParseConstructionFile pCF = new ParseConstructionFile();
         pCF.initiate();
-        String text = FileUtils.readResourceFile("constructionfile/data/pcrtest.txt");
+        String text = FileUtils.readResourceFile("constructionfile/data/Construction of aspC1.txt");
         ConstructionFile cf = pCF.run(text);
         
         //Simulate the construction file

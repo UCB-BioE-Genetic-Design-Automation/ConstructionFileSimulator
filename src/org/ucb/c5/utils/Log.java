@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.ucb.c5.utils;
 
 import java.io.File;
@@ -26,18 +25,42 @@ import java.util.logging.SimpleFormatter;
  * @author J. Christopher Anderson
  */
 public class Log {
-    private static Logger logger;
-    private static FileHandler handler;
-    
+
+    private static Logger msgLogger;
+    private static FileHandler msgHandler;
+    private static Logger seqLogger;
+    private static FileHandler seqHandler;
+
     static {
         try {
             File logfil = new File("C5log.txt");
             FileUtils.writeFile("", logfil.getAbsolutePath());
-            handler = new FileHandler(logfil.getAbsolutePath(), true);
-            logger = Logger.getLogger("C5");
-            logger.setLevel(Level.ALL);
-            logger.addHandler(handler);
-            handler.setFormatter(new Formatter() {
+            msgHandler = new FileHandler(logfil.getAbsolutePath(), true);
+            msgLogger = Logger.getLogger("C5");
+            msgLogger.setLevel(Level.ALL);
+            msgLogger.addHandler(msgHandler);
+            msgHandler.setFormatter(new Formatter() {
+                @Override
+                public String format(LogRecord record) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(record.getMessage());
+                    sb.append("\n");
+                    return sb.toString();
+                }
+            });
+        } catch (Exception ex) {
+            System.err.println("Unable to initiate logger");
+//            System.exit(0);
+        }
+
+        try {
+            File logfil = new File("C5seqs.txt");
+            FileUtils.writeFile("", logfil.getAbsolutePath());
+            seqHandler = new FileHandler(logfil.getAbsolutePath(), true);
+            seqLogger = Logger.getLogger("Log");
+            seqLogger.setLevel(Level.ALL);
+            seqLogger.addHandler(seqHandler);
+            seqHandler.setFormatter(new Formatter() {
                 @Override
                 public String format(LogRecord record) {
                     StringBuilder sb = new StringBuilder();
@@ -51,19 +74,23 @@ public class Log {
 //            System.exit(0);
         }
     }
-    
+
     public static void info(String msg) {
-        logger.info(msg);
+        msgLogger.info(msg);
     }
-    
+
     public static void warning(String msg) {
-        logger.warning(msg);
+        msgLogger.warning(msg);
     }
-    
+
     public static void severe(String msg) {
-        logger.severe(msg);
+        msgLogger.severe(msg);
     }
-       
+
+    public static void seq(String name, String seq, String note) {
+        seqLogger.info(name + "\t" + seq + "\t" + note + "\t");
+    }
+
     public static void main(String[] args) {
         Log.info("test of logging");
         Log.info("open up C5log.txt");

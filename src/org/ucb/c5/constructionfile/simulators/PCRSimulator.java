@@ -71,11 +71,20 @@ public class PCRSimulator {
             }
             templates.add(poly);
         }
+        
+        Log.seq(pcr.getOligo1(), oligo1, "Simulating PCR with this oligo1");
+        Log.seq(pcr.getOligo2(), oligo2, "Simulating PCR with this oligo2");
+        for(String tname : pcr.getTemplates()) {
+            Polynucleotide poly = fragments.get(tname);
+            Log.seq(tname, poly.getForwardStrand(), "Simulating PCR with this template");
+        }
 
         String pdtSeq = run(oligo1, oligo2, templates);
         Polynucleotide pdtPoly = new Polynucleotide(pdtSeq);
 //        System.out.println(pcr.getProduct() + "\t" + pdtSeq);
         fragments.put(pcr.getProduct(), pdtPoly);
+        
+        
     }
 
     public String run(String oligo1, String oligo2, List<Polynucleotide> templates) throws Exception {
@@ -110,6 +119,10 @@ public class PCRSimulator {
             singleStrands.add(oligo2);
 
             singleStrands = simulateAnneal(singleStrands, alreadyTried);
+            
+            for(String ss : singleStrands) {
+                Log.seq("", ss, "PCR intermediate from round " + breaker);
+            }
 
             //End loop if a PCR product is generated
             for (String seq : singleStrands) {
@@ -230,7 +243,6 @@ public class PCRSimulator {
         String rcB = rc.run(oligoB);
 
         //If oligoA and oligoB are identical, terminate
-        Log.info(oligoA + "\t" + oligoB);
         if (oligoA.equals(oligoB)) {
             return null;
         }

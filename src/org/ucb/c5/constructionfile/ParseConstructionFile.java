@@ -138,6 +138,7 @@ public class ParseConstructionFile {
                     throw new IllegalArgumentException("Sequence:\n" + seq + "\ncontains non-DNA sequences in:\n" + f);
                 }
                 sequences.put(name, createPoly(seq));
+                Log.seq(name, seq, "Construction file sequence from FASTA added");
             }
             return;
         }
@@ -162,6 +163,7 @@ public class ParseConstructionFile {
                     throw new IllegalArgumentException("Sequence:\n" + seq + "\ncontains non-DNA sequences in:\n" + line);
                 }
                 sequences.put(name, createPoly(seq));
+                Log.seq(name, seq, "Construction file sequence from TSV added");
             }
     }
 
