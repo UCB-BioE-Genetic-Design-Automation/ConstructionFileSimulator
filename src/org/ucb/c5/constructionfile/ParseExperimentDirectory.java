@@ -70,7 +70,7 @@ public class ParseExperimentDirectory {
             return cf;
 
         } catch (Exception e) {
-            throw new Exception("Not a valid Construction File");
+            throw new Exception("Construction File contains invalid syntax");
         }
     }
 
