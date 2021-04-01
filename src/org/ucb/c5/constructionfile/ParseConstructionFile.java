@@ -29,12 +29,14 @@ public class ParseConstructionFile {
             try {
                 processSequences(underSplit[1], sequences);
             } catch(Exception err) {
-                throw new IllegalArgumentException("Could not parse sequences below the line:\n" + underSplit[1]);
+                Log.severe("Could not parse sequences below the line:\n" + underSplit[1]);
+                throw err;
             }
             try {
                 processSteps(underSplit[0], steps);
             } catch(Exception err) {
-                throw new IllegalArgumentException("Could not parse steps above the line:\n" + underSplit[0]);
+                Log.severe("Could not parse steps above the line:\n" + underSplit[0]);
+                throw err;
             }
             String plasmidName = steps.get(steps.size()-1).getProduct();
             return new ConstructionFile(steps, plasmidName, sequences);
@@ -49,7 +51,8 @@ public class ParseConstructionFile {
             try {
                 processSequences(seqSection, sequences);
             } catch (Exception err) {
-                throw new IllegalArgumentException("Could not parse fasta in:\n" + seqSection);
+                Log.severe("Could not parse fasta in:\n" + seqSection);
+                throw err;
             }
             String plasmidName = steps.get(steps.size()-1).getProduct();
             return new ConstructionFile(steps, plasmidName, sequences);
@@ -105,7 +108,8 @@ public class ParseConstructionFile {
             try {
                 op = Operation.valueOf(sop);
             } catch(Exception err) {
-                throw new IllegalArgumentException("Unable to parse operation: " + sop);
+                Log.severe("Unable to parse operation: " + sop);
+                throw err;
             }
             
             //If past the gauntlet, keep the line
@@ -115,8 +119,8 @@ public class ParseConstructionFile {
                 steps.add(parsedStep);
             } catch(Exception err) {
                 err.printStackTrace();
-                Log.severe(err.getMessage());
-                throw new IllegalArgumentException("Could not parse the line:\n" + aline + "\nin text:\n" + rawText);
+                Log.severe("Could not parse the line:\n" + aline + "\nin text:\n" + rawText);
+                throw err;
             }
         }
     }
@@ -437,7 +441,13 @@ public class ParseConstructionFile {
     }
     
     private Step createAssemble(String[] fragments, String enzyme, String product){
-        Enzyme ez = Enzyme.valueOf(enzyme);
+        Enzyme ez;
+        try {
+            ez = Enzyme.valueOf(enzyme);
+        } catch(Exception err) {
+            Log.severe(enzyme + " is not a valid enzyme name");
+            throw err;
+        }
         List<String> frags = new ArrayList<>();
         for (String frag:fragments){
             frags.add(frag);
