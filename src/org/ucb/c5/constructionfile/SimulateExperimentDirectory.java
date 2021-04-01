@@ -50,7 +50,7 @@ public class SimulateExperimentDirectory {
 
     public static void main(String[] args) throws Exception {
         //Enter Path name as a String
-        String dirPath = "/Users/jca20n/Pimar/experiments/2020_02_04-Lycopene6";
+        String dirPath = "/Users/jca20n/Pimar/experiments/Lycopene6";
 
         //Simulate the experiment and write results
         SimulateExperimentDirectory sed = new SimulateExperimentDirectory();
