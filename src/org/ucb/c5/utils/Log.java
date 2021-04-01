@@ -80,11 +80,11 @@ public class Log {
     }
 
     public static void warning(String msg) {
-        msgLogger.warning(msg);
+        msgLogger.warning("WARNING:  " + msg);
     }
 
     public static void severe(String msg) {
-        msgLogger.severe(msg);
+        msgLogger.severe("SEVERE:  " + msg);
     }
 
     public static void seq(String name, String seq, String note) {
