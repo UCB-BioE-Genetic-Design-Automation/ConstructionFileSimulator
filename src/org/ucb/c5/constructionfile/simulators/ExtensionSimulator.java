@@ -11,6 +11,8 @@ import jaligner.SmithWatermanGotoh;
 import jaligner.formats.Pair;
 import jaligner.matrix.Matrix;
 import jaligner.matrix.MatrixLoader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.ucb.c5.sequtils.CalcEditDistance;
 import org.ucb.c5.sequtils.PolyRevComp;
 import org.ucb.c5.sequtils.RevComp;
@@ -35,6 +37,8 @@ public class ExtensionSimulator {
     private Matrix ednafull;
 
     public void initiate() throws Exception {
+        Logger logger = Logger.getLogger("jaligner.SmithWatermanGotoh");
+        logger.setLevel(Level.OFF);
         revcomp = new PolyRevComp();
         revcomp.initiate();
         rc = new RevComp();
@@ -45,7 +49,7 @@ public class ExtensionSimulator {
         ced.initiate();
         tmCalculator = new TmCalculator();
         tmCalculator.initiate();
-        
+
         ednafull = MatrixLoader.load("EDNAFULL_1");
     }
 
@@ -106,9 +110,9 @@ public class ExtensionSimulator {
 
             char[] S1 = alignment.getSequence1();
             char[] S2 = alignment.getSequence2();
-            
+
             //Put the sixbp back into the ends to replace U's
-            for(int i=0; i<6; i++) {
+            for (int i = 0; i < 6; i++) {
                 S1[S1.length - 6 + i] = sixbp.charAt(i);
                 S2[S2.length - 6 + i] = sixbp.charAt(i);
             }
