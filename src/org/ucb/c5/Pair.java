@@ -14,6 +14,11 @@ public class Pair<K,V> implements Serializable{
      */
     private K key;
 
+    public Pair(K key, V value) {
+        this.key = key;
+        this.value = value;
+    }
+
     /**
      * Gets the key for this pair.
      * @return key for this pair

@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javafx.util.Pair;
+import org.ucb.c5.Pair;
 import org.ucb.c5.constructionfile.model.PCR;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 import org.ucb.c5.sequtils.CalcEditDistance;
