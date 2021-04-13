@@ -27,7 +27,7 @@ public class ParseConstructionFile {
         String[] underSplit = rawText.split("(-)\\1{3,}");
         if(underSplit.length == 2) {
             try {
-                processSequences(underSplit[1], sequences);
+                processSequences(underSplit[1].trim(), sequences);
             } catch(Exception err) {
                 Log.severe("Could not parse sequences below the line:\n" + underSplit[1]);
                 throw err;
@@ -49,7 +49,7 @@ public class ParseConstructionFile {
             String seqSection = rawText.substring(gtLocus);
             processSteps(stepSection, steps);
             try {
-                processSequences(seqSection, sequences);
+                processSequences(seqSection.trim(), sequences);
             } catch (Exception err) {
                 Log.severe("Could not parse fasta in:\n" + seqSection);
                 throw err;
