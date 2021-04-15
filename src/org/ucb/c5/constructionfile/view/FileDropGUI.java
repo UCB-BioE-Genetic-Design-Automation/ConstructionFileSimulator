@@ -107,7 +107,6 @@ public class FileDropGUI extends JFrame {
             if (dirPath.endsWith(".txt")) {
                 String data = "default_features\t" + dirPath + "\n";
                 FileUtils.writeFile(data, "data_paths.txt");
-                Log.info("default_features set to " + dirPath);
                 featureBtn.setBorder(greenborder);
                 Log.info("default_features set to: " + dirPath);
                 return;
