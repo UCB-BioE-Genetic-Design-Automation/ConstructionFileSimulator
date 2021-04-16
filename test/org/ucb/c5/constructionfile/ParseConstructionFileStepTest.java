@@ -343,7 +343,7 @@ public class ParseConstructionFileStepTest {
             Digestion digest = (Digestion) steps.get(i-1);
             assert(digest.getSubstrate().equals("a"+i));
             assert(digest.getEnzymes().equals(ezlist[i-1]));
-            assert(digest.getFragSelection()+1==i);
+            assert(digest.getFragSelection()==i);
             assert(digest.getProduct().equals("d"+i));
             
         }
