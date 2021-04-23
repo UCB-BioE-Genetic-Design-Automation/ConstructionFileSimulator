@@ -88,7 +88,7 @@ public class Log {
     }
 
     public static void seq(String name, String seq, String note) {
-        seqLogger.info(name + "\t" + seq + "\t" + note + "\t");
+        seqLogger.info(name + "\t" + seq + "\t" + note + "\t" + seq.length());
     }
 
     public static void main(String[] args) {

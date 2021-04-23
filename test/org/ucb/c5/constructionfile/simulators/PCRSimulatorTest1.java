@@ -6,6 +6,7 @@ import org.ucb.c5.constructionfile.model.Polynucleotide;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.ucb.c5.utils.FileUtils;
 
 /**
  * Direct testing of the PCR Simulator on all imagined use cases
@@ -295,14 +296,19 @@ public class PCRSimulatorTest1 {
         assert (pdtpoly.equals(expectedpoly));   
     }
     
-//    @Test(timeout = 30000)
-//    public void testBlank() throws Exception {
-//        //run a wobble with 2 oligos no template (ser2 N5 lib, works)
-//        String oligo1 = "CcatagaattcggagagatgccggagcggctgaacggaccggtNNNNNNNNaccggagtaggggcaactctacc";
-//        String oligo2 = "gtcatctgcagtggcggagagagggggatttgaacccccggtagagttgcccctactccgg";
-//        List<Polynucleotide> templates = new ArrayList<>();
-//
-//        String pdt = sim.run(oligo1, oligo2, templates);
-//        assert (pdt.equals(""));
-//    }
+    @Test(timeout = 30000)
+    public void testGenomicDNATemplate() throws Exception {
+        //run a lab-confirmed PCR on a genomic DNA (full length) template
+        //pcr odxs3/odxs4 on MG1655	(1916 bp, dxs)
+        String odxs3 = "ccataCGTCTCatAcaataagtattaataggcccc";
+        String odxs4 = "gactaCGTCTCaagggttatgccagccaggccttg";
+        List<Polynucleotide> templates = new ArrayList<>();
+        String data = FileUtils.readResourceFile("constructionfile/data/MG1655_genome.txt");
+        data = data.replaceAll("\\r|\\r?\\n", "");
+        
+        templates.add(new Polynucleotide(data, true));
+
+        String pdt = sim.run(odxs3, odxs4, templates);
+        assert (pdt.equals(""));
+    }
 }

@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javafx.scene.paint.Color;
-import javax.naming.ConfigurationException;
 import org.ucb.c5.genbank.model.Annotation;
 import org.ucb.c5.sequtils.RevComp;
 import org.ucb.c5.utils.FileUtils;
@@ -27,10 +25,11 @@ public class AutoAnnotate {
 
     private Map<String, Annotation> features;
     private GenbankWriter gbwriter;
+    private RevComp rc;
 
     public void initiate() throws Exception {
         gbwriter = new GenbankWriter();
-        RevComp rc = new RevComp();
+        rc = new RevComp();
         rc.initiate();
 
         //Read in directory locations
@@ -54,6 +53,7 @@ public class AutoAnnotate {
             }
         }
 
+        //Read in the features if available
         features = new HashMap<>();
         try {
             String data = FileUtils.readFile(fileLocations.get("default_features"));
@@ -75,19 +75,32 @@ public class AutoAnnotate {
     }
 
     public void run(String sequence, String path) throws Exception {
-        String seq = sequence.toUpperCase();
-        seq = seq + seq;
+        String seqUpper = sequence.toUpperCase();
 
+        //Identify G00101 if it is present, and rotate
+        int g00101Pos = seqUpper.indexOf("GCTCACTCAAAGGCGGTAAT");
+        if(g00101Pos > 0) {
+            sequence = rc.run(sequence);
+            seqUpper = sequence.toUpperCase();
+        }
+        g00101Pos = seqUpper.indexOf("ATTACCGCCTTTGAGTGAGC");
+        if(g00101Pos > 0) {
+            sequence = sequence.substring(g00101Pos) + sequence.substring(0, g00101Pos);
+            seqUpper = sequence.toUpperCase();
+        }
+        
+        //Find the features and annotation
+        seqUpper = seqUpper + seqUpper;
         List<Annotation> annots = new ArrayList<>();
         for (String feat : features.keySet()) {
-            int index = seq.indexOf(feat);
+            int index = seqUpper.indexOf(feat);
             if (index == -1) {
                 continue;
             }
 
             int end = index + feat.length();
-            if (end > sequence.length()) {
-                end = end - sequence.length();
+            if (end > seqUpper.length()) {
+                end = end - seqUpper.length();
             }
 
             Annotation existing = features.get(feat);
