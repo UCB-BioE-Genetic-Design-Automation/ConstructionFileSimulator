@@ -105,7 +105,7 @@ public class ExtensionSimulator {
             Sequence s2 = new Sequence(rcU);
 
             //Use a modified EDNAFULL matrix to align and force the U's to align
-            Alignment alignment = SmithWatermanGotoh.align(s1, s2, ednafull, 10f, 0.5f);
+            Alignment alignment = SmithWatermanGotoh.align(s1, s2, ednafull, 15f, 2f);
             Matrix matrix = alignment.getMatrix();
 
             char[] S1 = alignment.getSequence1();
@@ -119,7 +119,7 @@ public class ExtensionSimulator {
 
             //Calculate the melting temperature of the duplex
             double Tm = tmCalculator.run(S1, S2);
-            if (Tm > 75) {
+            if (Tm > 55) {
                 num55++;
             }
             if (Tm > bestTm) {
@@ -129,7 +129,7 @@ public class ExtensionSimulator {
         }  //end while
 
         //return error code -1, if the best annealling Tm is less than 40 degrees
-        if (bestTm < 30) {
+        if (bestTm < 40) {
             return -1;
         }
         if (num55 > 1) {
