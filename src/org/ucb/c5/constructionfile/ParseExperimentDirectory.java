@@ -105,6 +105,7 @@ public class ParseExperimentDirectory {
                 }
                 nameToPoly.put(name, new Polynucleotide(seq, "", "", false, false, false));
                 Log.info("Added oligo:\t" + name + "\t" + seq);
+                Log.seq(name, seq, "oligo seq parse from tsv files");
             }
         }
 
@@ -124,6 +125,7 @@ public class ParseExperimentDirectory {
             }
             nameToPoly.put(seqName, new Polynucleotide(seqContent, true));
             Log.info("Added plasmid:\t" + seqName + " of length " + seqContent.length());
+            Log.seq(seqName, seqContent, "plasmid seq parse from gb files");
         }
         return nameToPoly;
     }
