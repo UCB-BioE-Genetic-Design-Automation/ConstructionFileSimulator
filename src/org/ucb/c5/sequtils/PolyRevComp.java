@@ -9,28 +9,31 @@ import org.ucb.c5.utils.SequenceUtils;
  * @author J. Christopher Anderson
  */
 public class PolyRevComp {
+    private RevComp revcomp;
 
     public void initiate() throws Exception {
+        revcomp = new RevComp();
+        revcomp.initiate();
     }
 
     public Polynucleotide run(Polynucleotide frag) throws Exception {
-        String rc = SequenceUtils.reverseComplement(frag.getSequence());
+        String rc = revcomp.run(frag.getSequence());
 
         String new5 = null;
         String new3 = null;
 
         if (frag.getExt3().startsWith("-")) {
             String old3 = frag.getExt3().substring(1);
-            new5 = "-" + SequenceUtils.reverseComplement(old3);
+            new5 = "-" + revcomp.run(old3);
         } else {
-            new5 = SequenceUtils.reverseComplement(frag.getExt3());
+            new5 = revcomp.run(frag.getExt3());
         }
 
         if (frag.getExt5().startsWith("-")) {
             String old5 = frag.getExt5().substring(1);
-            new3 = "-" + SequenceUtils.reverseComplement(old5);
+            new3 = "-" + revcomp.run(old5);
         } else {
-            new3 = SequenceUtils.reverseComplement(frag.getExt5());
+            new3 = revcomp.run(frag.getExt5());
         }
 
         Polynucleotide out = new Polynucleotide(rc, new5, new3);
