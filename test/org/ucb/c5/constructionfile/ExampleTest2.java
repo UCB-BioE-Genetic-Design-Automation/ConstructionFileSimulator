@@ -28,8 +28,8 @@ public class ExampleTest2 {
         ParseConstructionFile pCF = new ParseConstructionFile();
         pCF.initiate();
 
-        String text = "digest pSB3C6-r0040 with SpeI,PstI	(2, lefty)\n"
-                + "digest pSB1AK3-J1610 with XbaI,PstI	(1, righty)\n"
+        String text = "digest pSB3C6-r0040 with SpeI,PstI	(1, lefty)\n"
+                + "digest pSB1AK3-J1610 with XbaI,PstI	(0, righty)\n"
                 + "ligate lefty,righty	(lig)\n"
                 + "transform lig	(Mach1, Spec)\n"
                 + "\n"
@@ -57,8 +57,8 @@ public class ExampleTest2 {
         pCF.initiate();
 
         String text = "PCR papC-F/papC-R on S.ven.      (pcrpdt)\n"
-                + "Digest pcrpdt with BglII,XhoI,   (2, pcrdig)\n"
-                + "Digest pBca9145-Bca1089 with BglII,XhoI (2, vectdig)\n"
+                + "Digest pcrpdt with BglII,XhoI,   (1, pcrdig)\n"
+                + "Digest pBca9145-Bca1089 with BglII,XhoI (1, vectdig)\n"
                 + "Ligate pcrdig,vectdig             (pBca9145-papC)\n"
                 + "-----------------------------------------\n"
                 + ">papC-F   Cloning of papC\n"
@@ -89,8 +89,8 @@ public class ExampleTest2 {
         String text = "PCR ca1110F,ca1111R on pBACr899     (A)\n"
                 + "PCR ca1111F,ca899R on pBACr899      (B)\n"
                 + "PCR ca1110F/ca899R on A,B           (pcrpdt)\n"
-                + "Digest pcrpdt with EcoRI,BamHI      (2, pcrdig)\n"
-                + "Digest pBca1100 with EcoRI,BamHI     (2, plasdig)\n"
+                + "Digest pcrpdt with EcoRI,BamHI      (1, pcrdig)\n"
+                + "Digest pBca1100 with EcoRI,BamHI     (1, plasdig)\n"
                 + "Ligate pcrdig,plasdig               (pBca1100-Bca1111)\n"
                 + " ---------------------------------------------------\n"
                 + ">ca1110F  Forward EcoRI for Biobrick extreme variant of nahR-Psal  \n"
