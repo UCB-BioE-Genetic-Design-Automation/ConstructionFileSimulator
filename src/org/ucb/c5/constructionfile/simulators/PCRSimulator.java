@@ -163,15 +163,29 @@ public class PCRSimulator {
         
         start = start + 18;
         
+        //Check that there isn't another internal annealing site
+        int internal = template.indexOf(forAnneal, start);
+        if(internal > 0) {
+            throw new IllegalArgumentException("Multiple annealing sites for oligo1");
+        }
+        
+        //Spin the plasmid around if it is circular
         if(poly.isIsCircular()) {
             template = rotator.run(template, start);
             start = 0;
         }
         
+        //Find the annealing site of oligo2
         String revAnneal = rc2.substring(0, 18);
         int end = template.indexOf(revAnneal);
         if(end == -1) {
             throw new IllegalArgumentException("Perfect 18 Simulation could not align oligo2");
+        }
+        
+        //Check that there isn't another internal annealing site
+        internal = template.indexOf(revAnneal, end + 1);
+        if(internal > 0 && internal < 40000) {
+            throw new IllegalArgumentException("Multiple annealing sites for oligo2");
         }
         
         return oligo1 + template.substring(start, end) + rc2;
