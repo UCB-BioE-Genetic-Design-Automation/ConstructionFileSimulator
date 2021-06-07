@@ -92,6 +92,15 @@ public class PCRSimulator {
         oligo2 = oligo2.toUpperCase();
         String rc2 = rc.run(oligo2);
         String rc1 = rc.run(oligo1);
+        
+        //First try the simple method
+        if(templates.size() == 1) {
+            try {
+                return perfect18Simulation(oligo1, rc2, templates.get(0));
+            } catch(Exception err) {
+                Log.info("Failed to simulate PCR based on perfect 18bp anneal");
+            }
+        }
 
         //Combine all the species in a set and denature them
         Set<Polynucleotide> species = new HashSet<>();
@@ -137,6 +146,35 @@ public class PCRSimulator {
             oldStrands.clear();
             oldStrands.addAll(singleStrands);
         }
+    }
+    
+    private String perfect18Simulation(String oligo1, String rc2, Polynucleotide poly) throws Exception {
+        String template = poly.getSequence().toUpperCase();
+        String forAnneal = oligo1.substring(oligo1.length()-18);
+        int start = template.indexOf(forAnneal);
+        if(start == -1) {
+            template = rc.run(template);
+            start = template.indexOf(forAnneal);
+        }
+        
+        if(start == -1) {
+            throw new IllegalArgumentException("Perfect 18 Simulation could not align oligo1");
+        }
+        
+        start = start + 18;
+        
+        if(poly.isIsCircular()) {
+            template = rotator.run(template, start);
+            start = 0;
+        }
+        
+        String revAnneal = rc2.substring(0, 18);
+        int end = template.indexOf(revAnneal);
+        if(end == -1) {
+            throw new IllegalArgumentException("Perfect 18 Simulation could not align oligo2");
+        }
+        
+        return oligo1 + template.substring(start, end) + rc2;
     }
 
     private Set<String> initialDissociation(String oligo1, String oligo2, Set<Polynucleotide> species) throws Exception {
@@ -302,7 +340,7 @@ public class PCRSimulator {
         String Eback1 = sim.run(EB1F, EB1R, templates1);
         System.out.println("Eback1" + Eback1);
 */        
-        
+           
         String EB2F = "ccataggtctcAagtcgcctgtaggtcggcaggctt";
         String EB2R = "tggtgGGTCTCtcgagctaggcaccaataactgcc";
         List<Polynucleotide> templates1 = new ArrayList<>();
