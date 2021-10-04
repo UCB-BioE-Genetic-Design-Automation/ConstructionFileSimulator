@@ -221,6 +221,12 @@ public class ParseConstructionFile {
                     sizePCR = null;
                     productPCR = sizeProductPCR.trim();
                 }
+                
+                //Convert sizePCR string to an integer
+                Integer size = null;
+                if(sizePCR != null) {
+                    size = Integer.parseInt(sizePCR);
+                }
 
                 //extract the list of templates
                 List<String> templateList = new ArrayList<>();
@@ -237,9 +243,8 @@ public class ParseConstructionFile {
                 return createPCR(
                         oligosPCR,
                         templateList,
-                        sizePCR,
-                        productPCR
-                );
+                        productPCR,
+                        size);
 
             case pca://pca oligo1,oligo2 \t (product)
 
@@ -393,8 +398,8 @@ public class ParseConstructionFile {
         }
     }
 
-    private Step createPCR(String[] oligos, List<String> templates, String size, String product) {
-        return new PCR(oligos[0], oligos[1], templates, product);
+    private Step createPCR(String[] oligos, List<String> templates, String product, Integer size) {
+        return new PCR(oligos[0], oligos[1], templates, product, size);
     }
 
     private Step createPCA(String[] oligos, String product) {
@@ -508,8 +513,7 @@ public class ParseConstructionFile {
         ParseConstructionFile pCF = new ParseConstructionFile();
         pCF.initiate();
 
-        String text = FileUtils.readFile("/Users/jca20n/Pimar/experiments/Lycopene16/Construction Files/Construction of pLYC59.txt");
-//        String text = FileUtils.readResourceFile("constructionfile/data/Construction of aspC1.txt");
+        String text = FileUtils.readResourceFile("constructionfile/data/Construction of aspC1.txt");
         ConstructionFile cf = pCF.run(text);
 
         System.out.println(cf.toString());

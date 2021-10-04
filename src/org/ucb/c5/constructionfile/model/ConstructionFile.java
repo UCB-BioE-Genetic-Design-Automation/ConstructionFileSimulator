@@ -43,7 +43,7 @@ public class ConstructionFile {
         //pcr ca4238,ca4239 on pTargetF	(3927 bp, ipcr)
         List<String> templates = new ArrayList();
         templates.add("pTargetF");
-        steps.add(new PCR("ca4238", "ca4239", templates, "ipcr"));
+        steps.add(new PCR("ca4238", "ca4239", templates, "ipcr", 2023));
         
         //cleanup ipcr	(pcr)
 //        steps.add(new Cleanup("ipcr", "pcr"));
