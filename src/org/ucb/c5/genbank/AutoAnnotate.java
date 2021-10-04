@@ -69,8 +69,30 @@ public class AutoAnnotate {
                 features.put(seq, annot);
                 features.put(rc.run(seq), annotrc);
             }
+            return;
         } catch (Exception err) {
             Log.warning("Error parsing 'default_features'");
+        }
+        
+        //Pull from backup resource data otherwise
+        try {
+            String data = FileUtils.readResourceFile("genbank/data/Default_Features.txt");
+
+            String[] lines = data.split("\\r|\\r?\\n");
+            for (String line : lines) {
+                String[] tabs = line.split("\t");
+                String name = tabs[0];
+                String seq = tabs[1].toUpperCase().replaceAll("[^ATCGRYSWKMBDHVN]", "");
+                String color = tabs[3];
+                Annotation annot = new Annotation(name, color, 0, 0, false);
+                Annotation annotrc = new Annotation(name, color, 0, 0, true);
+                features.put(seq, annot);
+                features.put(rc.run(seq), annotrc);
+            }
+            return;
+        } catch (Exception err) {
+            Log.warning("Error parsing backup resource 'default_features'");
+            throw new RuntimeException("Unable to find features for AutoAnnotate");
         }
     }
 
