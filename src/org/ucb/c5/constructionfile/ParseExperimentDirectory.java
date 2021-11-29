@@ -114,7 +114,7 @@ public class ParseExperimentDirectory {
 
             String fileContent = FileUtils.readFile(afile.getAbsolutePath());
             String filename = afile.getName();
-            String seqName = filename.substring(0, filename.length()-4);
+            String seqName = filename.split("\\.")[0];
 
             int origin = fileContent.lastIndexOf("ORIGIN");
 
@@ -140,7 +140,7 @@ public class ParseExperimentDirectory {
         parseFolder.initiate();
 
         Experiment exp = parseFolder.run(dirPath);
-
+        
         //for debug
         System.out.print(exp);
     }
