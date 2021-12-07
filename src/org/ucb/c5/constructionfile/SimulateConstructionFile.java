@@ -17,7 +17,7 @@ public class SimulateConstructionFile {
     public void initiate() {
     }
 
-    public Polynucleotide run(ConstructionFile CF, Map<String, Polynucleotide> nameToPoly) throws Exception {
+    public ConstructionFile run(ConstructionFile CF, Map<String, Polynucleotide> nameToPoly) throws Exception {
         // Populate a Map with all of the intermediate polypeptides and directory-parsed sequences  
         Map<String, Polynucleotide> fragments = new HashMap<>(); 
         fragments.putAll(nameToPoly);
@@ -37,7 +37,12 @@ public class SimulateConstructionFile {
         Polynucleotide poly = fragments.get(pdtName);
         Log.seq(pdtName, poly.getForwardStrand(), "Final product");
         Log.info(pdtName + " successfully simulated!!!");
-        return poly;
+
+        ConstructionFile outputCf = new ConstructionFile(CF.getSteps(), CF.getPdtName(), fragments);
+        return outputCf;
+
+        //run method returns a construction file
+
     }
 
     // Process an individual step
@@ -202,7 +207,11 @@ public class SimulateConstructionFile {
         
         //Simulate the construction file
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
-        Polynucleotide product = simulateConstructionFile.run(cf, new HashMap<>());
+        //Polynucleotide product = simulateConstructionFile.run(cf, new HashMap<>());
+        //Commenting original statement above and adding new below
+        ConstructionFile outputConstructionFile = simulateConstructionFile.run(cf, new HashMap<>());
+        Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
         System.out.println(product);
+
     }
 }

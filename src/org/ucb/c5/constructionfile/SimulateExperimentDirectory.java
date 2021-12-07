@@ -43,7 +43,8 @@ public class SimulateExperimentDirectory {
         //Run the simulator
         for (ConstructionFile cf : exp.getCfs()) {
             Log.info("Simulating construction file for product: " + cf.getPdtName());
-            Polynucleotide pdt = simulator.run(cf, exp.getNameToPoly());
+            ConstructionFile outputConstructionFile = simulator.run(cf, exp.getNameToPoly());
+            Polynucleotide pdt = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
             autoanno.run(pdt.getSequence(), cf.getPdtName() + ".seq");
         }
     }

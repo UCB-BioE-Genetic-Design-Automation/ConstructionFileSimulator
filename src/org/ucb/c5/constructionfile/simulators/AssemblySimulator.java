@@ -164,7 +164,9 @@ public class AssemblySimulator {
         String text = FileUtils.readResourceFile("constructionfile/data/Construction of pJBAG.txt");
         ConstructionFile CF = pCF.run(text);
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
-        Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
+        //Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
+        ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
+        Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
         System.out.println(product.getSequence());
     }
 }

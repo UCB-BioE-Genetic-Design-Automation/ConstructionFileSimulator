@@ -43,7 +43,8 @@ public class ExceptionTest {
         simulateConstructionFile.initiate();
 
         try {
-            Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
+            ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
+            Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
             assert (false);
         } catch (Exception e) {
             assert (true);
@@ -78,7 +79,8 @@ public class ExceptionTest {
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
         simulateConstructionFile.initiate();
         try {
-            Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
+            ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
+            Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
             assert (false);
         } catch (Exception e) {
             assert (true);
@@ -109,7 +111,8 @@ public class ExceptionTest {
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
         simulateConstructionFile.initiate();
         try {
-            Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
+            ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
+            Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
             assert (false);
         } catch (Exception e) {
             assert (true);
@@ -141,7 +144,8 @@ public class ExceptionTest {
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
         simulateConstructionFile.initiate();
         try {
-            Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
+            ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
+            Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
             assert (false);
         } catch (Exception e) {
             assert (true);
@@ -174,7 +178,8 @@ public class ExceptionTest {
             ConstructionFile CF = pCF.run(text);
             SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
             simulateConstructionFile.initiate();
-            Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
+            ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
+            Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
             assert (false);
         } catch (Exception e) {
             assert (true);
@@ -206,7 +211,8 @@ public class ExceptionTest {
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
         simulateConstructionFile.initiate();
         try {
-            Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
+            ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
+            Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
             assert (false);
         } catch (Exception e) {
             assert (true);
@@ -237,7 +243,8 @@ public class ExceptionTest {
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
         simulateConstructionFile.initiate();
         try {
-            Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
+            ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
+            Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
             assert (false);
         } catch (Exception e) {
             assert (true);
@@ -269,7 +276,8 @@ public class ExceptionTest {
             ConstructionFile CF = pCF.run(text);
             SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
             simulateConstructionFile.initiate();
-            Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
+            ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
+            Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
             assert (false);
         } catch (Exception e) {
             assert (true);
@@ -319,7 +327,8 @@ public class ExceptionTest {
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
         simulateConstructionFile.initiate();
         try {
-            Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
+            ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
+            Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
             assert (false);
         } catch (Exception e) {
             assert (true);
@@ -362,7 +371,8 @@ public class ExceptionTest {
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
         simulateConstructionFile.initiate();
         try {
-            Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
+            ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
+            Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
             assert (false);
         } catch (Exception e) {
             assert (true);
