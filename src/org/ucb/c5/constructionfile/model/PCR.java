@@ -18,7 +18,8 @@ public class PCR implements Step {
     private final String oligo2;
     private final List<String> templates;
     private final String product;
-    private final Integer size;
+    //Removed size from PCR class
+
     
 
     public PCR(String oligo1, String oligo2, List<String> templates, String product, Integer size) {
@@ -26,7 +27,7 @@ public class PCR implements Step {
         this.oligo2 = oligo2;
         this.templates = templates;
         this.product = product;
-        this.size = size;
+
     }
 
     public String getOligo1() {
@@ -51,9 +52,6 @@ public class PCR implements Step {
         return Operation.pcr;
     }
 
-    public Integer getSize() {
-        return size;
-    }
     
     @Override
     public String toString() {
