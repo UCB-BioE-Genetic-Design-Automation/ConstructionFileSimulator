@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.Test;
+import org.ucb.c5.constructionfile.model.Modifications;
 
 /**
  * Tests of PCRSimulator using PCR objects
@@ -188,8 +189,8 @@ public class PCRSimulatorTest2 {
     
         Map<String, Polynucleotide> polys = new HashMap<>();
         polys.put("template",new Polynucleotide(template,true));
-        polys.put("Primer1",new Polynucleotide(oligo1, "","",false,false,false));
-        polys.put("Primer2",new Polynucleotide(oligo2, "","",false,false,false));
+        polys.put("Primer1",new Polynucleotide(oligo1, "","",false,false,false,Modifications.hydroxyl,Modifications.hydroxyl));
+        polys.put("Primer2",new Polynucleotide(oligo2, "","",false,false,false,Modifications.hydroxyl,Modifications.hydroxyl));
         PCRSimulator pcrSimulator = new PCRSimulator();
         pcrSimulator.initiate();
         pcrSimulator.run(pcr, polys);

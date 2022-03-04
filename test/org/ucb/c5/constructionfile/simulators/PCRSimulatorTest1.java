@@ -6,6 +6,7 @@ import org.ucb.c5.constructionfile.model.Polynucleotide;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
+import org.ucb.c5.constructionfile.ParseOligo;
 import org.ucb.c5.utils.FileUtils;
 
 /**
@@ -18,11 +19,13 @@ import org.ucb.c5.utils.FileUtils;
 public class PCRSimulatorTest1 {
 
     PCRSimulator sim;
+    ParseOligo po;
 
     @Before
     public void initializeNewPCRSimulatorTest() throws Exception {
         sim = new PCRSimulator();
         sim.initiate();
+        po = new ParseOligo();
     }
 
     @Test(timeout = 30000)
@@ -200,10 +203,10 @@ public class PCRSimulatorTest1 {
         String oligo2 = "GGATCGGATCCCCGGAAGACGGTGCTCTGAAAG";
         List<Polynucleotide> templates = new ArrayList<>();
         Polynucleotide[] temps = new Polynucleotide[4];
-        temps[0] = new Polynucleotide("AACGATGGTGTAGTCTTCGTTGTGGGAGGTGATGTCCAGTTTGATGTCGGTTTTG", "", "", false, false, false);
-        temps[1] = new Polynucleotide("CCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGG", "", "", false, false, false);
-        temps[2] = new Polynucleotide("CGGTTTTTTAGCCATGTAGGTGGTTTTAACTTCAGCGTCGTAGTGACCACCGTCTTTCAGTTTCAGACGCATTTTG", "", "", false, false, false);
-        temps[3] = new Polynucleotide("CCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTG", "", "", false, false, false);
+        temps[0] = po.run("AACGATGGTGTAGTCTTCGTTGTGGGAGGTGATGTCCAGTTTGATGTCGGTTTTG");
+        temps[1] = po.run("CCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGG");
+        temps[2] = po.run("CGGTTTTTTAGCCATGTAGGTGGTTTTAACTTCAGCGTCGTAGTGACCACCGTCTTTCAGTTTCAGACGCATTTTG");
+        temps[3] = po.run("CCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTG");
 
         for (Polynucleotide poly : temps) {
             templates.add(poly);
@@ -252,7 +255,8 @@ public class PCRSimulatorTest1 {
         String[] lines = pcaoligos.split("\n");
         for (String line : lines) {
             if (!line.startsWith(">")) {
-                templates.add(new Polynucleotide(line, "", "", false, false, false));
+
+                templates.add(po.run(line));
             }
         }
 
