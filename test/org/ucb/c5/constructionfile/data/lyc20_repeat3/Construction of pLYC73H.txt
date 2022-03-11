@@ -1,0 +1,7 @@
+PCR G00101,TP5H on p20N100    (f5H)
+PCR PF5a,PR5a on pLYC72GB6    (b21)
+Assemble f5H,b21        (BsaI, pLYC73H)
+Transform pLYC73H (Mach1, Amp)
+----
+>TP5H
+AAAAAAAAAAAAAAAAAAAAAAAAAAA

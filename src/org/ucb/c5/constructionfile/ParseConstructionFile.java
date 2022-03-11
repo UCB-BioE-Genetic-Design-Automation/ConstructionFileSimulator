@@ -142,7 +142,14 @@ public class ParseConstructionFile {
                 if (!seq.toUpperCase().matches("[ACGTRYSWKMBDHVNacgtryswkmbdhvn]+")) {
                     throw new IllegalArgumentException("Sequence:\n" + seq + "\ncontains non-DNA sequences in:\n" + f);
                 }
-                sequences.put(name, createPoly(seq));
+                Polynucleotide existPoly = sequences.get(name);
+                Polynucleotide newPoly = createPoly(seq);
+                if (existPoly == null || existPoly.equals(newPoly)) {
+                    sequences.put(name, newPoly);
+                } else {
+                    throw new IllegalArgumentException("Two different polynucleotides:" + newPoly +
+                            "and " + existPoly + "with same name:" + name + "in FASTA");
+                }
                 Log.seq(name, seq, "Construction file sequence from FASTA added");
             }
             return;
@@ -167,7 +174,14 @@ public class ParseConstructionFile {
             if (!seq.matches("[ATCGRYSWKMBDHVN]+")) {
                 throw new IllegalArgumentException("Sequence:\n" + seq + "\ncontains non-DNA sequences in:\n" + line);
             }
-            sequences.put(name, createPoly(seq));
+            Polynucleotide existPoly = sequences.get(name);
+            Polynucleotide newPoly = createPoly(seq);
+            if (existPoly == null || existPoly.equals(newPoly)) {
+                sequences.put(name, newPoly);
+            } else {
+                throw new IllegalArgumentException("Two different polynucleotides:" + newPoly +
+                        "and " + existPoly + "with same name:" + name + "in TSV");
+            }
             Log.seq(name, seq, "Construction file sequence from TSV added");
         }
     }
