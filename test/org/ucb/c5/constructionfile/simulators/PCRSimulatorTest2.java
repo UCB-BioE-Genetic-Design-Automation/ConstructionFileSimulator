@@ -9,8 +9,11 @@ import org.ucb.c5.constructionfile.model.Polynucleotide;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.Before;
 import org.junit.Test;
+import org.ucb.c5.constructionfile.ParseOligo;
 import org.ucb.c5.constructionfile.model.Modifications;
+import org.ucb.c5.sequtils.ComparePolynucleotides;
 
 /**
  * Tests of PCRSimulator using PCR objects
@@ -18,7 +21,21 @@ import org.ucb.c5.constructionfile.model.Modifications;
  * @author J. Christopher Anderson
  */
 public class PCRSimulatorTest2 {
+    PCRSimulator sim;
+    ParseOligo po;
+    ComparePolynucleotides cps;
 
+    @Before
+    public void initializeNewPCRSimulatorTest() throws Exception {
+        sim = new PCRSimulator();
+        sim.initiate();
+        po = new ParseOligo();
+        cps = new ComparePolynucleotides();
+        cps.initiate();
+    }
+
+    
+    
     @Test(timeout = 3000)
     public void testSimplePCR() throws Exception {
         String oligo1 = "oligo1";
@@ -46,7 +63,7 @@ public class PCRSimulatorTest2 {
         pcrSimulator.run(pcr, polys);
         Polynucleotide prediction = polys.get(product);
         Polynucleotide expected = new Polynucleotide(productSeq);
-        assert(prediction.equals(expected));
+        assert(cps.run(prediction,expected));
     }
 
     @Test(timeout = 3000)
@@ -76,7 +93,7 @@ public class PCRSimulatorTest2 {
         pcrSimulator.run(pcr, polys);
         Polynucleotide prediction = polys.get(product);
         Polynucleotide expected = new Polynucleotide(productSeq);
-        assert(prediction.equals(expected));
+        assert(cps.run(prediction,expected));
     }
 
     @Test(timeout = 3000)
@@ -110,7 +127,7 @@ public class PCRSimulatorTest2 {
         pcrSimulator.run(pcr, polys);
         Polynucleotide prediction = polys.get(product);
         Polynucleotide expected = new Polynucleotide(productSeq);
-        assert(prediction.equals(expected));
+        assert(cps.run(prediction,expected));
     }
 //product seq is expected seq, however the simlator seq contains a large insertion. we need to dedug the simulator
 
@@ -144,7 +161,7 @@ public class PCRSimulatorTest2 {
         pcrSimulator.run(pcr, polys);
         Polynucleotide prediction = polys.get(product);
         Polynucleotide expected = new Polynucleotide(productSeq);
-        assert(prediction.equals(expected));
+        assert(cps.run(prediction,expected));
     }
 
     @Test(timeout = 3000)
@@ -174,7 +191,7 @@ public class PCRSimulatorTest2 {
         pcrSimulator.run(pcr, polys);
         Polynucleotide prediction = polys.get(product);
         Polynucleotide expected = new Polynucleotide(productSeq);
-        assert(prediction.equals(expected));
+        assert(cps.run(prediction,expected));
     }
 
     @Test(timeout = 3000)
@@ -196,7 +213,7 @@ public class PCRSimulatorTest2 {
         pcrSimulator.run(pcr, polys);
         Polynucleotide prediction = polys.get("pdt");
         Polynucleotide expected = new Polynucleotide(product);
-        assert(prediction.equals(expected)); 
+        assert(cps.run(prediction,expected)); 
     }
 
     @Test(timeout = 3000)
@@ -226,7 +243,7 @@ public class PCRSimulatorTest2 {
         pcrSimulator.run(pcr, polys);
         Polynucleotide prediction = polys.get(product);
         Polynucleotide expected = new Polynucleotide(productSeq);
-        assert(prediction.equals(expected));
+        assert(cps.run(prediction,expected));
     }
 
     @Test(timeout = 3000)

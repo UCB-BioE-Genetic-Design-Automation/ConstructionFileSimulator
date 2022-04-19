@@ -26,7 +26,6 @@ public class TmCalculator {
     
     }
     
-    
     public double run(char[] S1, char[] S2){
    
     

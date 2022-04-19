@@ -22,7 +22,7 @@ public class ParseOligo {
 
         Modifications mod_= Modifications.hydroxyl;
         
-        if(!oligo.contains("/")) {
+        if(!(oligo.contains("/"))) {
             Polynucleotide poly_new = new Polynucleotide(oligo,"","", false, false, false, mod_, mod_);
             return poly_new;
         }
@@ -306,7 +306,7 @@ public class ParseOligo {
         return poly_mod_new;
     }
     
-
+    
     public static void main(String[] args) throws Exception {
         
         String polyM = ("/5AmMC6/CTAGTttgacggctagcG");

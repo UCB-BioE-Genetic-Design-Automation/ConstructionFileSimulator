@@ -64,6 +64,7 @@ public class AssemblySimulator {
         for (Polynucleotide assemblyFrag : assemblyFragments) {
             List<Polynucleotide> digestFrags = digestSimulator.run(assemblyFrag, enzymeList);
             for (Polynucleotide polyTemp : digestFrags) {
+                
                 String seq = polyTemp.getSequence().toUpperCase();
                 String rcseq = revcomp.run(seq);
                 Matcher mfor = p.matcher("TTTTTTTTTTTT" + seq + "TTTTTTTTTTTT");
