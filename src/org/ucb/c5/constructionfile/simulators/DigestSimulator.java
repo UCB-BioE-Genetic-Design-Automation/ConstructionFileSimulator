@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.ucb.c5.constructionfile.model.Digestion;
+import org.ucb.c5.constructionfile.model.Modifications;
 
 /**
  * A Function that inputs a DNA sequence and a List of restriction enzymes and
@@ -121,7 +122,7 @@ public class DigestSimulator {
                 int start = m.start();
                 int end = m.end();
 
-                if (sub.isIsCircular()) {
+                if (sub.isCircular()) {
                     //Construct the linearized fragment
                     Polynucleotide frag = createLinFrag(sub, threeover, start, enz);
                     out.add(frag);
@@ -167,7 +168,8 @@ public class DigestSimulator {
             ext3 = sub.getSequence().substring(start + enz.getCut5(), start + enz.getCut3());
         }
 
-        Polynucleotide frag = new Polynucleotide(remaining, ext5, ext3);
+        Polynucleotide frag = new Polynucleotide(remaining, ext5, ext3,true,false,false,sub.getMod5(),Modifications.phos5);
+
         return frag;
     }
 
@@ -186,7 +188,8 @@ public class DigestSimulator {
         }
         String ext3 = sub.getExt3();
 
-        Polynucleotide frag = new Polynucleotide(remaining, ext5, ext3);
+        Polynucleotide frag = new Polynucleotide(remaining, ext5, ext3,true,false,false,Modifications.phos5,sub.getMod3());
+
         return frag;
     }
 
@@ -211,7 +214,8 @@ public class DigestSimulator {
         } else {
             ext3 = sub.getSequence().substring(start + enz.getCut5(), start + enz.getCut3());
         }
-        return new Polynucleotide(newseq, ext5, ext3);
+       
+        return new Polynucleotide(newseq, ext5, ext3,true,false,false,Modifications.phos5,Modifications.phos5);   //
     }
 
     public static void main(String[] args) throws Exception {

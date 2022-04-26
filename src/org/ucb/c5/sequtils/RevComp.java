@@ -9,43 +9,11 @@ import java.util.Map;
  * @author J. Christopher Anderson
  */
 public class RevComp {
-    Map<Character, String> baseToRC;
 
     public void initiate() {
-        baseToRC = new HashMap<>();
-        
-        baseToRC.put('A', "T");
-        baseToRC.put('T', "A");
-        baseToRC.put('C', "G");
-        baseToRC.put('G', "C");
-        baseToRC.put('a', "t");
-        baseToRC.put('t', "a");
-        baseToRC.put('c', "g");
-        baseToRC.put('g', "c");
-        baseToRC.put('B', "V");
-        baseToRC.put('D', "H");
-        baseToRC.put('H', "D");
-        baseToRC.put('K', "M");
-        baseToRC.put('N', "N");
-        baseToRC.put('R', "Y");
-        baseToRC.put('S', "S");
-        baseToRC.put('M', "K");
-        baseToRC.put('V', "B");
-        baseToRC.put('W', "W");
-        baseToRC.put('Y', "R");
-        baseToRC.put('b', "v");
-        baseToRC.put('d', "h");
-        baseToRC.put('h', "d");
-        baseToRC.put('k', "m");
-        baseToRC.put('n', "n");
-        baseToRC.put('r', "y");
-        baseToRC.put('s', "s");
-        baseToRC.put('v', "b");
-        baseToRC.put('w', "w");
-        baseToRC.put('y', "r");
-        baseToRC.put('m', "k");
+
     }
-    
+
     /**
      * Calculates the reverse complement of a DNA sequence preserving the case
      * of each character
@@ -57,21 +25,127 @@ public class RevComp {
         StringBuilder sb = new StringBuilder();
         for (int i = dna.length() - 1; i >= 0; i--) {
             char achar = dna.charAt(i);
-            String base = baseToRC.get(achar);
-            if(base==null) {
-                throw new IllegalArgumentException("Invalid base " + achar + " in " + dna);
-            }
+            char base = compbase(achar);
             sb.append(base);
         }
 
         return sb.toString();
     }
-    
+
+    private char compbase(char abase) {
+
+        char compbase = 'z';
+        switch (abase) {
+            case 'G':
+                compbase = 'C';
+                break;
+            case 'C':
+                compbase = 'G';
+                break;
+            case 'A':
+                compbase = 'T';
+                break;
+            case 'T':
+                compbase = 'A';
+                break;
+            case 'a':
+                compbase = 't';
+                break;
+            case 't':
+                compbase = 'a';
+                break;
+            case 'c':
+                compbase = 'g';
+                break;
+            case 'g':
+                compbase = 'c';
+                break;
+            case 'B':
+                compbase = 'V';
+                break;
+            case 'D':
+                compbase = 'H';
+                break;
+            case 'H':
+                compbase = 'D';
+                break;
+            case 'K':
+                compbase = 'M';
+                break;
+            case 'N':
+                compbase = 'N';
+                break;
+            case 'R':
+                compbase = 'Y';
+                break;
+            case 'S':
+                compbase = 'S';
+                break;
+            case 'M':
+                compbase = 'K';
+                break;
+            case 'V':
+                compbase = 'B';
+                break;
+            case 'W':
+                compbase = 'W';
+                break;
+            case 'Y':
+                compbase = 'R';
+                break;
+            case 'b':
+                compbase = 'v';
+                break;
+            case 'd':
+                compbase = 'h';
+                break;
+            case 'h':
+                compbase = 'd';
+                break;
+            case 'k':
+                compbase = 'm';
+                break;
+            case 'n':
+                compbase = 'n';
+                break;
+            case 'r':
+                compbase = 'y';
+                break;
+            case 's':
+                compbase = 's';
+                break;
+            case 'v':
+                compbase = 'b';
+                break;
+            case 'w':
+                compbase = 'w';
+                break;
+            case 'y':
+                compbase = 'r';
+                break;
+            case 'm':
+                compbase = 'k';
+                break;
+            default:
+                throw new IllegalArgumentException("No complementary base for " + abase);
+        }
+        return compbase;
+    }
+
     public static void main(String[] args) {
         RevComp revcomp = new RevComp();
+        double startTime = System.currentTimeMillis();
         revcomp.initiate();
-        
-        String rc = revcomp.run("ATGCATCCCAAATAANRW");
-        System.out.println(rc);
+        //double middleTime = System.currentTimeMillis();
+        //String rc = revcomp.run("ATGCATCCCAAATAANRW");
+        for (int i = 0; i < 1000; i++) {
+            String rc = revcomp.run("ATGCATCCCAAATAANRWATCCCAAATAANRWATCCCAAATAANRWATCCCAAATAANRWCATCCCAAATAANRWATCCCAAATAANRWATCCCAAATAANRWATCCCAAATAANRW");
+        }
+        double stopTime = System.currentTimeMillis();
+
+        System.out.println(startTime);
+        System.out.println(stopTime);
+        System.out.println(stopTime - startTime);
+
     }
 }

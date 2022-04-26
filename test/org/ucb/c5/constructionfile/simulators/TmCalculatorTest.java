@@ -26,6 +26,7 @@ public class TmCalculatorTest {
             TmCalculator tmCalculator = new TmCalculator();
             tmCalculator.initiate();
             double result = tmCalculator.run(s1.toCharArray(),s1.toCharArray());
+            System.out.println("s1 result");
             System.out.println(s1+result);
             assert(result > 72 && result <74);
     }
@@ -246,6 +247,7 @@ public class TmCalculatorTest {
             TmCalculator tmCalculator = new TmCalculator();
             tmCalculator.initiate();
             double result = tmCalculator.run(s1.toCharArray(),s1.toCharArray());
+            System.out.println("first error");
             System.out.println(s1+result);
             assert(result > 45 && result <47);
     }
