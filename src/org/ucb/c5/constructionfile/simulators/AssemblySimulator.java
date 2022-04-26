@@ -47,7 +47,7 @@ public class AssemblySimulator {
         // Test homologous region is on reverse comp
         // Test common errors and throw errors correctly (doesn't recombine correctly, 20 bp are revcomp)
         else if (enzyme == Enzyme.Gibson) { // Gibson
-            return simGibson(assemblyFragments);
+            return simGibson(assemblyFragments); 
         } else {
             throw new Exception("The given enzyme is not supported for assembly reactions");
         }
@@ -100,15 +100,17 @@ public class AssemblySimulator {
         revComp.initiate();
         while (assemblyFragments.size() > 1) {
             Polynucleotide currFrag = assemblyFragments.remove(0);
+            int currLen = currFrag.getSequence().length(); //* declared currLen outside of loop 
+            String homologyRegion = currFrag.getSequence().substring(currLen - 20); //can now use currLen
             Polynucleotide matchedFrag = null;
             int currHomologousRegionStartIndex; // The index of the beginning of the homologous region on the current strand
             int matchedHomologousRegionStartIndex; // The index of the beginning of the homologous region on the matched strand
             int matchedHomologousRegionEndIndex = 0; // Index on matchedFrag of the end of the homologous region (including 20 bp)
             for (Polynucleotide tempFrag : assemblyFragments) {
-                int currLen = currFrag.getSequence().length();
+                //int currLen = currFrag.getSequence().length(); moved this outside of the for loop
 
                 // If there is a match between the last 20 bp of currFrag and the forward strand of tempFrag
-                if (tempFrag.getSequence().contains(currFrag.getSequence().substring(currLen - 20))) {
+                if (tempFrag.getSequence().contains(homologyRegion)) {
                     matchedFrag = tempFrag;
                     matchedHomologousRegionEndIndex = 20 + tempFrag.getSequence().indexOf(currFrag.getSequence().substring(currLen - 20));
                     assemblyFragments.remove(tempFrag);
@@ -124,6 +126,10 @@ public class AssemblySimulator {
             if (matchedFrag == null) {
                 throw new Exception("The provided assembly fragments cannot be joined together because there are not enough homologous regions between them");
             }
+            //added if statement to catch degenerate base pairs 
+           if (!homologyRegion.matches("[ATCG]+")) {
+               throw new IllegalArgumentException("The provided assembly contains degenerate base pairs, assembly failed. ");
+           }
             currHomologousRegionStartIndex = currFrag.getSequence().length() - matchedHomologousRegionEndIndex;
             String currHomologousRegion = currFrag.getSequence().substring(currHomologousRegionStartIndex);
             String matchedHomologousRegion = matchedFrag.getSequence().substring(0, matchedHomologousRegionEndIndex);
@@ -145,7 +151,7 @@ public class AssemblySimulator {
             String currFragRegion = currFrag.getSequence().substring(0, currHomologousRegionStartIndex);
             String matchedFragRegion = matchedFrag.getSequence();
             Polynucleotide assembledProduct = new Polynucleotide(currFragRegion.concat(matchedFragRegion));
-            assemblyFragments.add(assembledProduct);
+            assemblyFragments.add(assembledProduct); 
         }
         Polynucleotide linearProduct = assemblyFragments.remove(0);
         String forwardStrand = linearProduct.getSequence();
@@ -162,8 +168,11 @@ public class AssemblySimulator {
         //JBAG BsmBI golden gate example
         ParseConstructionFile pCF = new ParseConstructionFile();
         pCF.initiate();
-        String text = FileUtils.readResourceFile("constructionfile/data/Construction of pJBAG.txt");
-        ConstructionFile CF = pCF.run(text); 
+
+        String text = FileUtils.readResourceFile("constructionfile/data/Construction of pTarg2.txt");
+        ConstructionFile CF = pCF.run(text);
+  
+  
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
         
         Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());

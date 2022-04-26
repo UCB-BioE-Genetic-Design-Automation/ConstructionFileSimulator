@@ -1,0 +1,49 @@
+LOCUS       p20N100                  253 bp    DNA        linear       08-MAR-2022
+DEFINITION  .
+ACCESSION   
+VERSION     
+SOURCE      .
+  ORGANISM  .
+COMMENT     
+COMMENT     
+COMMENT     ApEinfo:methylated:1
+FEATURES             Location/Qualifiers
+     primer_bind     1..20
+                     /locus_tag="G00101"
+                     /label="G00101"
+                     /ApEinfo_label="G00101"
+                     /ApEinfo_fwdcolor="#99e4fb"
+                     /ApEinfo_revcolor="#99e4fb"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     promoter        join(175..180,198..203,210..210)
+                     /locus_tag="HIGH Promoter pattern J23100 - A"
+                     /label="HIGH Promoter pattern J23100 - A"
+                     /ApEinfo_label="HIGH Promoter pattern J23100 - A"
+                     /ApEinfo_fwdcolor="Blue"
+                     /ApEinfo_revcolor="Blue"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     CDS             235..253
+                     /locus_tag="amilGFP"
+                     /label="amilGFP"
+                     /ApEinfo_label="amilGFP"
+                     /ApEinfo_fwdcolor="#ffef13"
+                     /ApEinfo_revcolor="#ffef13"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+     terminator      113..154
+                     /locus_tag="T5"
+                     /label="T5"
+                     /ApEinfo_label="T5"
+                     /ApEinfo_fwdcolor="IndianRed"
+                     /ApEinfo_revcolor="IndianRed"
+                     /ApEinfo_graphicformat="arrow_data {{0 1 2 0 0 -1} {} 0}
+                     width 5 offset 0"
+ORIGIN
+        1 attaccgcct ttgagtgagc tgataccgct cgccgcagcc gaacgaccga gcgcagcgag
+       61 tcagtgagcg aggaagcctg caaCTCGAGt GAGGAGGTCT CAccctACTA GAGCATAAGT
+      121 TGAGGACTCC TTCGGGAGTC CTTTTTTATT TTCCCAGGTG GTATGGAAGC TATCttgacg
+      181 tcttcagtat tatgtggtac agtcgagtcA GGATCCaaat aggagaaata ctagATGTCT
+      241 TATTCAAAGC ATG    
+//

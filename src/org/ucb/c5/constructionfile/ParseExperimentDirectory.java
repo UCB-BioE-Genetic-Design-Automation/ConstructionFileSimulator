@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+
 import org.ucb.c5.constructionfile.model.ConstructionFile;
 import org.ucb.c5.constructionfile.model.Experiment;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
@@ -16,7 +17,6 @@ import org.ucb.c5.utils.FileUtils;
 import org.ucb.c5.utils.Log;
 
 /**
- *
  * @author Zihang Shao
  */
 public class ParseExperimentDirectory {
@@ -42,11 +42,55 @@ public class ParseExperimentDirectory {
             if (file.getName().toLowerCase().startsWith("construction")) {
                 cfs.add(runCF(file));
             } else {
-                nameToPoly.putAll(runSeq(file));
+                Map<String, Polynucleotide> newSeq = runSeq(file);
+                for (Map.Entry<String, Polynucleotide> entry : newSeq.entrySet()) {
+                    AddToMapNoRepetition(entry.getValue(), entry.getKey(), nameToPoly);
+                }
             }
         }
-        
+        for (ConstructionFile cf : cfs) {
+            checkRepeat(cf, nameToPoly);
+        }
+
         return new Experiment(dir.getAbsolutePath(), cfs, nameToPoly);
+    }
+
+    /**
+     * check repeat sequences between construction file and nameToPoly map
+     * if there is an conflict that one name has two different sequences, throw an IllegalArgumentException
+     * @param cf
+     * @param nameToPoly
+     * @throws IllegalArgumentException
+     */
+    private void checkRepeat(ConstructionFile cf, Map<String, Polynucleotide> nameToPoly) throws IllegalArgumentException {
+        Map<String, Polynucleotide> cfMap = cf.getSequences();
+        if (cfMap.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, Polynucleotide> entry : cfMap.entrySet()) {
+            Polynucleotide poly = nameToPoly.get(entry.getKey());
+            if (poly != null && !entry.getValue().equals(poly)) {
+                throw new IllegalArgumentException("different Polynucleotide sequences of " + entry.getKey());
+            }
+        }
+    }
+
+    /**
+     * add new sequence to map when there is no repetition
+     * if there is a conflict that two different sequences have the same name, throw an IllegalArgument exception.
+     * Else, add the new Entry to the nameToPloy map
+     * @param newPoly
+     * @param nameToPoly
+     * @param name
+     */
+    private void AddToMapNoRepetition(Polynucleotide newPoly, String name, Map<String, Polynucleotide> nameToPoly) {
+        Polynucleotide existPoly = nameToPoly.get(name);
+        if (existPoly == null || existPoly.equals(newPoly)) {
+            nameToPoly.put(name, newPoly);
+        } else {
+            throw new IllegalArgumentException("Two different polynucleotides:" + newPoly +
+                    "and " + existPoly + "with same name:" + name);
+        }
     }
 
     //Recursive folder parser
@@ -109,13 +153,11 @@ public class ParseExperimentDirectory {
                 Polynucleotide oligo = po.run(seq);
                 
                 nameToPoly.put(name,oligo);
-                
-                //if(!seq.matches("[ACGTRYSWKMBDHVNacgtryswkmbdhvn]+")) {
-                //    throw new Exception("Oligo file has non-DNA sequence:\n" + seq);
-                //}
-                //nameToPoly.put(name, new Polynucleotide(seq, "", "", false, false, false));
-                
-                
+              
+               //Polynucleotide newPoly = new Polynucleotide(seq, "", "", false, false, false);
+               //AddToMapNoRepetition(newPoly, name, nameToPoly);
+              
+
                 Log.info("Added oligo:\t" + name + "\t" + seq);
                 Log.seq(name, seq, "oligo seq parse from tsv files");
             }
@@ -132,10 +174,11 @@ public class ParseExperimentDirectory {
 
             String rawSeq = fileContent.substring(origin + 6);
             String seqContent = rawSeq.replaceAll("[^A-za-z]", "");
-            if(!seqContent.matches("[ACGTRYSWKMBDHVNacgtryswkmbdhvn]+")) {
+            if (!seqContent.matches("[ACGTRYSWKMBDHVNacgtryswkmbdhvn]+")) {
                 throw new IllegalArgumentException("Sequence " + seqName + "is not DNA");
             }
-            nameToPoly.put(seqName, new Polynucleotide(seqContent, true));
+            Polynucleotide newPoly = new Polynucleotide(seqContent, true);
+            AddToMapNoRepetition(newPoly, seqName, nameToPoly);
             Log.info("Added plasmid:\t" + seqName + " of length " + seqContent.length());
             Log.seq(seqName, seqContent, "plasmid seq parse from gb files");
         }
@@ -152,7 +195,6 @@ public class ParseExperimentDirectory {
         parseFolder.initiate();
 
         Experiment exp = parseFolder.run(dirPath);
-        
         //for debug
         System.out.print(exp);
     }
