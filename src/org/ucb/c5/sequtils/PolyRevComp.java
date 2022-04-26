@@ -1,5 +1,6 @@
 package org.ucb.c5.sequtils;
 
+import org.ucb.c5.constructionfile.model.Modifications;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 import org.ucb.c5.utils.SequenceUtils;
 
@@ -16,7 +17,7 @@ public class PolyRevComp {
         revcomp.initiate();
     }
 
-    public Polynucleotide run(Polynucleotide frag) throws Exception {
+    public Polynucleotide run(Polynucleotide frag) throws Exception {          
         String rc = revcomp.run(frag.getSequence());
 
         String new5 = null;
@@ -35,19 +36,25 @@ public class PolyRevComp {
         } else {
             new3 = revcomp.run(frag.getExt5());
         }
-
-        Polynucleotide out = new Polynucleotide(rc, new5, new3);
+        
+        
+        //flip the modifications
+        Polynucleotide out = new Polynucleotide(rc, new5, new3,frag.isIsDoubleStranded(),false,false,frag.getMod3(),frag.getMod5());
+        
+        
         return out;
     }
 
     public static void main(String[] args) throws Exception {
         PolyRevComp revcomp = new PolyRevComp();
-
+        revcomp.initiate();
         {
             System.out.println("Demo a BamHI/EcoRI digested DNA with 5' sticky ends");
             String ext5 = "GATC";
             String ext3 = "AATT";
             Polynucleotide poly = new Polynucleotide("caaacccg", ext5, ext3);
+            
+            System.out.println("poly.tostring");
             System.out.println(poly.toString());
 
             Polynucleotide rc = revcomp.run(poly);
@@ -74,6 +81,19 @@ public class PolyRevComp {
 
             Polynucleotide rc = revcomp.run(poly);
             System.out.println(rc.toString());
+        }
+        
+        {
+            System.out.println("Demo a synthetic DNA with modified ends");
+            String ext5 = "CCCT";
+            String ext3 = "-GAAA";
+            Polynucleotide poly = new Polynucleotide("ttttt", ext5, ext3,true,false,false,Modifications.ILink12,Modifications.ATTO590N);
+            System.out.println(poly.toString());
+
+            Polynucleotide rc = revcomp.run(poly);
+            System.out.println(rc.toString());
+            
+            
         }
     }
 }

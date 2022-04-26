@@ -17,10 +17,18 @@ import org.ucb.c5.constructionfile.model.Step;
  */
 public class ParseConstructionFileTest {
     
-    private Polynucleotide createPoly(String seq) {
+    private Polynucleotide createPoly(String seq) throws Exception {
         //If it's an oligo
         if(seq.length() < 100) {
-            return new Polynucleotide(seq, "", "", false, false, false);
+
+            ParseOligo po = new ParseOligo();
+            Polynucleotide oligo = po.run(seq);
+                    
+            //return new Polynucleotide
+            return oligo;
+            
+            //return new Polynucleotide(seq, "", "", false, false, false); ORIGINAL
+            //String sequence, String ext5, String ext3, boolean isDoubleStranded, boolean isRNA, boolean isCircular, Modifications mod_ext3, Modifications mod_ext5
         }
         
         //If it's a plasmid

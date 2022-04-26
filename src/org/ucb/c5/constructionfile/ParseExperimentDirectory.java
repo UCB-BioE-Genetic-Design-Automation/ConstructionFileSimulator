@@ -20,8 +20,11 @@ import org.ucb.c5.utils.Log;
  * @author Zihang Shao
  */
 public class ParseExperimentDirectory {
-
+    
+    private ParseOligo po;
+    
     public void initiate() {
+        ParseOligo po = new ParseOligo();
     }
 
     public Experiment run(String dirPath) throws Exception {
@@ -122,7 +125,8 @@ public class ParseExperimentDirectory {
     private Map<String, Polynucleotide> runSeq(File afile) throws IOException, Exception {
         Log.info("Extracting sequences from: " + afile.getAbsolutePath());
         Map<String, Polynucleotide> nameToPoly = new HashMap<>();
-
+        
+        
         //read .txt or .tsv files with oligo sequences
         if (afile.getName().endsWith(".txt") || afile.getName().endsWith(".tsv")) {
 
@@ -144,11 +148,16 @@ public class ParseExperimentDirectory {
                 String[] tabs = str.split("\t");
                 String name = tabs[0];
                 String seq = tabs[1];
-                if (!seq.matches("[ACGTRYSWKMBDHVNacgtryswkmbdhvn]+")) {
-                    throw new Exception("Oligo file has non-DNA sequence:\n" + seq);
-                }
-                Polynucleotide newPoly = new Polynucleotide(seq, "", "", false, false, false);
-                AddToMapNoRepetition(newPoly, name, nameToPoly);
+                
+                //parse oligo
+                Polynucleotide oligo = po.run(seq);
+                
+                nameToPoly.put(name,oligo);
+              
+               //Polynucleotide newPoly = new Polynucleotide(seq, "", "", false, false, false);
+               //AddToMapNoRepetition(newPoly, name, nameToPoly);
+              
+
                 Log.info("Added oligo:\t" + name + "\t" + seq);
                 Log.seq(name, seq, "oligo seq parse from tsv files");
             }

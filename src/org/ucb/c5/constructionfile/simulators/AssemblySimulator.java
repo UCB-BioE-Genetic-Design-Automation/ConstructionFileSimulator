@@ -64,6 +64,7 @@ public class AssemblySimulator {
         for (Polynucleotide assemblyFrag : assemblyFragments) {
             List<Polynucleotide> digestFrags = digestSimulator.run(assemblyFrag, enzymeList);
             for (Polynucleotide polyTemp : digestFrags) {
+                
                 String seq = polyTemp.getSequence().toUpperCase();
                 String rcseq = revcomp.run(seq);
                 Matcher mfor = p.matcher("TTTTTTTTTTTT" + seq + "TTTTTTTTTTTT");
@@ -167,9 +168,13 @@ public class AssemblySimulator {
         //JBAG BsmBI golden gate example
         ParseConstructionFile pCF = new ParseConstructionFile();
         pCF.initiate();
+
         String text = FileUtils.readResourceFile("constructionfile/data/Construction of pTarg2.txt");
         ConstructionFile CF = pCF.run(text);
+  
+  
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
+        
         Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
         System.out.println(product.getSequence());
     }

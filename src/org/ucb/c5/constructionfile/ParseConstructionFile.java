@@ -126,7 +126,7 @@ public class ParseConstructionFile {
         }
     }
 
-    private void processSequences(String seqSection, HashMap<String, Polynucleotide> sequences) {
+    private void processSequences(String seqSection, HashMap<String, Polynucleotide> sequences) throws Exception {
         //Handle if it is a list of FASTA
         if (seqSection.contains(">")) {
             String[] fseqs = seqSection.split(">");
@@ -186,10 +186,22 @@ public class ParseConstructionFile {
         }
     }
 
-    private Polynucleotide createPoly(String seq) {
+    private Polynucleotide createPoly(String seq) throws Exception {
         //If it's an oligo
+        
+        //parse oligo
+
         if (seq.length() < 100) {
-            return new Polynucleotide(seq, "", "", false, false, false);
+            //run parse oligo
+            
+            ParseOligo po = new ParseOligo();
+            Polynucleotide oligo = po.run(seq);
+            
+            //return new Polynucleotide
+            return oligo;
+            
+            
+            //return parse Polynucleotide(seq, "", "", false, false, false);
         }
 
         //If it's a plasmid
@@ -529,6 +541,11 @@ public class ParseConstructionFile {
 
         String text = FileUtils.readResourceFile("constructionfile/data/Construction of aspC1.txt");
         ConstructionFile cf = pCF.run(text);
+        
+        for (String name:cf.getSequences().keySet()){
+            System.out.println(name);
+            System.out.println(cf.getSequences().get(name));
+        }
 
         System.out.println(cf.toString());
     }
