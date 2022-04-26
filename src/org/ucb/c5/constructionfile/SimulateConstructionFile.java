@@ -126,8 +126,8 @@ public class SimulateConstructionFile {
     private void simulateDigest(Digestion digestion, Map<String, Polynucleotide> fragments) throws Exception {
         //Log it
         String enzlog = "";
-        for(Enzyme enz : digestion.getEnzymes()) {
-            enzlog+=enz.name();
+        for(String enz : digestion.getEnzymes()) {
+            enzlog+=enz;
             enzlog+=", ";
         }
         enzlog = enzlog.substring(0, enzlog.length()-2);

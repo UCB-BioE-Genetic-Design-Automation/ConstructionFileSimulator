@@ -411,13 +411,13 @@ public class ParseConstructionFile {
     }
 
     private Step createDigest(String substrate, String[] enzymes, String fragsel, String product) {
-        List<Enzyme> enzList = new ArrayList<>();
+        List<String> enzList = new ArrayList<>();
         for (String enz : enzymes) {
-            Enzyme enzyme;
+            String enzyme;
             try {
-                enzyme = Enzyme.valueOf(enz);
+                enzyme = enz;
             } catch (Exception IllegalArgumentException) {
-                enzyme = Enzyme.valueOf(enz.toLowerCase());
+                enzyme = enz.toLowerCase();
             }
             enzList.add(enzyme);
         }
@@ -441,9 +441,9 @@ public class ParseConstructionFile {
     }
 
     private Step createAssemble(String[] fragments, String enzyme, String product) {
-        Enzyme ez;
+        String ez;
         try {
-            ez = Enzyme.valueOf(enzyme);
+            ez = enzyme;
         } catch (Exception err) {
             Log.severe(enzyme + " is not a valid enzyme name");
             throw err;

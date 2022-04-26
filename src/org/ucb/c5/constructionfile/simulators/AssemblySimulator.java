@@ -2,7 +2,7 @@ package org.ucb.c5.constructionfile.simulators;
 
 import org.ucb.c5.sequtils.RestrictionEnzymeFactory;
 import org.ucb.c5.constructionfile.model.Assembly;
-import org.ucb.c5.constructionfile.model.Enzyme;
+//import org.ucb.c5.constructionfile.model.Enzyme;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 import org.ucb.c5.constructionfile.model.RestrictionEnzyme;
 import org.ucb.c5.sequtils.RevComp;
@@ -22,6 +22,7 @@ public class AssemblySimulator {
 
     DigestSimulator digestSimulator;
     LigateSimulator ligateSimulator;
+    RestrictionEnzymeFactory resEnzFactory;
     RevComp revcomp;
 
     public void initiate() throws Exception {
@@ -30,6 +31,8 @@ public class AssemblySimulator {
         digestSimulator.initiate();
         ligateSimulator = new LigateSimulator();
         ligateSimulator.initiate();
+        resEnzFactory = new RestrictionEnzymeFactory();
+        resEnzFactory.initiate();
         revcomp = new RevComp();
         revcomp.initiate();
     }
@@ -40,24 +43,23 @@ public class AssemblySimulator {
         for (String name : assemblyNames) {
             assemblyFragments.add(fragments.get(name));
         }
-        Enzyme enzyme = assembly.getEnzyme();
-        if (enzyme == Enzyme.BsmBI || enzyme == Enzyme.BsaI) {
-            return simGoldenGate(enzyme, assemblyFragments);
-        } // Test multiple fragment assembly
-        // Test homologous region is on reverse comp
-        // Test common errors and throw errors correctly (doesn't recombine correctly, 20 bp are revcomp)
-        else if (enzyme == Enzyme.Gibson) { // Gibson
+        //Changed
+        String enzyme = assembly.getEnzyme();
+        if (enzyme.equals("Gibson")) { // Gibson
             return simGibson(assemblyFragments); 
-        } else {
-            throw new Exception("The given enzyme is not supported for assembly reactions");
         }
+        
+// Test multiple fragment assembly
+        // Test homologous region is on reverse comp
+        // Test common errors and throw errors correctly (doesn't recombine correctly, 20 bp are revcomp) 
+        return simGoldenGate(enzyme, assemblyFragments);
     }
 
-    private Polynucleotide simGoldenGate(Enzyme enzyme, List<Polynucleotide> assemblyFragments) throws Exception {
+    private Polynucleotide simGoldenGate(String enzyme, List<Polynucleotide> assemblyFragments) throws Exception {
         //Find all the BsaI site-free fragments of the digestion products of each sequence using the given enzyme and put into a list
         List<Polynucleotide> validFrags = new ArrayList<>();
         List<RestrictionEnzyme> enzymeList = new ArrayList<>();
-        RestrictionEnzyme res = new RestrictionEnzymeFactory().run(enzyme);
+        RestrictionEnzyme res = resEnzFactory.run(enzyme);
         enzymeList.add(res);
         Pattern p = Pattern.compile(res.getSite());
 
