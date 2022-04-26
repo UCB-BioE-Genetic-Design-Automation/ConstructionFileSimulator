@@ -107,7 +107,7 @@ public class DigestSimulator {
      */
     private List<Polynucleotide> cutOnce(Polynucleotide sub, List<RestrictionEnzyme> enzymes) {
         List<Polynucleotide> out = new ArrayList<>();
-
+        
         for (RestrictionEnzyme enz : enzymes) {
             //Check if the enzyme is a 3' overhanger
             boolean threeover = false;
@@ -121,7 +121,7 @@ public class DigestSimulator {
             while (m.find()) {
                 int start = m.start();
                 int end = m.end();
-
+                
                 if (sub.isCircular()) {
                     //Construct the linearized fragment
                     Polynucleotide frag = createLinFrag(sub, threeover, start, enz);

@@ -1,5 +1,6 @@
 package org.ucb.c5.constructionfile;
 
+import java.io.File;
 import org.junit.Test;
 
 /**
@@ -66,7 +67,7 @@ public class ParseExperimentDirectoryTest {
             assert(true);
         }
     }
-
+    
     @Test
     /**
      * Runs the parser on an Experiment folder containing a modified version
@@ -79,6 +80,7 @@ public class ParseExperimentDirectoryTest {
         try {
             String relative = "/test/org/ucb/c5/constructionfile/data/lyc20_repeat3";
             String absolute = getResourcePath(relative);
+            System.out.println(absolute);
             parseFolder.run(absolute);
             assert(false);
         } catch (IllegalArgumentException e) {
@@ -92,10 +94,9 @@ public class ParseExperimentDirectoryTest {
      * @return
      */
     private static String getResourcePath(String relativePath) {
-        String projectDir = System.getProperty("user.dir");
-        if (relativePath.charAt(0) != '/') {
-            projectDir = projectDir + '/';
-        }
-        return projectDir + relativePath;
+        
+        File currentDirFile = new File("");
+        return currentDirFile.getAbsolutePath() + relativePath;
+        
     }
 }

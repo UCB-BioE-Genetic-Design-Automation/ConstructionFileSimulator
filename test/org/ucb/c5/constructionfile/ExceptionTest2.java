@@ -13,7 +13,7 @@ import org.junit.Test;
  * @author J. Christopher Anderson
  */
 public class ExceptionTest2 {
-
+    
     @Test
     public void undigestedGoldenGateFragmentsTest() throws Exception {
         ParseConstructionFile pCF = new ParseConstructionFile();

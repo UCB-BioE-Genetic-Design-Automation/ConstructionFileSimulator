@@ -14,7 +14,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.ucb.c5.constructionfile.ParseOligo;
-import org.ucb.c5.constructionfile.model.Enzyme;
 import org.ucb.c5.constructionfile.model.Modifications;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 import org.ucb.c5.constructionfile.model.RestrictionEnzyme;
@@ -45,19 +44,20 @@ public class DigestSimulatorTest1 {
 
     @Test(timeout = 3000)
     public void testDigest_linear() throws Exception {
-        System.out.println("linear");
         RestrictionEnzymeFactory factory = new RestrictionEnzymeFactory();
         factory.initiate();
         DigestSimulator dig = new DigestSimulator();
         dig.initiate();
-
-        Polynucleotide poly = new Polynucleotide("AAAGAATTCAAA", "", "", true, false, false, Modifications.Alex456N, Modifications.TET);
+                                                      //AAAGAATTCAAA
+        Polynucleotide poly = new Polynucleotide("CACACCAAAGAATTCAAACC", "", "", true, false, false, Modifications.Alex456N, Modifications.TET);
 
         List<RestrictionEnzyme> enz = new ArrayList<>();
-        enz.add(factory.run(Enzyme.EcoRI));
+        //the last int in restriction enzymes
+        enz.add(factory.run("EcoRI"));
 
         List<Polynucleotide> pdts = dig.run(poly, enz);
-
+        
+        
         Polynucleotide frag1 = pdts.get(0);
         Polynucleotide frag2 = pdts.get(1);
 
@@ -66,14 +66,16 @@ public class DigestSimulatorTest1 {
 
         assert (frag1.getMod5() == Modifications.Alex456N);
         assert (frag1.getMod3() == Modifications.phos5);
+        
+         System.out.println(frag1.getExt3());
 
-        assert (frag1.getSequence().equals("AAAG"));
+        assert (frag1.getSequence().equals("CACACCAAAG"));
         assert (frag1.getExt3().equals("AATT"));
 
         assert (frag2.getMod5() == Modifications.phos5);
         assert (frag2.getMod3() == Modifications.TET);
 
-        assert (frag2.getSequence().equals("CAAA"));
+        assert (frag2.getSequence().equals("CAAACC"));
         assert (frag2.getExt5().equals("AATT"));
     }
 
@@ -85,11 +87,11 @@ public class DigestSimulatorTest1 {
         DigestSimulator dig = new DigestSimulator();
         dig.initiate();
 
-        //EcoR1 site circular example
+        //EcoR1 site circular example                   
         Polynucleotide poly_circ = new Polynucleotide("AAAGAATTCAAA", "", "", true, false, true, Modifications.circular, Modifications.circular);
 
         List<RestrictionEnzyme> enz_c = new ArrayList<>();
-        enz_c.add(factory.run(Enzyme.EcoRI));
+        enz_c.add(factory.run("EcoRI"));
 
         List<Polynucleotide> pdts_c = dig.run(poly_circ, enz_c);
 
