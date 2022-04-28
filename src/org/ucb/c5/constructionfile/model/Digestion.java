@@ -40,6 +40,13 @@ public class Digestion implements Step {
         return product;
     }
 
+    @Override
+    public List<String> getInputs() {
+        List<String> inputs = new ArrayList<String>();
+        inputs.add(getSubstrate()) ;
+        return inputs;
+    }
+
     public int getFragSelection() {
         return fragSelection;
     }

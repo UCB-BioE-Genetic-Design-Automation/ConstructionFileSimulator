@@ -176,8 +176,8 @@ public class AssemblySimulator {
   
   
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
-        
-        Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
+        ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
+        Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
         System.out.println(product.getSequence());
     }
 }

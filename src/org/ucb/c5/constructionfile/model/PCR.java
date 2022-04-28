@@ -6,6 +6,7 @@
 
 package org.ucb.c5.constructionfile.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,15 +19,16 @@ public class PCR implements Step {
     private final String oligo2;
     private final List<String> templates;
     private final String product;
-    private final Integer size;
+    //Removed size from PCR class
+
     
 
-    public PCR(String oligo1, String oligo2, List<String> templates, String product, Integer size) {
+    public PCR(String oligo1, String oligo2, List<String> templates, String product) {
         this.oligo1 = oligo1;
         this.oligo2 = oligo2;
         this.templates = templates;
         this.product = product;
-        this.size = size;
+
     }
 
     public String getOligo1() {
@@ -45,15 +47,23 @@ public class PCR implements Step {
     public String getProduct() {
         return product;
     }
-    
+
+    @Override
+    public List<String> getInputs() {
+        List<String> inputs = new ArrayList<String>();
+        inputs.add(oligo1);
+        inputs.add(oligo2);
+        for (String addingTemplates: templates) {
+            inputs.add(addingTemplates);
+        }
+        return inputs;
+    }
+
     @Override
     public Operation getOperation() {
         return Operation.pcr;
     }
 
-    public Integer getSize() {
-        return size;
-    }
     
     @Override
     public String toString() {

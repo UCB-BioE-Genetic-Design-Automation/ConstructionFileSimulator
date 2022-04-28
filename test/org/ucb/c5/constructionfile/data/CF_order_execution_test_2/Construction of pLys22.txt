@@ -1,0 +1,3 @@
+PCR olys15/olys16 on pGFP1            (gfp)PCR olys17/olys18 on pLys9-B2         (back9)
+Assemble gfp,back9            (BsaI, pLys22)
+Transform pLys22              (Mach1, Amp)

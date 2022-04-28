@@ -1,0 +1,4 @@
+PCR olys12/olys13 on lambda       (Ls1)
+PCR olys14/tb4R on pLys22       (sB1)
+Assemble Ls1,sB1                    (BsaI, pLys24)
+Transform pLys24                  (Mach1, Amp)

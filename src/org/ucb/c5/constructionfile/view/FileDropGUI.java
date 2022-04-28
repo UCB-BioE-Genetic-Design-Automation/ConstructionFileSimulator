@@ -15,7 +15,10 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import javax.swing.*;
 import javax.swing.border.Border;
+
+import org.ucb.c5.constructionfile.ParseExperimentDirectory;
 import org.ucb.c5.constructionfile.SimulateExperimentDirectory;
+import org.ucb.c5.constructionfile.model.Experiment;
 import org.ucb.c5.utils.FileUtils;
 import org.ucb.c5.utils.Log;
 
@@ -76,10 +79,15 @@ public class FileDropGUI extends JFrame {
                     try {
                         String dirPath = files[i].getCanonicalPath();
 
+                        ParseExperimentDirectory parseFolder = new ParseExperimentDirectory();
+                        parseFolder.initiate();
+                        Experiment exp = parseFolder.run(dirPath);
+
                         //Simulate the experiment and write results
                         SimulateExperimentDirectory sed = new SimulateExperimentDirectory();
                         sed.initiate();
-                        sed.run(dirPath);
+                        //sed.run(dirPath);
+                        sed.run(exp);
                         Log.info("--> -->  Success!!");
                         imgLabel.setBorder(greenborder);
                     } catch (Exception ex) {

@@ -18,7 +18,8 @@ public class ValidateConstructionFile {
     }
     public boolean run(ConstructionFile CF, Polynucleotide product) throws Exception {
         SimulateConstructionFile simulator = new SimulateConstructionFile();
-        Polynucleotide seq = simulator.run(CF, new HashMap<>());
+        ConstructionFile outputConstructionFile = simulator.run(CF, new HashMap<>());
+        Polynucleotide seq = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
         // Take into account that the product may be rotated
         return (seq.equals(product));
     }

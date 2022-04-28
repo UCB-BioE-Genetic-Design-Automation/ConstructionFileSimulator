@@ -36,7 +36,8 @@ public class ExceptionTest2 {
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
         simulateConstructionFile.initiate();
         try {
-            Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
+            ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
+            Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
             assert (false);
         } catch (IllegalArgumentException e) {
             assert (true);

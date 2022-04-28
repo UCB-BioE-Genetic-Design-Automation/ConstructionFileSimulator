@@ -24,7 +24,8 @@ public class ParseExperimentDirectory {
     private ParseOligo po;
     
     public void initiate() {
-        ParseOligo po = new ParseOligo();
+//        ParseOligo po = new ParseOligo();
+        po = new ParseOligo();
     }
 
     public Experiment run(String dirPath) throws Exception {
