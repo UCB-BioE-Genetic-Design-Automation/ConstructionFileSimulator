@@ -35,4 +35,9 @@ public class Assembly implements Step {
     public String getProduct() {
         return product;
     }
+
+    @Override
+    public List<String> getInputs() {
+        return getFragments();
+    }
 }

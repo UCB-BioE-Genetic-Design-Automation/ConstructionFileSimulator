@@ -38,5 +38,12 @@ public String getSubstrate() {
     @Override
     public String getProduct() {
         return product;
-    }    
+    }
+
+    @Override
+    public List<String> getInputs() {
+        List<String> inputs = new ArrayList<String>();
+        inputs.add(getSubstrate());
+        return inputs;
+    }
 }

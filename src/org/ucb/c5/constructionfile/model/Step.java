@@ -1,5 +1,8 @@
 package org.ucb.c5.constructionfile.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author J. Christopher Anderson
@@ -7,4 +10,5 @@ package org.ucb.c5.constructionfile.model;
 public interface Step {
     public Operation getOperation();
     public String getProduct();
+    public List<String> getInputs();
 }

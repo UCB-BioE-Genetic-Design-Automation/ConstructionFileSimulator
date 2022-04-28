@@ -1,5 +1,6 @@
 package org.ucb.c5.constructionfile.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,5 +29,11 @@ public class PCA implements Step {
     @Override
     public Operation getOperation() {
         return Operation.pca;
+    }
+
+
+    @Override
+    public List<String> getInputs() {
+        return getOligoPool();
     }
 }

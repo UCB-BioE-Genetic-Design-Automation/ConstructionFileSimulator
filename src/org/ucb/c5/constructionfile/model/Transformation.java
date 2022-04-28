@@ -49,4 +49,11 @@ public class Transformation implements Step {
     public String getProduct() {
         return product;
     }
+
+    @Override
+    public List<String> getInputs() {
+        List<String> inputs = new ArrayList<String>();
+        inputs.add(getDna());
+        return inputs;
+    }
 }
