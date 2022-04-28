@@ -32,8 +32,8 @@ public class tester {
 
         templates.add(new Polynucleotide(data, true));
 
-        String pdt = sim.run(odxs3, odxs4, templates);
-        System.out.println(pdt);
+//        String pdt = sim.run(odxs3, odxs4, templates);
+//        System.out.println(pdt);
     }
 
 }

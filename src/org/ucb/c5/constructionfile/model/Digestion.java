@@ -9,11 +9,11 @@ import java.util.List;
  */
 public class Digestion implements Step {
     private final String substrate;
-    private final List<Enzyme> enzymes;
+    private final List<String> enzymes;
     private final int fragSelection;
     private final String product;
 
-    public Digestion(String substrate, List<Enzyme> enzymes, int fragSelection, String product) {
+    public Digestion(String substrate, List<String> enzymes, int fragSelection, String product) {
         this.substrate = substrate;
         this.enzymes = enzymes;
         this.product = product;
@@ -22,7 +22,7 @@ public class Digestion implements Step {
         substrates.add(substrate);
     }
     
-    public List<Enzyme> getEnzymes() {
+    public List<String> getEnzymes() {
         return enzymes;
     }
 

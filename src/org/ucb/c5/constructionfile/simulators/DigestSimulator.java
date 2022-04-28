@@ -2,7 +2,6 @@ package org.ucb.c5.constructionfile.simulators;
 
 import org.ucb.c5.sequtils.PolyRevComp;
 import org.ucb.c5.sequtils.RestrictionEnzymeFactory;
-import org.ucb.c5.constructionfile.model.Enzyme;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 import org.ucb.c5.constructionfile.model.RestrictionEnzyme;
 
@@ -12,6 +11,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.ucb.c5.constructionfile.model.Digestion;
+import org.ucb.c5.constructionfile.model.Modifications;
 
 /**
  * A Function that inputs a DNA sequence and a List of restriction enzymes and
@@ -44,7 +44,7 @@ public class DigestSimulator {
 
         RestrictionEnzymeFactory rezfactory = new RestrictionEnzymeFactory();
         rezfactory.initiate();
-        for (Enzyme enz : dig.getEnzymes()) {
+        for (String enz : dig.getEnzymes()) {
             enzymes.add(rezfactory.run(enz));
         }
 
@@ -107,7 +107,7 @@ public class DigestSimulator {
      */
     private List<Polynucleotide> cutOnce(Polynucleotide sub, List<RestrictionEnzyme> enzymes) {
         List<Polynucleotide> out = new ArrayList<>();
-
+        
         for (RestrictionEnzyme enz : enzymes) {
             //Check if the enzyme is a 3' overhanger
             boolean threeover = false;
@@ -121,12 +121,19 @@ public class DigestSimulator {
             while (m.find()) {
                 int start = m.start();
                 int end = m.end();
-
-                if (sub.isIsCircular()) {
+                
+                if (sub.isCircular()) {
                     //Construct the linearized fragment
                     Polynucleotide frag = createLinFrag(sub, threeover, start, enz);
                     out.add(frag);
-                } else {
+                } else { //If it's linear
+                    //check the distance in  restrictionenzyme object, if not pass continue 
+                    if(start < enz.getMinCleavageDistance()) {
+                        continue;
+                    }
+                    if((sub.getSequence().length()-end) < enz.getMinCleavageDistance()) {
+                        continue;
+                    }
                     //Construct the 5' remaining fragment
                     Polynucleotide frag5 = create5Frag(sub, threeover, start, enz);
                     out.add(frag5);
@@ -135,13 +142,15 @@ public class DigestSimulator {
                     Polynucleotide frag3 = create3Frag(sub, threeover, start, enz);
                     out.add(frag3);
                 }
-
+                
+              
                 return out;
             }
         }
 
-        //Returns null if nothing is found
+        //Returns null if nothing is found //return null may allow failed digests to continue?
         return null;
+        
     }
 
     private Polynucleotide create5Frag(Polynucleotide sub, boolean threeover, int start, RestrictionEnzyme enz) {
@@ -159,7 +168,8 @@ public class DigestSimulator {
             ext3 = sub.getSequence().substring(start + enz.getCut5(), start + enz.getCut3());
         }
 
-        Polynucleotide frag = new Polynucleotide(remaining, ext5, ext3);
+        Polynucleotide frag = new Polynucleotide(remaining, ext5, ext3,true,false,false,sub.getMod5(),Modifications.phos5);
+
         return frag;
     }
 
@@ -178,7 +188,8 @@ public class DigestSimulator {
         }
         String ext3 = sub.getExt3();
 
-        Polynucleotide frag = new Polynucleotide(remaining, ext5, ext3);
+        Polynucleotide frag = new Polynucleotide(remaining, ext5, ext3,true,false,false,Modifications.phos5,sub.getMod3());
+
         return frag;
     }
 
@@ -203,7 +214,8 @@ public class DigestSimulator {
         } else {
             ext3 = sub.getSequence().substring(start + enz.getCut5(), start + enz.getCut3());
         }
-        return new Polynucleotide(newseq, ext5, ext3);
+       
+        return new Polynucleotide(newseq, ext5, ext3,true,false,false,Modifications.phos5,Modifications.phos5);   //
     }
 
     public static void main(String[] args) throws Exception {
@@ -218,7 +230,7 @@ public class DigestSimulator {
             System.out.println(poly);
             System.out.println("fragments:");
             List<RestrictionEnzyme> enz = new ArrayList<>();
-            enz.add(factory.run(Enzyme.BamHI));
+            enz.add(factory.run("BamHI"));
 
             List<Polynucleotide> pdts = dig.run(poly, enz);
 
@@ -238,7 +250,7 @@ public class DigestSimulator {
             System.out.println("fragments:");
 
             List<RestrictionEnzyme> enz = new ArrayList<>();
-            enz.add(factory.run(Enzyme.BsaI));
+            enz.add(factory.run("BsaI"));
 
             List<Polynucleotide> pdts = dig.run(poly, enz);
 
@@ -258,7 +270,7 @@ public class DigestSimulator {
             System.out.println("fragments:");
 
             List<RestrictionEnzyme> enz = new ArrayList<>();
-            enz.add(factory.run(Enzyme.BsaI));
+            enz.add(factory.run("BsaI"));
 
             List<Polynucleotide> pdts = dig.run(poly, enz);
 
@@ -277,7 +289,7 @@ public class DigestSimulator {
             System.out.println("fragments:");
 
             List<RestrictionEnzyme> enz = new ArrayList<>();
-            enz.add(factory.run(Enzyme.PstI));
+            enz.add(factory.run("PstI"));
 
             List<Polynucleotide> pdts = dig.run(poly, enz);
 
@@ -296,7 +308,7 @@ public class DigestSimulator {
             System.out.println("fragments:");
 
             List<RestrictionEnzyme> enz = new ArrayList<>();
-            enz.add(factory.run(Enzyme.BseRI));
+            enz.add(factory.run("BseRI"));
 
             List<Polynucleotide> pdts = dig.run(poly, enz);
 
@@ -315,7 +327,7 @@ public class DigestSimulator {
             System.out.println("fragments:");
 
             List<RestrictionEnzyme> enz = new ArrayList<>();
-            enz.add(factory.run(Enzyme.BseRI));
+            enz.add(factory.run("BseRI"));
 
             List<Polynucleotide> pdts = dig.run(poly, enz);
 
@@ -336,7 +348,7 @@ public class DigestSimulator {
             System.out.println("fragments:");
 
             List<RestrictionEnzyme> enz = new ArrayList<>();
-            enz.add(factory.run(Enzyme.BamHI));
+            enz.add(factory.run("BamHI"));
 
             List<Polynucleotide> pdts = dig.run(poly, enz);
 
@@ -357,7 +369,7 @@ public class DigestSimulator {
             System.out.println("fragments:");
 
             List<RestrictionEnzyme> enz = new ArrayList<>();
-            enz.add(factory.run(Enzyme.BseRI));
+            enz.add(factory.run("BseRI"));
 
             List<Polynucleotide> pdts = dig.run(poly, enz);
 

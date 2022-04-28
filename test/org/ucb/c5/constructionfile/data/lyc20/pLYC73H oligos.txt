@@ -1,0 +1,5 @@
+G00101	attaccgcctttgagtgagc
+PF5a	ccataGGTCTCTgtaggaggtatatattaatgtatcg	25nm	STD
+PR5a rev2	cagttGGTCTCAaggggcgtgaacgtcatggccgcc	25nm	STD
+TP5H	ccaaaggtctcActacTgactcgactgtaccacataatactg	25nm	STD
+TP5H	CCAAAGGTCTCACTACTGACTCGACTGTACCACATAATACTG	25nm	STD

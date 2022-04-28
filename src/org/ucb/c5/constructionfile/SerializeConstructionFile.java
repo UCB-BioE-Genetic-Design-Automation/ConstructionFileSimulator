@@ -66,7 +66,7 @@ public class SerializeConstructionFile {
                     sb.append(op.toString()).append(" ").append(dig.getSubstrate()).append(" with ");
                     
                     for(int i=0; i< dig.getEnzymes().size(); i++) {
-                        Enzyme enz = dig.getEnzymes().get(i);
+                        String enz = dig.getEnzymes().get(i);
                         sb.append(enz.toString());
                         if(i < dig.getEnzymes().size()-1) {
                             sb.append(",");

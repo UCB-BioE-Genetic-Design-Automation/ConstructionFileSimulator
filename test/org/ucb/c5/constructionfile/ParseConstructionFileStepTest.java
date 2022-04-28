@@ -13,7 +13,6 @@ import org.ucb.c5.constructionfile.model.Assembly;
 import org.ucb.c5.constructionfile.model.Blunting;
 import org.ucb.c5.constructionfile.model.ConstructionFile;
 import org.ucb.c5.constructionfile.model.Digestion;
-import org.ucb.c5.constructionfile.model.Enzyme;
 import org.ucb.c5.constructionfile.model.Ligation;
 import org.ucb.c5.constructionfile.model.PCA;
 import org.ucb.c5.constructionfile.model.PCR;
@@ -290,7 +289,8 @@ public class ParseConstructionFileStepTest {
         assert (pca3.getProduct().equals("p4"));
 
     }
-
+//Gibson to add to reading of the rebase file 
+    //add digestion test after spring break: explicit; test for end length assert catching problems. Digestionsimulator class for mulitple tests in it
     @Test
     public void testDigestion() throws Exception {
         String rawText
@@ -303,13 +303,13 @@ public class ParseConstructionFileStepTest {
                 + "digest a7 with MfeI/PstI  (   7\t,\td7   )\n";
 
         List[] ezlist = new List[7];
-        ezlist[0] = Arrays.asList(Enzyme.valueOf("DpnI"), Enzyme.valueOf("SpeI"));
-        ezlist[1] = Arrays.asList(Enzyme.valueOf("XbaI"), Enzyme.valueOf("XhoI"));
-        ezlist[2] = Arrays.asList(Enzyme.valueOf("BsaI"), Enzyme.valueOf("BsmBI"));
-        ezlist[3] = Arrays.asList(Enzyme.valueOf("Gibson"), Enzyme.valueOf("AarI"));
-        ezlist[4] = Arrays.asList(Enzyme.valueOf("BbsI"), Enzyme.valueOf("EcoRI"));
-        ezlist[5] = Arrays.asList(Enzyme.valueOf("BamHI"), Enzyme.valueOf("BglII"));
-        ezlist[6] = Arrays.asList(Enzyme.valueOf("MfeI"), Enzyme.valueOf("PstI"));
+        ezlist[0] = Arrays.asList("DpnI", "SpeI");
+        ezlist[1] = Arrays.asList("XbaI", "XhoI");
+        ezlist[2] = Arrays.asList("BsaI", "BsmBI");
+        ezlist[3] = Arrays.asList("Gibson", "AarI");
+        ezlist[4] = Arrays.asList("BbsI", "EcoRI");
+        ezlist[5] = Arrays.asList("BamHI", "BglII");
+        ezlist[6] = Arrays.asList("MfeI", "PstI");
 
         ParseConstructionFile pcf = new ParseConstructionFile();
         pcf.initiate();
@@ -440,13 +440,13 @@ public class ParseConstructionFileStepTest {
                 + "assemble a5 and b5 (BbsI    c5)\n"
                 + "assemble a6/b6    (   BamHI/c6     )\n";
 
-        Enzyme[] ez = new Enzyme[6];
-        ez[0] = Enzyme.valueOf("DpnI");
-        ez[1] = Enzyme.valueOf("XbaI");
-        ez[2] = Enzyme.valueOf("BsaI");
-        ez[3] = Enzyme.valueOf("Gibson");
-        ez[4] = Enzyme.valueOf("BbsI");
-        ez[5] = Enzyme.valueOf("BamHI");
+        String[] ez = new String[6];
+        ez[0] = "DpnI";
+        ez[1] = "XbaI";
+        ez[2] = "BsaI";
+        ez[3] = "Gibson";
+        ez[4] = "BbsI";
+        ez[5] = "BamHI";
 
         ParseConstructionFile pcf = new ParseConstructionFile();
         pcf.initiate();
@@ -474,13 +474,13 @@ public class ParseConstructionFileStepTest {
                 + "assemble c207-c208 (BbsI    p5)\n"
                 + "assemble d999-d1000    (   BamHI/p6     )\n";
 
-        Enzyme[] ez = new Enzyme[6];
-        ez[0] = Enzyme.valueOf("DpnI");
-        ez[1] = Enzyme.valueOf("XbaI");
-        ez[2] = Enzyme.valueOf("BsaI");
-        ez[3] = Enzyme.valueOf("Gibson");
-        ez[4] = Enzyme.valueOf("BbsI");
-        ez[5] = Enzyme.valueOf("BamHI");
+        String[] ez = new String[6];
+        ez[0] = "DpnI";
+        ez[1] = "XbaI";
+        ez[2] = "BsaI";
+        ez[3] = "Gibson";
+        ez[4] = "BbsI";
+        ez[5] = "BamHI";
 
         ParseConstructionFile pcf = new ParseConstructionFile();
         pcf.initiate();

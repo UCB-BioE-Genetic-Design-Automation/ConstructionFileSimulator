@@ -126,7 +126,7 @@ public class ParseConstructionFile {
         }
     }
 
-    private void processSequences(String seqSection, HashMap<String, Polynucleotide> sequences) {
+    private void processSequences(String seqSection, HashMap<String, Polynucleotide> sequences) throws Exception {
         //Handle if it is a list of FASTA
         if (seqSection.contains(">")) {
             String[] fseqs = seqSection.split(">");
@@ -142,7 +142,14 @@ public class ParseConstructionFile {
                 if (!seq.toUpperCase().matches("[ACGTRYSWKMBDHVNacgtryswkmbdhvn]+")) {
                     throw new IllegalArgumentException("Sequence:\n" + seq + "\ncontains non-DNA sequences in:\n" + f);
                 }
-                sequences.put(name, createPoly(seq));
+                Polynucleotide existPoly = sequences.get(name);
+                Polynucleotide newPoly = createPoly(seq);
+                if (existPoly == null || existPoly.equals(newPoly)) {
+                    sequences.put(name, newPoly);
+                } else {
+                    throw new IllegalArgumentException("Two different polynucleotides:" + newPoly +
+                            "and " + existPoly + "with same name:" + name + "in FASTA");
+                }
                 Log.seq(name, seq, "Construction file sequence from FASTA added");
             }
             return;
@@ -167,15 +174,34 @@ public class ParseConstructionFile {
             if (!seq.matches("[ATCGRYSWKMBDHVN]+")) {
                 throw new IllegalArgumentException("Sequence:\n" + seq + "\ncontains non-DNA sequences in:\n" + line);
             }
-            sequences.put(name, createPoly(seq));
+            Polynucleotide existPoly = sequences.get(name);
+            Polynucleotide newPoly = createPoly(seq);
+            if (existPoly == null || existPoly.equals(newPoly)) {
+                sequences.put(name, newPoly);
+            } else {
+                throw new IllegalArgumentException("Two different polynucleotides:" + newPoly +
+                        "and " + existPoly + "with same name:" + name + "in TSV");
+            }
             Log.seq(name, seq, "Construction file sequence from TSV added");
         }
     }
 
-    private Polynucleotide createPoly(String seq) {
+    private Polynucleotide createPoly(String seq) throws Exception {
         //If it's an oligo
+        
+        //parse oligo
+
         if (seq.length() < 100) {
-            return new Polynucleotide(seq, "", "", false, false, false);
+            //run parse oligo
+            
+            ParseOligo po = new ParseOligo();
+            Polynucleotide oligo = po.run(seq);
+            
+            //return new Polynucleotide
+            return oligo;
+            
+            
+            //return parse Polynucleotide(seq, "", "", false, false, false);
         }
 
         //If it's a plasmid
@@ -411,13 +437,13 @@ public class ParseConstructionFile {
     }
 
     private Step createDigest(String substrate, String[] enzymes, String fragsel, String product) {
-        List<Enzyme> enzList = new ArrayList<>();
+        List<String> enzList = new ArrayList<>();
         for (String enz : enzymes) {
-            Enzyme enzyme;
+            String enzyme;
             try {
-                enzyme = Enzyme.valueOf(enz);
+                enzyme = enz;
             } catch (Exception IllegalArgumentException) {
-                enzyme = Enzyme.valueOf(enz.toLowerCase());
+                enzyme = enz.toLowerCase();
             }
             enzList.add(enzyme);
         }
@@ -441,9 +467,9 @@ public class ParseConstructionFile {
     }
 
     private Step createAssemble(String[] fragments, String enzyme, String product) {
-        Enzyme ez;
+        String ez;
         try {
-            ez = Enzyme.valueOf(enzyme);
+            ez = enzyme;
         } catch (Exception err) {
             Log.severe(enzyme + " is not a valid enzyme name");
             throw err;
@@ -515,6 +541,11 @@ public class ParseConstructionFile {
 
         String text = FileUtils.readResourceFile("constructionfile/data/Construction of aspC1.txt");
         ConstructionFile cf = pCF.run(text);
+        
+        for (String name:cf.getSequences().keySet()){
+            System.out.println(name);
+            System.out.println(cf.getSequences().get(name));
+        }
 
         System.out.println(cf.toString());
     }

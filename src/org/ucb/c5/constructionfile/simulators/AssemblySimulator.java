@@ -2,7 +2,7 @@ package org.ucb.c5.constructionfile.simulators;
 
 import org.ucb.c5.sequtils.RestrictionEnzymeFactory;
 import org.ucb.c5.constructionfile.model.Assembly;
-import org.ucb.c5.constructionfile.model.Enzyme;
+//import org.ucb.c5.constructionfile.model.Enzyme;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 import org.ucb.c5.constructionfile.model.RestrictionEnzyme;
 import org.ucb.c5.sequtils.RevComp;
@@ -22,6 +22,7 @@ public class AssemblySimulator {
 
     DigestSimulator digestSimulator;
     LigateSimulator ligateSimulator;
+    RestrictionEnzymeFactory resEnzFactory;
     RevComp revcomp;
 
     public void initiate() throws Exception {
@@ -30,6 +31,8 @@ public class AssemblySimulator {
         digestSimulator.initiate();
         ligateSimulator = new LigateSimulator();
         ligateSimulator.initiate();
+        resEnzFactory = new RestrictionEnzymeFactory();
+        resEnzFactory.initiate();
         revcomp = new RevComp();
         revcomp.initiate();
     }
@@ -40,30 +43,30 @@ public class AssemblySimulator {
         for (String name : assemblyNames) {
             assemblyFragments.add(fragments.get(name));
         }
-        Enzyme enzyme = assembly.getEnzyme();
-        if (enzyme == Enzyme.BsmBI || enzyme == Enzyme.BsaI) {
-            return simGoldenGate(enzyme, assemblyFragments);
-        } // Test multiple fragment assembly
-        // Test homologous region is on reverse comp
-        // Test common errors and throw errors correctly (doesn't recombine correctly, 20 bp are revcomp)
-        else if (enzyme == Enzyme.Gibson) { // Gibson
-            return simGibson(assemblyFragments);
-        } else {
-            throw new Exception("The given enzyme is not supported for assembly reactions");
+        //Changed
+        String enzyme = assembly.getEnzyme();
+        if (enzyme.equals("Gibson")) { // Gibson
+            return simGibson(assemblyFragments); 
         }
+        
+// Test multiple fragment assembly
+        // Test homologous region is on reverse comp
+        // Test common errors and throw errors correctly (doesn't recombine correctly, 20 bp are revcomp) 
+        return simGoldenGate(enzyme, assemblyFragments);
     }
 
-    private Polynucleotide simGoldenGate(Enzyme enzyme, List<Polynucleotide> assemblyFragments) throws Exception {
+    private Polynucleotide simGoldenGate(String enzyme, List<Polynucleotide> assemblyFragments) throws Exception {
         //Find all the BsaI site-free fragments of the digestion products of each sequence using the given enzyme and put into a list
         List<Polynucleotide> validFrags = new ArrayList<>();
         List<RestrictionEnzyme> enzymeList = new ArrayList<>();
-        RestrictionEnzyme res = new RestrictionEnzymeFactory().run(enzyme);
+        RestrictionEnzyme res = resEnzFactory.run(enzyme);
         enzymeList.add(res);
         Pattern p = Pattern.compile(res.getSite());
 
         for (Polynucleotide assemblyFrag : assemblyFragments) {
             List<Polynucleotide> digestFrags = digestSimulator.run(assemblyFrag, enzymeList);
             for (Polynucleotide polyTemp : digestFrags) {
+                
                 String seq = polyTemp.getSequence().toUpperCase();
                 String rcseq = revcomp.run(seq);
                 Matcher mfor = p.matcher("TTTTTTTTTTTT" + seq + "TTTTTTTTTTTT");
@@ -99,15 +102,17 @@ public class AssemblySimulator {
         revComp.initiate();
         while (assemblyFragments.size() > 1) {
             Polynucleotide currFrag = assemblyFragments.remove(0);
+            int currLen = currFrag.getSequence().length(); //* declared currLen outside of loop 
+            String homologyRegion = currFrag.getSequence().substring(currLen - 20); //can now use currLen
             Polynucleotide matchedFrag = null;
             int currHomologousRegionStartIndex; // The index of the beginning of the homologous region on the current strand
             int matchedHomologousRegionStartIndex; // The index of the beginning of the homologous region on the matched strand
             int matchedHomologousRegionEndIndex = 0; // Index on matchedFrag of the end of the homologous region (including 20 bp)
             for (Polynucleotide tempFrag : assemblyFragments) {
-                int currLen = currFrag.getSequence().length();
+                //int currLen = currFrag.getSequence().length(); moved this outside of the for loop
 
                 // If there is a match between the last 20 bp of currFrag and the forward strand of tempFrag
-                if (tempFrag.getSequence().contains(currFrag.getSequence().substring(currLen - 20))) {
+                if (tempFrag.getSequence().contains(homologyRegion)) {
                     matchedFrag = tempFrag;
                     matchedHomologousRegionEndIndex = 20 + tempFrag.getSequence().indexOf(currFrag.getSequence().substring(currLen - 20));
                     assemblyFragments.remove(tempFrag);
@@ -123,6 +128,10 @@ public class AssemblySimulator {
             if (matchedFrag == null) {
                 throw new Exception("The provided assembly fragments cannot be joined together because there are not enough homologous regions between them");
             }
+            //added if statement to catch degenerate base pairs 
+           if (!homologyRegion.matches("[ATCG]+")) {
+               throw new IllegalArgumentException("The provided assembly contains degenerate base pairs, assembly failed. ");
+           }
             currHomologousRegionStartIndex = currFrag.getSequence().length() - matchedHomologousRegionEndIndex;
             String currHomologousRegion = currFrag.getSequence().substring(currHomologousRegionStartIndex);
             String matchedHomologousRegion = matchedFrag.getSequence().substring(0, matchedHomologousRegionEndIndex);
@@ -144,7 +153,7 @@ public class AssemblySimulator {
             String currFragRegion = currFrag.getSequence().substring(0, currHomologousRegionStartIndex);
             String matchedFragRegion = matchedFrag.getSequence();
             Polynucleotide assembledProduct = new Polynucleotide(currFragRegion.concat(matchedFragRegion));
-            assemblyFragments.add(assembledProduct);
+            assemblyFragments.add(assembledProduct); 
         }
         Polynucleotide linearProduct = assemblyFragments.remove(0);
         String forwardStrand = linearProduct.getSequence();
@@ -161,10 +170,12 @@ public class AssemblySimulator {
         //JBAG BsmBI golden gate example
         ParseConstructionFile pCF = new ParseConstructionFile();
         pCF.initiate();
-        String text = FileUtils.readResourceFile("constructionfile/data/Construction of pJBAG.txt");
+
+        String text = FileUtils.readResourceFile("constructionfile/data/Construction of pTarg2.txt");
         ConstructionFile CF = pCF.run(text);
+  
+  
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
-        //Polynucleotide product = simulateConstructionFile.run(CF, new HashMap<>());
         ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
         Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
         System.out.println(product.getSequence());

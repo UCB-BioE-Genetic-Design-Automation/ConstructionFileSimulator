@@ -9,10 +9,10 @@ import java.util.List;
  */
 public class Assembly implements Step {
     private final List<String> fragments;
-    private final Enzyme enzyme;
+    private final String enzyme;
     private final String product;
 
-    public Assembly(List<String> fragments, Enzyme enzyme, String product) {
+    public Assembly(List<String> fragments, String enzyme, String product) {
         this.fragments = fragments;
         this.enzyme = enzyme;
         this.product = product;
@@ -21,8 +21,8 @@ public class Assembly implements Step {
     public List<String> getFragments() {
         return fragments;
     }
-
-    public Enzyme getEnzyme() {
+    //changed 
+    public String getEnzyme() {
         return enzyme;
     }
 

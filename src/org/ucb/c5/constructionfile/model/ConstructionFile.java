@@ -49,9 +49,9 @@ public class ConstructionFile {
 //        steps.add(new Cleanup("ipcr", "pcr"));
         
         //digest pcr with SpeI,DpnI	(spedig)
-        List<Enzyme> enzymes = new ArrayList<>();
-        enzymes.add(Enzyme.SpeI);
-        enzymes.add(Enzyme.DpnI);
+        List<String> enzymes = new ArrayList<>();
+        enzymes.add("SpeI");
+        enzymes.add("DpnI");
         steps.add(new Digestion("pcr", enzymes, 1, "spedig"));
         
         //cleanup spedig	(dig)

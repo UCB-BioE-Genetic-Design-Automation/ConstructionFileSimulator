@@ -6,8 +6,11 @@
 package org.ucb.c5.constructionfile;
 
 import java.util.HashMap;
+import org.junit.Before;
+import org.junit.Test;
 import org.ucb.c5.constructionfile.model.ConstructionFile;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
+import org.ucb.c5.sequtils.ComparePolynucleotides;
 import org.ucb.c5.utils.FileUtils;
 
 /**
@@ -16,8 +19,24 @@ import org.ucb.c5.utils.FileUtils;
  */
 public class tester2 {
     
-    public static void main(String[] args) throws Exception {
-                ParseConstructionFile pCF = new ParseConstructionFile();
+    ComparePolynucleotides cps;
+    
+    @Before
+    public void initializeNewtester2() throws Exception {
+
+        cps = new ComparePolynucleotides();
+        cps.initiate();
+    }
+        @Test
+    /**
+     * Runs the parser on an Experiment folder containing a modified version
+     * of the lyc20 example in which one plasmid (p20N100) has been duplicated with
+     * a different, truncated sequence
+     */
+
+    
+    public void tester() throws Exception {
+        ParseConstructionFile pCF = new ParseConstructionFile();
         pCF.initiate();
         String text = FileUtils.readResourceFile("constructionfile/data/Construction of pTarg2.txt");
         ConstructionFile CF = pCF.run(text);
@@ -26,7 +45,7 @@ public class tester2 {
         Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
         String expectSeq = "attaccgcctttgagtgagctgataccgctcgccgcagccgaacgaccgagcgcagcgagtcagtgagcgaggaagcggaagagcgcctgatgcggtattttctccttacgcatctgtgcggtatttcacaccgcatatgctggatccttgacagctagctcagtcctaggtataatactagtcatcgccgcagcggtttcaggttttagagctagaaatagcaagttaaaataaggctagtccgttatcaacttgaaaaagtggcaccgagtcggtgctttttttgaattctctagagtcgacctgcagaagcttagatctattaccctgttatccctactcGAGTTCATGTGCAGCTCCATAAGCTGAAATTCTGCCTCGTGATACgcctatttttataggttaatgtcatgataataatggtttcttagacgtcaggtggcacttttcggggaaatgtgcgcggaacccctatttgtttatttttctaaatacattcaaatatgtatccgctcatgagacaataaccctgataaatgcttcaataatattgaaaaaggaagagtatgagtattcaacatttccgtgtcgcccttattcccttttttgcggcattttgccttcctgtttttgctcacccagaaacgctggtgaaagtaaaagatgctgaagatcagttgggtgcacgagtgggttacatcgaactggatctcaacagcggtaagatccttgagagttttcgccccgaagaacgttttccaatgatgagcacttttaaagttctgctatgtggcgcggtattatcccgtattgacgccgggcaagagcaactcggtcgccgcatacactattctcagaatgacttggttgagtactcaccagtcacagaaaagcatcttacggatggcatgacagtaagagaattatgcagtgctgccataaccatgagtgataacactgcggccaacttacttctgacaacgatcggaggaccgaaggagctaaccgcttttttgcacaacatgggggatcatgtaactcgccttgatcgttgggaaccggagctgaatgaagccataccaaacgacgagcgtgacaccacgatgcctgtagcaatggcaacaacgttgcgcaaactattaactggcgaactacttactctagcttcccggcaacaattaatagactggatggaggcggataaagttgcaggaccacttctgcgctcggcccttccggctggctggtttattgctgataaatctggagccggtgagcgtggCtctcgcggtatcattgcagcactggggccagatggtaagccctcccgtatcgtagttatctacacgacggggagtcaggcaactatggatgaacgaaatagacagatcgctgagataggtgcctcactgattaagcattggtaactgtcagaccaagtttactcatatatactttagattgatttaaaacttcatttttaatttaaaaggatctaggtGAAGATCCTTTTTGATAATCTCATGACCAAAATCCCTTAACgtgagttttcgttccactgagcgtcagaccccgtagaaaagatcaaaggatcttcttgagatcctttttttctgcgcgtaatctgctgcttgcaaacaaaaaaaccaccgctaccagcggtggtttgtttgccggatcaagagctaccaactctttttccgaaggtaactggcttcagcagagcgcagataccaaatactgtccttctagtgtagccgtagttaggccaccacttcaagaactctgtagcaccgcctacatacctcgctctgctaatcctgttaccagtggctgctgccagtggcgataagtcgtgtcttaccgggttggactcaagacgatagttaccggataaggcgcagcggtcgggctgaacggggggttcgtgcacacagcccagcttggagcgaacgacctacaccgaactgagatacctacagcgtgagctatgagaaagcgccacgcttcccgaagggagaaaggcggacaggtatccggtaagcggcagggtcggaacaggagagcgcacgagggagcttccagggggaaacgcctggtatctttatagtcctgtcgggtttcgccacctctgacttgagcgtcgatttttgtgatgctcgtcaggggggcggagcctatggaaaaacgccagcaacgcggcctttttacggttcctggccttttgctggccttttgctcacatgttctttcctgcgttatcccctgattctgtggataaccgt";
         Polynucleotide expected = new Polynucleotide(expectSeq, true);
-        assert(expected.equals(product));
+        assert(cps.run(product,expected));
     }
     
 }
