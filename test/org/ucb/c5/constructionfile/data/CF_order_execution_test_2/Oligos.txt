@@ -1,0 +1,10 @@
+tb4R	ctgatGGTCTCtAGGGAAGCGTCAGGTAGGATCCGC	25nm	STD	back4 pcrs
+olys10	ccataGGTCTCaCCCTGAGNVWGGRDAAACTTTATGCATGTAAGTAATTTTACAGCTG	25nm	STD	Forward PWM library oligo for spanin from T4_gen
+olys11	cagttGGTCTCtGAACGTTCAAATTGATGCCATG	25nm	STD	Reverse oligo for spanin from T4_gen
+olys12	ccataGGTCTCaCCCTGTCNVWGGRDTTGATGTATGAGCAGAGTCACCGCGATT	25nm	STD	Forward PWM library oligo for spanin from lambda_gen
+olys13	cagttGGTCTCtGAACGAGTTGCCCATCGATATGGGC	25nm	STD	Reverse oligo for spanin from lambda_gen
+olys14	CCATAGGTCTCAGTTCGTTGCTCCGTCTACCTCTTC	25nm	STD	Forward backbone oligo for spanin insertion
+olys15	ccaaaGGTCTCaGATGttccagactagaataaag	25nm	STD	Forward for TPamilGFP
+olys16	ccaaaGGTCTCaCGCCaagcgcgcaattaaccctc	25nm	STD	Reverse for TPamilGFP
+olys17	ccaaaGGTCTCaGGCGGCCGGCTTATCGGTCAGTTTC	25nm	STD	Forward for pLys9 backbone
+olys18	ccaaaGGTCTCaCATCGGCAGATCCTTATTGATTTC	25nm	STD	Reverse for pLys9 backbone

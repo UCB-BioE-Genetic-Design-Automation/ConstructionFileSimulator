@@ -1,0 +1,5 @@
+PCR oCasF/oCasR on pMBP-FnCas12a       (p1)
+PCR oBADF/oBADR on p-PBAD-Cas9    (back)
+PCR oT4F/oT4R on pt4crRNA    (p2)
+Assemble back,p1,p2     (Gibson, pCBA-1)
+Transform pCBA-1      (Mach1, Kan)

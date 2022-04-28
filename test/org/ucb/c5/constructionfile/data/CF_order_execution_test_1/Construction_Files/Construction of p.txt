@@ -1,0 +1,3 @@
+PCR orf2/orr2 on pt4crRNA-1r       (p1)
+Assemble p1     (BsaI, pt4crRNA)
+Transform pt4crRNA      (Mach1, Kan)
