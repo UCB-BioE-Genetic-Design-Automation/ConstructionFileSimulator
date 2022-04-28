@@ -243,8 +243,8 @@ public class ParseConstructionFile {
                 return createPCR(
                         oligosPCR,
                         templateList,
-                        productPCR,
-                        size);
+                        productPCR
+                        );
 
             case pca://pca oligo1,oligo2 \t (product)
 
@@ -398,8 +398,8 @@ public class ParseConstructionFile {
         }
     }
 
-    private Step createPCR(String[] oligos, List<String> templates, String product, Integer size) {
-        return new PCR(oligos[0], oligos[1], templates, product, size);
+    private Step createPCR(String[] oligos, List<String> templates, String product) {
+        return new PCR(oligos[0], oligos[1], templates, product);
     }
 
     private Step createPCA(String[] oligos, String product) {

@@ -30,7 +30,7 @@ public class PCRSimulatorTest2 {
         String productSeq = "gaattcgcggccgcttctagagtccctatcagtgatagagattgacatccctatcagtgatagagatactgagcactactagagaaagaggagaaatactagatggcttcctccgaagacgttatcaaagagttcatgcgtttcaaagttcgtatggaaggttccgttaacggtcacgagttcgaaatcgaaggtgaaggtgaaggtcgtccgtacgaaggtacccagaccgctaaactgaaagttaccaaaggtggtccgctgccgttcgcttgggacatcctgtccccgcagttccagtacggttccaaagcttacgttaaacacccggctgacatcccggactacctgaaactgtccttcccggaaggtttcaaatgggaacgtgttatgaacttcgaagacggtggtgttgttaccgttacccaggactcctccctgcaagacggtgagttcatctacaaagttaaactgcgtggtaccaacttcccgtccgacggtccggttatgcagaaaaaaaccatgggttgggaagcttccaccgaacgtatgtacccggaagacggtgctctgaaaggtgaaatcaaaatgcgtctgaaactgaaagacggtggtcactacgacgctgaagttaaaaccacctacatggctaaaaaaccggttcagctgccgggtgcttacaaaaccgacatcaaactggacatcacctcccacaacgaagactacaccatcgttgaacagtacgaacgtgctgaaggtcgtcactccaccggtgcttaataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttatatac";
         List<String> templates = new ArrayList<>();
         templates.add(template);
-        PCR pcr = new PCR(oligo1, oligo2, templates, product, null);
+        PCR pcr = new PCR(oligo1, oligo2, templates, product);
         Map<String, String> fragments = new HashMap<>();
         fragments.put(oligo1, oligo1Seq);
         fragments.put(oligo2, oligo2Seq);
@@ -60,7 +60,7 @@ public class PCRSimulatorTest2 {
         String productSeq = "ccataggatccgaattcgcggccgcttctagagtccctatcagtgatagagattgacatccctatcagtgatagagatactgagcactactagagaaagaggagaaatactagatggcttcctccgaagacgttatcaaagagttcatgcgtttcaaagttcgtatggaaggttccgttaacggtcacgagttcgaaatcgaaggtgaaggtgaaggtcgtccgtacgaaggtacccagaccgctaaactgaaagttaccaaaggtggtccgctgccgttcgcttgggacatcctgtccccgcagttccagtacggttccaaagcttacgttaaacacccggctgacatcccggactacctgaaactgtccttcccggaaggtttcaaatgggaacgtgttatgaacttcgaagacggtggtgttgttaccgttacccaggactcctccctgcaagacggtgagttcatctacaaagttaaactgcgtggtaccaacttcccgtccgacggtccggttatgcagaaaaaaaccatgggttgggaagcttccaccgaacgtatgtacccggaagacggtgctctgaaaggtgaaatcaaaatgcgtctgaaactgaaagacggtggtcactacgacgctgaagttaaaaccacctacatggctaaaaaaccggttcagctgccgggtgcttacaaaaccgacatcaaactggacatcacctcccacaacgaagactacaccatcgttgaacagtacgaacgtgctgaaggtcgtcactccaccggtgcttaataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttatatacgaattccactg";
         List<String> templates = new ArrayList<>();
         templates.add(template);
-        PCR pcr = new PCR(oligo1, oligo2, templates, product, null);
+        PCR pcr = new PCR(oligo1, oligo2, templates, product);
         Map<String, String> fragments = new HashMap<>();
         fragments.put(oligo1, oligo1Seq);
         fragments.put(oligo2, oligo2Seq);
@@ -94,7 +94,7 @@ public class PCRSimulatorTest2 {
         // "gaattcgcggccgcttctagagtcccaaagaattcgcggcagcttctagagtccctatcagtgatagagattgacatccctatcagtgatagagatactgagcactactagagaaagaggagaaatactagatggcttcctccgaagacgttatcaaagagttcatgcgtttcaaagttcgtatggaaggttccgttaacggtcacgagttcgaaatcgaaggtgaaggtgaaggtcgtccgtacgaaggtacccagaccgctaaactgaaagttaccaaaggtggtccgctgccgttcgcttgggacatcctgtccccgcagttccagtacggttccaaagcttacgttaaacacccggctgacatcccggactacctgaaactgtccttcccggaaggtttcaaatgggaacgtgttatgaacttcgaagacggtggtgttgttaccgttacccaggactcctccctgcaagacggtgagttcatctacaaagttaaactgcgtggtaccaacttcccgtccgacggtccggttatgcagaaaaaaaccatgggttgggaagcttccaccgaacgtatgtacccggaagacggtgctctgaaaggtgaaatcaaaatgcgtctgaaactgaaagacggtggtcactacgacgctgaagttaaaaccacctacatggctaaaaaaccggttcagctgccgggtgcttacaaaaccgacatcaaactggacatcacctcccacaacgaagactacaccatcgttgaacagtacgaacgtgctgaaggtcgtcactccaccggtgcttaataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttatatac";
         List<String> templates = new ArrayList<>();
         templates.add(template);
-        PCR pcr = new PCR(oligo1, oligo2, templates, product, null);
+        PCR pcr = new PCR(oligo1, oligo2, templates, product);
         Map<String, String> fragments = new HashMap<>();
         fragments.put(oligo1, oligo1Seq);
         fragments.put(oligo2, oligo2Seq);
@@ -128,7 +128,7 @@ public class PCRSimulatorTest2 {
         //"gaattcgcggccgcttctagagtcccaaagaattcgcggccgcttcaagagtccctatcagtgatagagattgacatccctatcagtgatagagatactgagcactactagagaaagaggagaaatactagatggcttcctccgaagacgttatcaaagagttcatgcgtttcaaagttcgtatggaaggttccgttaacggtcacgagttcgaaatcgaaggtgaaggtgaaggtcgtccgtacgaaggtacccagaccgctaaactgaaagttaccaaaggtggtccgctgccgttcgcttgggacatcctgtccccgcagttccagtacggttccaaagcttacgttaaacacccggctgacatcccggactacctgaaactgtccttcccggaaggtttcaaatgggaacgtgttatgaacttcgaagacggtggtgttgttaccgttacccaggactcctccctgcaagacggtgagttcatctacaaagttaaactgcgtggtaccaacttcccgtccgacggtccggttatgcagaaaaaaaccatgggttgggaagcttccaccgaacgtatgtacccggaagacggtgctctgaaaggtgaaatcaaaatgcgtctgaaactgaaagacggtggtcactacgacgctgaagttaaaaccacctacatggctaaaaaaccggttcagctgccgggtgcttacaaaaccgacatcaaactggacatcacctcccacaacgaagactacaccatcgttgaacagtacgaacgtgctgaaggtcgtcactccaccggtgcttaataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttatatac";
         List<String> templates = new ArrayList<>();
         templates.add(template);
-        PCR pcr = new PCR(oligo1, oligo2, templates, product, null);
+        PCR pcr = new PCR(oligo1, oligo2, templates, product);
         Map<String, String> fragments = new HashMap<>();
         fragments.put(oligo1, oligo1Seq);
         fragments.put(oligo2, oligo2Seq);
@@ -158,7 +158,7 @@ public class PCRSimulatorTest2 {
         String productSeq = "gaattcgcgatagccgcttctagagtccctatcagtgatagagattgacatccctatcagtgatagagatactgagcactactagagaaagaggagaaatactagatggcttcctccgaagacgttatcaaagagttcatgcgtttcaaagttcgtatggaaggttccgttaacggtcacgagttcgaaatcgaaggtgaaggtgaaggtcgtccgtacgaaggtacccagaccgctaaactgaaagttaccaaaggtggtccgctgccgttcgcttgggacatcctgtccccgcagttccagtacggttccaaagcttacgttaaacacccggctgacatcccggactacctgaaactgtccttcccggaaggtttcaaatgggaacgtgttatgaacttcgaagacggtggtgttgttaccgttacccaggactcctccctgcaagacggtgagttcatctacaaagttaaactgcgtggtaccaacttcccgtccgacggtccggttatgcagaaaaaaaccatgggttgggaagcttccaccgaacgtatgtacccggaagacggtgctctgaaaggtgaaatcaaaatgcgtctgaaactgaaagacggtggtcactacgacgctgaagttaaaaccacctacatggctaaaaaaccggttcagctgccgggtgcttacaaaaccgacatcaaactggacatcacctcccacaacgaagactacaccatcgttgaacagtacgaacgtgctgaaggtcgtcactccaccggtgcttaataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttatatac";
         List<String> templates = new ArrayList<>();
         templates.add(template);
-        PCR pcr = new PCR(oligo1, oligo2, templates, product, null);
+        PCR pcr = new PCR(oligo1, oligo2, templates, product);
         Map<String, String> fragments = new HashMap<>();
         fragments.put(oligo1, oligo1Seq);
         fragments.put(oligo2, oligo2Seq);
@@ -184,7 +184,7 @@ public class PCRSimulatorTest2 {
         String template = "gaagacggtggtgttgttaccgttacccaggactcctccctgcaagacggtgagttcatctacaaagttaaactgcgtggtaccaacttcccgtccgacggtccggttatgcagaaaaaaaccatgggttgggaagcttccaccgaacgtatgtacccggaagacggtgctctgaaaggtgaaatcaaaatgcgtctgaaactgaaagacggtggtcactacgacgctgaagttaaaaccacctacatggctaaaaaaccggttcagctgccgggtgcttacaaaaccgacatcaaactggacatcacctcccacaacgaagactacaccatcgttgaacagtacgaacgtgctgaaggtcgtcactccaccggtgcttaataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttatatactagtagcggccgctgcagaaaaaagaattcgcggccgcttctagagtccctatcagtgatagagattgacatccctatcagtgatagagatactgagcactactagagaaagaggagaaatactagatggcttcctccgaagacgttatcaaagagttcatgcgtttcaaagttcgtatggaaggttccgttaacggtcacgagttcgaaatcgaaggtgaaggtgaaggtcgtccgtacgaaggtacccagaccgctaaactgaaagttaccaaaggtggtccgctgccgttcgcttgggacatcctgtccccgcagttccagtacggttccaaagcttacgttaaacacccggctgacatcccggactacctgaaactgtccttcccggaaggtttcaaatgggaacgtgttatgaacttc";
         templates.add("template");
         String product = "gaattcgcggccgcttctagagtccctatcagtgatagagattgacatccctatcagtgatagagatactgagcactactagagaaagaggagaaatactagatggcttcctccgaagacgttatcaaagagttcatgcgtttcaaagttcgtatggaaggttccgttaacggtcacgagttcgaaatcgaaggtgaaggtgaaggtcgtccgtacgaaggtacccagaccgctaaactgaaagttaccaaaggtggtccgctgccgttcgcttgggacatcctgtccccgcagttccagtacggttccaaagcttacgttaaacacccggctgacatcccggactacctgaaactgtccttcccggaaggtttcaaatgggaacgtgttatgaacttcgaagacggtggtgttgttaccgttacccaggactcctccctgcaagacggtgagttcatctacaaagttaaactgcgtggtaccaacttcccgtccgacggtccggttatgcagaaaaaaaccatgggttgggaagcttccaccgaacgtatgtacccggaagacggtgctctgaaaggtgaaatcaaaatgcgtctgaaactgaaagacggtggtcactacgacgctgaagttaaaaccacctacatggctaaaaaaccggttcagctgccgggtgcttacaaaaccgacatcaaactggacatcacctcccacaacgaagactacaccatcgttgaacagtacgaacgtgctgaaggtcgtcactccaccggtgcttaataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttatatac";
-        PCR pcr = new PCR("Primer1", "Primer2", templates, "pdt", null);
+        PCR pcr = new PCR("Primer1", "Primer2", templates, "pdt");
     
         Map<String, Polynucleotide> polys = new HashMap<>();
         polys.put("template",new Polynucleotide(template,true));
@@ -210,7 +210,7 @@ public class PCRSimulatorTest2 {
         String productSeq = "gaattcgcggccgcttctagagtccctatcagtgatagagattgacatccctatcagtgatagagatactgagcactactagagaaagaggagaaatactagatggcttcctccgaagacgttatcaaagagttcatgcgtttcaaagttcgtatggaaggttccgttaacggtcacgagttcgaaatcgaaggtgaaggtgaaggtcgtccgtacgaaggtacccagaccgctaaactgaaagttaccaaaggtggtccgctgccgttcgcttgggacatcctgtccccgcagttccagtacggttccaaagcttacgttaaacacccggctgacatcccggactacctgaaactgtccttcccggaaggtttcaaatgggaacgtgttatgaacttcgaagacggtggtgttgttaccgttacccaggactcctccctgcaagacggtgagttcatctacaaagttaaactgcgtggtaccaacttcccgtccgacggtccggttatgcagaaaaaaaccatgggttgggaagcttccaccgaacgtatgtacccggaagacggtgctctgaaaggtgaaatcaaaatgcgtctgaaactgaaagacggtggtcactacgacgctgaagttaaaaccacctacatggctaaaaaaccggttcagctgccgggtgcttacaaaaccgacatcaaactggacatcacctcccacaacgaagactacaccatcgttgaacagtacgaacgtgctgaaggtcgtcactccaccggtgcttaataacgctgatagtgctagtgtagatcgctactagagccaggcatcaaataaaacgaaaggctcagtcgaaagactgggcctttcgttttatctgttgtttgtcggtgaacgctctctactagagtcacactggctcaccttcgggtgggcctttctgcgtttatatac";
         List<String> templates = new ArrayList<>();
         templates.add(template);
-        PCR pcr = new PCR(oligo1, oligo2, templates, product, null);
+        PCR pcr = new PCR(oligo1, oligo2, templates, product);
         Map<String, String> fragments = new HashMap<>();
         fragments.put(oligo1, oligo1Seq);
         fragments.put(oligo2, oligo2Seq);
@@ -240,7 +240,7 @@ public class PCRSimulatorTest2 {
         String productSeq = "?";
         List<String> templates = new ArrayList<>();
         templates.add(template);
-        PCR pcr = new PCR(oligo1, oligo2, templates, product, null);
+        PCR pcr = new PCR(oligo1, oligo2, templates, product);
         Map<String, String> fragments = new HashMap<>();
         fragments.put(oligo1, oligo1Seq);
         fragments.put(oligo2, oligo2Seq);
@@ -272,7 +272,7 @@ public class PCRSimulatorTest2 {
         String productSeq = "?";
         List<String> templates = new ArrayList<>();
         templates.add(template);
-        PCR pcr = new PCR(oligo1, oligo2, templates, product, null);
+        PCR pcr = new PCR(oligo1, oligo2, templates, product);
         Map<String, String> fragments = new HashMap<>();
         fragments.put(oligo1, oligo1Seq);
         fragments.put(oligo2, oligo2Seq);
@@ -304,7 +304,7 @@ public class PCRSimulatorTest2 {
         String productSeq = "?";
         List<String> templates = new ArrayList<>();
         templates.add(template);
-        PCR pcr = new PCR(oligo1, oligo2, templates, product, null);
+        PCR pcr = new PCR(oligo1, oligo2, templates, product);
         Map<String, String> fragments = new HashMap<>();
         fragments.put(oligo1, oligo1Seq);
         fragments.put(oligo2, oligo2Seq);
@@ -336,7 +336,7 @@ public class PCRSimulatorTest2 {
         String productSeq = "?";
         List<String> templates = new ArrayList<>();
         templates.add(template);
-        PCR pcr = new PCR(oligo1, oligo2, templates, product, null);
+        PCR pcr = new PCR(oligo1, oligo2, templates, product);
         Map<String, String> fragments = new HashMap<>();
         fragments.put(oligo1, oligo1Seq);
         fragments.put(oligo2, oligo2Seq);
