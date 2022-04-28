@@ -94,6 +94,65 @@ public class ParseExperimentDirectory {
         }
     }
 
+    public Experiment run(String cfPath, List<String> seqPaths) throws Exception{
+        File dir = new File(cfPath);
+        List<File> files = new ArrayList<>();
+
+        List<ConstructionFile> cfs = new ArrayList<>();
+        Map<String, Polynucleotide> nameToPoly = new HashMap<>();
+
+        //Handle sub-directory
+        List<File> filesParse = parseDirectory(dir, files);
+
+        for (File file : filesParse) {
+            cfs.add(runCF(file));
+        }
+        for (String everyFolder : seqPaths){
+            File dir2 = new File(everyFolder);
+            List<File> files2 = new ArrayList<>();
+
+            //Handle sub-directory
+            List<File> filesParse2 = parseDirectory(dir2, files2);
+
+            //Dispose files as cf or seq
+            for (File file : filesParse2) {
+                nameToPoly.putAll(runSeq(file));
+
+            }
+
+        }
+
+        return new Experiment("experiment name", cfs, nameToPoly);
+    }
+
+    public Experiment run(String[] dirPath) throws Exception {
+        List<ConstructionFile> finalCfs = new ArrayList<>();
+        Map<String, Polynucleotide> finalNameToPoly = new HashMap<>();
+        for (String everyFolder : dirPath){
+            Log.info("Parsing experiment directory: " + dirPath);
+            File dir = new File(everyFolder);
+            List<File> files = new ArrayList<>();
+//            List<ConstructionFile> cfs = new ArrayList<>();
+//            Map<String, Polynucleotide> nameToPoly = new HashMap<>();
+
+            //Handle sub-directory
+            List<File> filesParse = parseDirectory(dir, files);
+
+            //Dispose files as cf or seq
+            for (File file : filesParse) {
+                if (file.getName().toLowerCase().startsWith("construction")) {
+                    finalCfs.add(runCF(file));
+                } else {
+                    finalNameToPoly.putAll(runSeq(file));
+                }
+            }
+
+        }
+
+        return new Experiment("experiment name", finalCfs, finalNameToPoly);
+    }
+
+
     //Recursive folder parser
     private List<File> parseDirectory(File dir, List<File> files) throws IOException {
         for (File afile : dir.listFiles()) {
