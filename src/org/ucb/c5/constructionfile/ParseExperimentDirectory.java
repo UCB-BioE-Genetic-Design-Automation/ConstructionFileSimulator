@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.ucb.c5.constructionfile;
 
 import java.io.File;
@@ -22,10 +18,13 @@ import org.ucb.c5.utils.Log;
 public class ParseExperimentDirectory {
     
     private ParseOligo po;
+    private OriginalCFParser parseConstruction;
     
     public void initiate() {
 //        ParseOligo po = new ParseOligo();
         po = new ParseOligo();
+        parseConstruction = new OriginalCFParser();
+        parseConstruction.initiate();
     }
 
     public Experiment run(String dirPath) throws Exception {
@@ -111,8 +110,6 @@ public class ParseExperimentDirectory {
     private ConstructionFile runCF(File afile) throws IOException, Exception {
         Log.info("Parsing construction file: " + afile.getAbsolutePath());
         String cfContent = FileUtils.readFile(afile.getAbsolutePath());
-        ParseConstructionFile parseConstruction = new ParseConstructionFile();
-        parseConstruction.initiate();
         try {
             ConstructionFile cf = parseConstruction.run(cfContent);
             return cf;
@@ -189,7 +186,7 @@ public class ParseExperimentDirectory {
     public static void main(String args[]) throws Exception {
 
         //Enter Path name as a String
-        String dirPath = "/Users/jca20n/Pimar/experiments/2020_02_04-Lycopene6";
+        String dirPath = "/Users/jca20n/Downloads/staged";
 
         //initiate
         ParseExperimentDirectory parseFolder = new ParseExperimentDirectory();
