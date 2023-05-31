@@ -14,7 +14,6 @@ public class CFShorthandParserTest {
         
     CFShorthandParser sp = new CFShorthandParser();
     
-
     @Test
     /**
      * Test of Shorthand with comments of various types

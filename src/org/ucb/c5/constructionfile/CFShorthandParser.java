@@ -62,6 +62,12 @@ public class CFShorthandParser {
                     }
             }
         }
+        
+        //Use the last step for product name if there wasn't a Transformation
+        if (productName == null && !steps.isEmpty()) {
+            Step lastStep = steps.get(steps.size() - 1);
+            productName = lastStep.getProduct();
+        }
 
         // Create and return ConstructionFile
         return new ConstructionFile(steps, productName, sequences);
