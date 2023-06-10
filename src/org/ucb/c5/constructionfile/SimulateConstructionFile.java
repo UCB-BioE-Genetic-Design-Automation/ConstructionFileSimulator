@@ -4,6 +4,7 @@ import org.ucb.c5.constructionfile.simulators.AssemblySimulator;
 import org.ucb.c5.constructionfile.simulators.DigestSimulator;
 import org.ucb.c5.constructionfile.simulators.LigateSimulator;
 import org.ucb.c5.constructionfile.simulators.PCRSimulator;
+import org.ucb.c5.constructionfile.simulators.TransformationSimulator;
 import org.ucb.c5.constructionfile.model.*;
 import org.ucb.c5.utils.FileUtils;
 import org.ucb.c5.sequtils.RestrictionEnzymeFactory;
@@ -182,9 +183,15 @@ public class SimulateConstructionFile {
         fragments.put(assembly.getProduct(), assemblyProduct);
     }
 
-    private void simulateTransform(Transformation transformation, Map<String, Polynucleotide> fragments, String pdtName) {
-        Log.info("Simulating Transformation of " + transformation.getProduct());
-        fragments.put(pdtName, fragments.get(transformation.getDna()));
+    private void simulateTransform(Transformation transformation, Map<String, Polynucleotide> fragments, String pdtName) throws Exception {
+        //Log it
+        String fraglog = transformation.getDna();
+        Log.info("Simulating Transformation of " + fraglog + " in " + transformation.getStrain());
+
+        TransformationSimulator transSimulator = new TransformationSimulator();
+        transSimulator.initiate();
+        Polynucleotide transProduct = transSimulator.run(transformation, fragments);
+        fragments.put(transformation.getProduct(), transProduct);
     }
     
     private void simulateBlunting(Blunting blunting, Map<String, Polynucleotide> fragments) throws Exception{
