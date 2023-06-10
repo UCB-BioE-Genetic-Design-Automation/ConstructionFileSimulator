@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import org.ucb.c5.constructionfile.ParseConstructionFile;
 import org.ucb.c5.constructionfile.SimulateConstructionFile;
 import org.ucb.c5.constructionfile.model.ConstructionFile;
+import org.ucb.c5.constructionfile.model.Modifications;
 import org.ucb.c5.utils.FileUtils;
 
 public class AssemblySimulator {
@@ -56,45 +57,84 @@ public class AssemblySimulator {
     }
 
     private Polynucleotide simGoldenGate(String enzyme, List<Polynucleotide> assemblyFragments) throws Exception {
-        //Find all the BsaI site-free fragments of the digestion products of each sequence using the given enzyme and put into a list
-        List<Polynucleotide> validFrags = new ArrayList<>();
+        //Retrieve the enzyme
         List<RestrictionEnzyme> enzymeList = new ArrayList<>();
         RestrictionEnzyme res = resEnzFactory.run(enzyme);
         enzymeList.add(res);
-        Pattern p = Pattern.compile(res.getSite());
 
+        //Digest all the fragments
+        List<Polynucleotide> allDigFrags = new ArrayList<>();
         for (Polynucleotide assemblyFrag : assemblyFragments) {
-            List<Polynucleotide> digestFrags = digestSimulator.run(assemblyFrag, enzymeList);
-            for (Polynucleotide polyTemp : digestFrags) {
-                
-                String seq = polyTemp.getSequence().toUpperCase();
-                String rcseq = revcomp.run(seq);
-                Matcher mfor = p.matcher("TTTTTTTTTTTT" + seq + "TTTTTTTTTTTT");
-                if (mfor.find()) {
-                    continue;
-                }
-                Matcher mrev = p.matcher("TTTTTTTTTTTT" + rcseq + "TTTTTTTTTTTT");
-                if (mrev.find()) {
-                    continue;
-                }
-                validFrags.add(polyTemp);
-            }
+            List<Polynucleotide> digPdts = digestSimulator.run(assemblyFrag, enzymeList);
+            allDigFrags.addAll(digPdts); //Assumes 3 fragments, with the correct one in the middle
         }
-
-        //Confirm that all the validFrags have sticky ends
-        for (Polynucleotide dig : validFrags) {
-            if (dig.getExt5().isEmpty()) {
-                throw new IllegalArgumentException("Golden Gate digestion fragment has no 5' end extension:\n" + dig.toString());
+        
+        //Eliminate all but ones with sticky ends and 5' phosphates
+        List<Polynucleotide> stickyFrags = new ArrayList<>();
+        for(Polynucleotide frag : allDigFrags) {
+            //Check for their being sticky ends on both sides
+            if(frag.getExt5()==null || frag.getExt5().isEmpty()) {
+                continue;
             }
-            if (dig.getExt3().isEmpty()) {
-                throw new IllegalArgumentException("Golden Gate digestion fragment has no 3' end extension:\n" + dig.toString());
+            if(frag.getExt3()==null || frag.getExt3().isEmpty()) {
+                continue;
+            }
+            
+            //Check for their being 5' phosphates
+            if(frag.getMod5()!=Modifications.phos5) {
+                continue;
+            }
+            if(frag.getMod3()!=Modifications.phos5) {
+                continue;
+            }
+            stickyFrags.add(frag);
+        }
+        
+        //Validate that all ends are non-palindromic
+        for(Polynucleotide frag : stickyFrags) {
+            if(isPalindromic(frag.getExt5().replaceAll("-", ""))) {
+                throw new IllegalArgumentException("Fragment is pandindromic: " + frag.getExt5() + " in " + frag.toString());
             }
         }
 
         // Ligate the valid fragments together
         Polynucleotide ligationProduct;
-        ligationProduct = ligateSimulator.run(validFrags);
+        ligationProduct = ligateSimulator.run(stickyFrags);
         return ligationProduct;
+    }
+
+
+    /**
+     * Determines whether a given DNA sequence is palindromic.
+     * A palindromic DNA sequence is one that reads the same forward and backward when complemented.
+     * This function also checks for invalid characters in the input sequence and throws an exception if any are found.
+     *
+     * @param seq The input DNA sequence to be checked for palindromicity.
+     * @return Returns true if the input DNA sequence is palindromic, false otherwise.
+     * @throws IllegalArgumentException Throws an error if the input sequence contains characters other than A, T, C, or G.
+     *
+     * Usage:
+     *   boolean result = isPalindromic("AATT");
+     *   System.out.println(result); // Output: true
+     *
+     * Example:
+     *   1. isPalindromic("AATT") returns true
+     *   2. isPalindromic("AGCT") returns false
+     *   3. isPalindromic("GAATTC") returns true
+     *   4. isPalindromic("AATN") throws an error (invalid character 'N')
+     */
+    private boolean isPalindromic(String seq) throws IllegalArgumentException {
+        seq = seq.toUpperCase();
+        
+        // Check for invalid characters and throw an exception if found
+        for (char nucleotide : seq.toCharArray()) {
+            if (nucleotide != 'A' && nucleotide != 'T' && nucleotide != 'C' && nucleotide != 'G') {
+                throw new IllegalArgumentException("Error: Invalid character '" + nucleotide + "' found in sequence '" + seq + "'. Sequence must contain only A, T, C, or G.");
+            }
+        }
+
+        String rc = revcomp.run(seq);
+        return seq.equals(rc);
     }
 
     private Polynucleotide simGibson(List<Polynucleotide> assemblyFragments) throws Exception {

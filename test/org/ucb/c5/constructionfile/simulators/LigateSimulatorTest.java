@@ -7,13 +7,8 @@ package org.ucb.c5.constructionfile.simulators;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import org.ucb.c5.constructionfile.ParseOligo;
 import org.ucb.c5.constructionfile.model.Modifications;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
 import org.ucb.c5.sequtils.ComparePolynucleotides;
@@ -21,475 +16,323 @@ import org.ucb.c5.sequtils.ComparePolynucleotides;
 /**
  *
  * @author michaelfernandez
+ * @author jcaucb
  */
 public class LigateSimulatorTest {
 
-    PCRSimulator sim;
-    ParseOligo po;
     ComparePolynucleotides cps;
     LigateSimulator lig;
+    String BamHIExt = "GATC";
 
     @Before
-    public void initializeNewLigateSimulatorTest() throws Exception {
-        sim = new PCRSimulator();
-        sim.initiate();
-        po = new ParseOligo();
+    public void initialize() throws Exception {
         cps = new ComparePolynucleotides();
         cps.initiate();
         lig = new LigateSimulator();
         lig.initiate();
     }
 
-    @Test(timeout = 3000)
-    public void testDigest_modcombinations_5to3() throws Exception {
-        LigateSimulator lig = new LigateSimulator();
-        lig.initiate();
+    @Test
+    public void testLigation_single_fragment() throws Exception {
+        //Circularization of a single fragment with 5' phosphates on both ends
+        Polynucleotide poly = new Polynucleotide("CCCCCCCCCCCC", "GGGG", "GGGG", true, false, false, Modifications.phos5, Modifications.phos5);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly);
 
-        ComparePolynucleotides cps = new ComparePolynucleotides();
-        cps.initiate();
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("GGGGCCCCCCCCCCCC", "", "", true, false, true, Modifications.circular, Modifications.circular);
 
-        System.out.println("Two BamHI-digested DNAs examples: 5 to 3");
-        String BamHIExt = "GATC";
-
-        //5' p1 onto 3'p2 
-        //Only a phosphate leftover on the 5' side
-        Polynucleotide poly1 = new Polynucleotide("Caaaaaa", BamHIExt, "c", true, false, false, Modifications.phos5, Modifications.hydroxyl);
-        Polynucleotide poly2 = new Polynucleotide("ccccccG", "", BamHIExt, true, false, false, Modifications.phos5, Modifications.phos5);
-
-        List<Polynucleotide> frags1 = new ArrayList<>();
-        frags1.add(poly1);
-        frags1.add(poly2);
-
-        Polynucleotide pdt1 = lig.run(frags1);
-
-        System.out.println("poly1");
-        System.out.println(poly1);
-
-        System.out.println("poly2");
-        System.out.println(poly2);
-
-        System.out.println("Ligation Product: 1");
-        System.out.println(pdt1);
-
-        assert (pdt1.getSequence().equals("ccccccGGATCCaaaaaa"));
-        assert (pdt1.getExt3().equals("c"));
-        assert (pdt1.getMod5().equals(Modifications.phos5));
-        assert (pdt1.getMod3().equals(Modifications.hydroxyl));
-
-        //5 to 3
-        //Only a phosphate leftover on the 3' side
-        Polynucleotide poly3 = new Polynucleotide("Caaaaaa", BamHIExt, "c", true, false, false, Modifications.phos5, Modifications.phos5);
-        Polynucleotide poly4 = new Polynucleotide("ccccccG", "", BamHIExt, true, false, false, Modifications.hydroxyl, Modifications.phos5);
-
-        List<Polynucleotide> frags2 = new ArrayList<>();
-        frags2.add(poly3);
-        frags2.add(poly4);
-
-        Polynucleotide pdt2 = lig.run(frags2);
-
-        System.out.println("poly3");
-        System.out.println(poly3);
-
-        System.out.println("poly4");
-        System.out.println(poly4);
-
-        System.out.println("Ligation Product: 2");
-        System.out.println(pdt2);
-
-        assert (pdt2.getSequence().equals("ccccccGGATCCaaaaaa"));
-        assert (pdt2.getExt3().equals("c"));
-        assert (pdt2.getMod5().equals(Modifications.hydroxyl));
-        assert (pdt2.getMod3().equals(Modifications.phos5));
-
-        //Just 5' phosphate 
-        //No remaining phosphates
-        Polynucleotide poly5 = new Polynucleotide("Caaaaaa", BamHIExt, "c", true, false, false, Modifications.phos5, Modifications.hydroxyl);
-        Polynucleotide poly6 = new Polynucleotide("ccccccG", "", BamHIExt, true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
-
-        List<Polynucleotide> frags3 = new ArrayList<>();
-        frags3.add(poly5);
-        frags3.add(poly6);
-
-        Polynucleotide pdt3 = lig.run(frags3);
-
-        System.out.println("poly5");
-        System.out.println(poly5);
-
-        System.out.println("poly6");
-        System.out.println(poly6);
-
-        System.out.println("Ligation Product: 3");
-        System.out.println(pdt3);
-
-        assert (pdt3.getSequence().equals("ccccccGGATCCaaaaaa"));
-        assert (pdt3.getExt3().equals("c"));
-        assert (pdt3.getMod5().equals(Modifications.hydroxyl));
-        assert (pdt3.getMod3().equals(Modifications.hydroxyl));
-
+        assert (cps.run(pdt, expected));
     }
 
-    @Test(timeout = 3000)
-    public void testDigest_modcombinations_3to5() throws Exception {
-        LigateSimulator lig = new LigateSimulator();
-        lig.initiate();
+    @Test
+    public void testLigation_single_fragment_lefty_phosphate() throws Exception {
+        //Circularization of a single fragment with a 5' phosphates on lefty end
+        Polynucleotide poly = new Polynucleotide("CCCCCCCCCCCC", "GGGG", "GGGG", true, false, false, Modifications.hydroxyl, Modifications.phos5);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly);
 
-        ComparePolynucleotides cps = new ComparePolynucleotides();
-        cps.initiate();
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("GGGGCCCCCCCCCCCC", "", "", true, false, true, Modifications.circular, Modifications.circular);
 
-        System.out.println("Two BamHI-digested DNAs examples: 3 to 5");
-        String BamHIExt = "GATC";
-
-        //3' p1 onto 5'p2
-        //Final product only has 5' phosphate
-        Polynucleotide poly1 = new Polynucleotide("Caaaaaa", "", BamHIExt, true, false, false, Modifications.phos5, Modifications.phos5);
-        Polynucleotide poly2 = new Polynucleotide("ccccccG", BamHIExt, "c", true, false, false, Modifications.phos5, Modifications.hydroxyl);
-
-        List<Polynucleotide> frags1 = new ArrayList<>();
-        frags1.add(poly1);
-        frags1.add(poly2);
-
-        Polynucleotide pdt1 = lig.run(frags1);
-
-        System.out.println("poly1");
-        System.out.println(poly1);
-
-        System.out.println("poly2");
-        System.out.println(poly2);
-
-        System.out.println("Ligation Product: 1");
-        System.out.println(pdt1);
-
-        assert (pdt1.getSequence().equals("CaaaaaaGATCccccccG"));
-        assert (pdt1.getExt3().equals("c"));
-        assert (pdt1.getMod5().equals(Modifications.phos5));
-        assert (pdt1.getMod3().equals(Modifications.hydroxyl));
-
-        //Final product only has 3' phosphate
-        Polynucleotide poly3 = new Polynucleotide("Caaaaaa", "", BamHIExt, true, false, false, Modifications.hydroxyl, Modifications.phos5);
-        Polynucleotide poly4 = new Polynucleotide("ccccccG", BamHIExt, "c", true, false, false, Modifications.hydroxyl, Modifications.phos5);
-
-        List<Polynucleotide> frags2 = new ArrayList<>();
-        frags2.add(poly3);
-        frags2.add(poly4);
-
-        Polynucleotide pdt2 = lig.run(frags2);
-
-        System.out.println("poly3");
-        System.out.println(poly3);
-
-        System.out.println("poly4");
-        System.out.println(poly4);
-
-        System.out.println("Ligation Product: 2");
-        System.out.println(pdt2);
-
-        assert (pdt2.getSequence().equals("CaaaaaaGATCccccccG"));
-        assert (pdt2.getExt3().equals("c"));
-        assert (pdt2.getMod5().equals(Modifications.hydroxyl));
-        assert (pdt2.getMod3().equals(Modifications.phos5));
-
-        //Final product has no phosphates
-        Polynucleotide poly5 = new Polynucleotide("Caaaaaa", "", BamHIExt, true, false, false, Modifications.hydroxyl, Modifications.phos5);
-        Polynucleotide poly6 = new Polynucleotide("ccccccG", BamHIExt, "c", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
-
-        List<Polynucleotide> frags3 = new ArrayList<>();
-        frags3.add(poly5);
-        frags3.add(poly6);
-
-        Polynucleotide pdt3 = lig.run(frags3);
-
-        System.out.println("poly5");
-        System.out.println(poly5);
-
-        System.out.println("poly6");
-        System.out.println(poly6);
-
-        System.out.println("Ligation Product: 3");
-        System.out.println(pdt3);
-
-        assert (pdt3.getSequence().equals("CaaaaaaGATCccccccG"));
-        assert (pdt3.getExt3().equals("c"));
-        assert (pdt3.getMod5().equals(Modifications.hydroxyl));
-        assert (pdt3.getMod3().equals(Modifications.hydroxyl));
-
+        assert (cps.run(pdt, expected));
     }
 
-    @Test(timeout = 3000)
-    public void testDigest_modcombinations_5to3_rc() throws Exception {
+    @Test
+    public void testLigation_single_fragment_righty_phosphate() throws Exception {
+        //Circularization of a single fragment with a 5' phosphates on righty end
+        Polynucleotide poly = new Polynucleotide("CCCCCCCCCCCC", "GGGG", "GGGG", true, false, false, Modifications.phos5, Modifications.hydroxyl);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly);
 
-        System.out.println("Two BamHI-digested DNAs in other orientation:5 to 3");
-        String BamHIExt = "GATC";
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("GGGGCCCCCCCCCCCC", "", "", true, false, true, Modifications.circular, Modifications.circular);
 
-        //5' p1 onto 3'p2
-        //No phosphate on 3' side
-        Polynucleotide poly1 = new Polynucleotide("Caaaaaa", "c", BamHIExt, true, false, false, Modifications.phos5, Modifications.phos5);
-        Polynucleotide poly2 = new Polynucleotide("ccccccG", "", BamHIExt, true, false, false, Modifications.hydroxyl, Modifications.phos5);
-
-        List<Polynucleotide> frags1 = new ArrayList<>();
-        frags1.add(poly1);
-        frags1.add(poly2);
-
-        Polynucleotide pdt1 = lig.run(frags1);
-
-        System.out.println("poly1");
-        System.out.println(poly1);
-
-        System.out.println("poly2");
-        System.out.println(poly2);
-
-        System.out.println("Ligation Product: 1");
-        System.out.println(pdt1);
-
-        assert (pdt1.getSequence().equals("CaaaaaaGATCCgggggg"));
-        assert (pdt1.getExt5().equals("c"));
-        assert (pdt1.getMod5().equals(Modifications.phos5));
-        assert (pdt1.getMod3().equals(Modifications.hydroxyl));
-
-        //5 to 3
-        //No phosphate on 5' side
-        Polynucleotide poly3 = new Polynucleotide("Caaaaaa", "c", BamHIExt, true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
-        Polynucleotide poly4 = new Polynucleotide("ccccccG", "", BamHIExt, true, false, false, Modifications.phos5, Modifications.phos5);
-
-        List<Polynucleotide> frags2 = new ArrayList<>();
-        frags2.add(poly3);
-        frags2.add(poly4);
-
-        Polynucleotide pdt2 = lig.run(frags2);
-
-        System.out.println("poly3");
-        System.out.println(poly3);
-
-        System.out.println("poly4");
-        System.out.println(poly4);
-
-        System.out.println("Ligation Product: 2");
-        System.out.println(pdt2);
-
-        assert (pdt2.getSequence().equals("CaaaaaaGATCCgggggg"));
-        assert (pdt2.getExt5().equals("c"));
-        assert (pdt2.getMod5().equals(Modifications.hydroxyl));
-        assert (pdt2.getMod3().equals(Modifications.phos5));
-
-        //No phosphate on either side
-        Polynucleotide poly5 = new Polynucleotide("Caaaaaa", "c", BamHIExt, true, false, false, Modifications.hydroxyl, Modifications.phos5);
-        Polynucleotide poly6 = new Polynucleotide("ccccccG", "", BamHIExt, true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
-
-        List<Polynucleotide> frags3 = new ArrayList<>();
-        frags3.add(poly5);
-        frags3.add(poly6);
-
-        Polynucleotide pdt3 = lig.run(frags3);
-
-        System.out.println("poly5");
-        System.out.println(poly5);
-
-        System.out.println("poly6");
-        System.out.println(poly6);
-
-        System.out.println("Ligation Product: 3");
-        System.out.println(pdt3);
-
-        assert (pdt3.getSequence().equals("CaaaaaaGATCCgggggg"));
-        assert (pdt3.getExt5().equals("c"));
-        assert (pdt3.getMod5().equals(Modifications.hydroxyl));
-        assert (pdt3.getMod3().equals(Modifications.hydroxyl));
+        assert (cps.run(pdt, expected));
     }
 
-    @Test(timeout = 3000)
-    public void testDigest_modcombinations_3to5_rc() throws Exception {
-
-        System.out.println("Two BamHI-digested DNAs in other orientation: 3 to 5");
-        String BamHIExt = "GATC";
-
-        //3' p1 onto 5'p2
-        //Only a phosphate on the 5' side
-        Polynucleotide poly1 = new Polynucleotide("Caaaaaa", BamHIExt, "c", true, false, false, Modifications.phos5, Modifications.hydroxyl);
-        Polynucleotide poly2 = new Polynucleotide("ccccccG", BamHIExt, "", true, false, false, Modifications.phos5, Modifications.phos5);
-
-        List<Polynucleotide> frags1 = new ArrayList<>();
-        frags1.add(poly1);
-        frags1.add(poly2);
-
-        System.out.println("poly1");
-        System.out.println(poly1);
-
-        System.out.println("poly2");
-        System.out.println(poly2);
-
-        Polynucleotide pdt1 = lig.run(frags1);
-
-        System.out.println("Ligation Product: 1");
-        System.out.println(pdt1);
-
-        assert (pdt1.getSequence().equals("CggggggGATCCaaaaaa"));
-        assert (pdt1.getExt3().equals("c"));
-        assert (pdt1.getMod5().equals(Modifications.phos5));
-        assert (pdt1.getMod3().equals(Modifications.hydroxyl));
-
-        //5 to 3
-        //only phosphate on the 5' side
-        Polynucleotide poly3 = new Polynucleotide("Caaaaaa", BamHIExt, "", true, false, false, Modifications.phos5, Modifications.phos5);
-        Polynucleotide poly4 = new Polynucleotide("ccccccG", BamHIExt, "c", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
-
-        List<Polynucleotide> frags2 = new ArrayList<>();
-        frags2.add(poly3);
-        frags2.add(poly4);
-
-        Polynucleotide pdt2 = lig.run(frags2);
-
-        System.out.println("poly3");
-        System.out.println(poly3);
-
-        System.out.println("poly4");
-        System.out.println(poly4);
-
-        System.out.println("Ligation Product: 2");
-        System.out.println(pdt2);
-
-        assert (pdt2.getSequence().equals("CggggggGATCCaaaaaa"));
-        assert (pdt2.getExt5().equals("g"));
-        assert (pdt2.getMod5().equals(Modifications.hydroxyl));
-        assert (pdt2.getMod3().equals(Modifications.phos5));
-
-        //Just 5
-        //No phosphates
-        Polynucleotide poly5 = new Polynucleotide("Caaaaaa", BamHIExt, "", true, false, false, Modifications.phos5, Modifications.hydroxyl);
-        Polynucleotide poly6 = new Polynucleotide("ccccccG", BamHIExt, "c", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
-
-        List<Polynucleotide> frags3 = new ArrayList<>();
-        frags3.add(poly5);
-        frags3.add(poly6);
-
-        Polynucleotide pdt3 = lig.run(frags3);
-
-        System.out.println("poly5");
-        System.out.println(poly5);
-
-        System.out.println("poly6");
-        System.out.println(poly6);
-
-        System.out.println("Ligation Product: 3");
-        System.out.println(pdt3);
-
-        assert (pdt3.getSequence().equals("CggggggGATCCaaaaaa"));
-        assert (pdt3.getExt5().equals("g"));
-        assert (pdt3.getMod5().equals(Modifications.hydroxyl));
-        assert (pdt3.getMod3().equals(Modifications.hydroxyl));
-    }
-
-    @Test(timeout = 3000)
-    public void testDigest_modcombinations_circular() throws Exception {
-
-        System.out.println("Two BamHI-digested DNAs to make circular");
-        String BamHIExt = "GATC";
-
-        //circular example that works
-        Polynucleotide poly1 = new Polynucleotide("Caaaaaa", BamHIExt, "", true, false, false, Modifications.phos5, Modifications.phos5);
-        Polynucleotide poly2 = new Polynucleotide("ccccccG", BamHIExt, "", true, false, false, Modifications.phos5, Modifications.phos5);
-
-        List<Polynucleotide> frags1 = new ArrayList<>();
-        frags1.add(poly1);
-        frags1.add(poly2);
-
-        System.out.println("poly1");
-        System.out.println(poly1);
-
-        System.out.println("poly2");
-        System.out.println(poly2);
-
-        Polynucleotide pdt1 = lig.run(frags1);
-
-        System.out.println("Circular Ligation Product: 1");
-        System.out.println(pdt1);
-
-        assert (pdt1.getSequence().equals("GATCCaaaaaaCgggggg"));
-        assert (pdt1.getMod5().equals(Modifications.circular));
-        assert (pdt1.getMod3().equals(Modifications.circular));
-
-        //circular example that doesnt work: no phosphate
-        Polynucleotide poly3 = new Polynucleotide("Caaaaaa", BamHIExt, "", true, false, false, Modifications.phos5, Modifications.hydroxyl);
-        Polynucleotide poly4 = new Polynucleotide("ccccccG", BamHIExt, "", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
-
-        List<Polynucleotide> frags2 = new ArrayList<>();
-        frags2.add(poly3);
-        frags2.add(poly4);
-
-        System.out.println("poly3");
-        System.out.println(poly3);
-
-        System.out.println("poly4");
-        System.out.println(poly4);
-
-        Polynucleotide pdt2 = lig.run(frags2);
-
-        if (pdt2.isCircular()) {
-            System.out.println("created a circular polynucleotide");
-            System.out.println(pdt2);
-        } else {
-            System.out.println("Ligation Product: 2");
-            System.out.println("Did not created a circular polynucleotide");
-            System.out.println(pdt2);
-        }
-
-        assert (pdt2.getSequence().equals("CggggggGATCCaaaaaa"));
-        assert (pdt2.getMod5().equals(Modifications.hydroxyl));
-        assert (pdt2.getMod3().equals(Modifications.hydroxyl));
-
-    }
-
-    @Test(timeout = 3000)
-    public void testDigest_modcombinations_error() throws Exception {
-        LigateSimulator lig = new LigateSimulator();
-        lig.initiate();
-
-        ComparePolynucleotides cps = new ComparePolynucleotides();
-        cps.initiate();
-
-        System.out.println("Two BamHI-digested DNAs examples: ERROR");
-        String BamHIExt = "GATC";
-
-        //ERROR ONES
-        //Just hydroxyls
-        Polynucleotide poly1 = new Polynucleotide("Caaaaaa", BamHIExt, "c", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
-        Polynucleotide poly2 = new Polynucleotide("ccccccG", "", BamHIExt, true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
-
-        List<Polynucleotide> frags1 = new ArrayList<>();
-        frags1.add(poly1);
-        frags1.add(poly2);
-
-        System.out.println("poly1");
-        System.out.println(poly1);
-
-        System.out.println("poly2");
-        System.out.println(poly2);
+    /**
+     * Circularization of a single fragment with a 5' phosphates on righty end
+     * An exception test since no ligation should occur
+     */
+    @Test
+    public void testLigation_single_fragment_no_phosphate() throws Exception {
+        Polynucleotide poly = new Polynucleotide("CCCCCCCCCCCC", "GGGG", "GGGG", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly);
 
         try {
-            Polynucleotide pdt1 = lig.run(frags1);
+            Polynucleotide pdt = lig.run(frags);
+            assert (false);
         } catch (Exception err) {
-            System.out.println("(Expected exception thrown)\n All hydroxyl Modifications no ligation\n ");
+            assert (true);
         }
-
-        //wrong phosphates
-        Polynucleotide poly3 = new Polynucleotide("Caaaaaa", BamHIExt, "c", true, false, false, Modifications.hydroxyl, Modifications.phos5);
-        Polynucleotide poly4 = new Polynucleotide("ccccccG", "", BamHIExt, true, false, false, Modifications.phos5, Modifications.hydroxyl);
-
-        List<Polynucleotide> frags2 = new ArrayList<>();
-        frags1.add(poly1);
-        frags1.add(poly2);
-
-        System.out.println("poly3");
-        System.out.println(poly3);
-
-        System.out.println("poly4");
-        System.out.println(poly4);
-
-        
-        try {
-            Polynucleotide pdt2 = lig.run(frags2);
-        } catch (Exception err) {
-            System.out.println("(Expected exception thrown)\n Wrong phosphates\n ");
-        }
-
     }
 
+    @Test
+    public void testLigation_two_frags_GATC_linear_twophosphates() throws Exception {
+        //Phosphate on both strands of the ligation junction
+        Polynucleotide poly1 = new Polynucleotide("AAAAAAA", "", "GATC", true, false, false, Modifications.hydroxyl, Modifications.phos5);
+        Polynucleotide poly2 = new Polynucleotide("CCCCCCC", "GATC", "", true, false, false, Modifications.phos5, Modifications.hydroxyl);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("AAAAAAAGATCCCCCCCC", "", "", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
+
+        assert (cps.run(pdt, expected));
+    }
+
+    @Test
+    public void testLigation_two_frags_GATC_linear_leftyphosphate() throws Exception {
+        //Only one phosphate on the lefty side
+        Polynucleotide poly1 = new Polynucleotide("AAAAAAA", "", "GATC", true, false, false, Modifications.hydroxyl, Modifications.phos5);
+        Polynucleotide poly2 = new Polynucleotide("CCCCCCC", "GATC", "", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("AAAAAAAGATCCCCCCCC", "", "", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
+
+        assert (cps.run(pdt, expected));
+    }
+
+    @Test
+
+    public void testLigation_two_frags_GATC_linear_rightyphosphate() throws Exception {
+        //Only one phosphate on the righty side
+        Polynucleotide poly1 = new Polynucleotide("AAAAAAA", "", "GATC", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
+        Polynucleotide poly2 = new Polynucleotide("CCCCCCC", "GATC", "", true, false, false, Modifications.phos5, Modifications.hydroxyl);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("AAAAAAAGATCCCCCCCC", "", "", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
+
+        assert (cps.run(pdt, expected));
+    }
+
+    /**
+     * Joining two sticky ends that lack 5' phosphates. An exception test since
+     * no ligation should occur
+     */
+    @Test
+    public void testLigation_two_frags_GATC_linear_nophosphate() throws Exception {
+        //Only one phosphate on the righty side
+        Polynucleotide poly1 = new Polynucleotide("AAAAAAA", "", "GATC", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
+        Polynucleotide poly2 = new Polynucleotide("CCCCCCC", "GATC", "", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+
+        try {
+            Polynucleotide pdt = lig.run(frags);
+            assert (false);
+        } catch (Exception err) {
+            assert (true);
+        }
+    }
+
+    @Test
+    public void testLigation_two_frags_nonpalindromic_fiveprime_sticky() throws Exception {
+        //Joining a 5' non-palindromic sticky end
+        Polynucleotide poly1 = new Polynucleotide("AAAAAAA", "", "CAAA", true, false, false, Modifications.hydroxyl, Modifications.phos5);
+        Polynucleotide poly2 = new Polynucleotide("CCCCCCC", "CAAA", "", true, false, false, Modifications.phos5, Modifications.hydroxyl);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("AAAAAAACAAACCCCCCC", "", "", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
+
+        assert (cps.run(pdt, expected));
+    }
+
+    @Test
+    public void testLigation_two_frags_nonpalindromic_threeprime_sticky() throws Exception {
+        //Joining 3' nonpalindromic sticky ends
+        Polynucleotide poly1 = new Polynucleotide("AAAAAAA", "", "-CAAA", true, false, false, Modifications.hydroxyl, Modifications.phos5);
+        Polynucleotide poly2 = new Polynucleotide("CCCCCCC", "-CAAA", "", true, false, false, Modifications.phos5, Modifications.hydroxyl);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("AAAAAAACAAACCCCCCC", "", "", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
+
+        assert (cps.run(pdt, expected));
+    }
+
+    @Test
+    public void testLigation_two_frags_threeprime_sticky() throws Exception {
+        //Joining 3' sticky ends
+        Polynucleotide poly1 = new Polynucleotide("AAAAAAA", "", "-GATC", true, false, false, Modifications.hydroxyl, Modifications.phos5);
+        Polynucleotide poly2 = new Polynucleotide("CCCCCCC", "-GATC", "", true, false, false, Modifications.phos5, Modifications.hydroxyl);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("AAAAAAAGATCCCCCCCC", "", "", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
+
+        assert (cps.run(pdt, expected));
+    }
+
+    @Test
+    public void testLigation_two_frags_blunt_sticky() throws Exception {
+        //Joining two blunt ends
+        Polynucleotide poly1 = new Polynucleotide("AAAAAAA", "c", "", true, false, false, Modifications.hydroxyl, Modifications.phos5);
+        Polynucleotide poly2 = new Polynucleotide("CCCCCCC", "", "a", true, false, false, Modifications.phos5, Modifications.hydroxyl);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("AAAAAAACCCCCCC", "c", "a", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
+
+        assert (cps.run(pdt, expected));
+    }
+
+    /**
+     * Joining two sticky ends that are not the same sticky end An exception
+     * test since no ligation should occur
+     */
+    @Test
+    public void testLigation_two_frags_mismatched_ends() throws Exception {
+        //Only one phosphate on the righty side
+        Polynucleotide poly1 = new Polynucleotide("AAAAAAA", "", "CCCC", true, false, false, Modifications.hydroxyl, Modifications.phos5);
+        Polynucleotide poly2 = new Polynucleotide("CCCCCCC", "CACC", "", true, false, false, Modifications.phos5, Modifications.hydroxyl);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+
+        try {
+            Polynucleotide pdt = lig.run(frags);
+            assert (false);
+        } catch (Exception err) {
+            assert (true);
+        }
+    }
+
+    @Test
+    public void testLigation_two_frags_circular_fiveprime() throws Exception {
+        //Recircularizing over 5' extensions
+        Polynucleotide poly1 = new Polynucleotide("AAAAAAA", "GATC", "AATT", true, false, false, Modifications.phos5, Modifications.phos5);
+        Polynucleotide poly2 = new Polynucleotide("CCCCCCC", "AATT", "GATC", true, false, false, Modifications.phos5, Modifications.phos5);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("GATCAAAAAAAAATTCCCCCCC", "", "", true, false, true, Modifications.circular, Modifications.circular);
+
+        assert (cps.run(pdt, expected));
+    }
+
+    @Test
+    public void testLigation_two_frags_circular_threeprime() throws Exception {
+        //Recircularizing over 3' extensions
+        Polynucleotide poly1 = new Polynucleotide("AAAAAAA", "-GATC", "AATT", true, false, false, Modifications.phos5, Modifications.phos5);
+        Polynucleotide poly2 = new Polynucleotide("CCCCCCC", "AATT", "-GATC", true, false, false, Modifications.phos5, Modifications.phos5);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("GATCAAAAAAAAATTCCCCCCC", "", "", true, false, true, Modifications.circular, Modifications.circular);
+    
+        assert (cps.run(pdt, expected));
+    }
+
+    @Test
+    public void testLigation_two_frags_circular_blunt() throws Exception {
+        //Recircularizing over blunt ends
+        Polynucleotide poly1 = new Polynucleotide("AAAAAAA", "", "AATT", true, false, false, Modifications.phos5, Modifications.phos5);
+        Polynucleotide poly2 = new Polynucleotide("CCCCCCC", "AATT", "", true, false, false, Modifications.phos5, Modifications.phos5);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("AAAAAAAAATTCCCCCCC", "", "", true, false, true, Modifications.circular, Modifications.circular);
+    
+        assert (cps.run(pdt, expected));
+    }
+
+    /**
+     * Two fragments, one of which can self-circularize An exception test since
+     * ambiugous products would occur
+     */
+    @Test
+    public void testLigation_two_frags_self_circularization() throws Exception {
+        Polynucleotide poly1 = new Polynucleotide("AAAAAAA", "CCCC", "CCCC", true, false, false, Modifications.phos5, Modifications.phos5);
+        Polynucleotide poly2 = new Polynucleotide("CCCCCCC", "CCCC", "GATC", true, false, false, Modifications.phos5, Modifications.phos5);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+
+        try {
+            Polynucleotide pdt = lig.run(frags);
+            assert (false);
+        } catch (Exception err) {
+            assert (true);
+        }
+    }
+
+    @Test
+    public void testLigation_three_frags() throws Exception {
+        //Three non-palindromic fragments ligate to a circle
+        Polynucleotide poly1 = new Polynucleotide("AAAAA", "ATTT", "CTTT", true, false, false, Modifications.phos5, Modifications.phos5);
+        Polynucleotide poly2 = new Polynucleotide("CCCCC", "CTTT", "GTTT", true, false, false, Modifications.phos5, Modifications.phos5);
+        Polynucleotide poly3 = new Polynucleotide("GGGGG", "GTTT", "ATTT", true, false, false, Modifications.phos5, Modifications.phos5);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly2);
+        frags.add(poly3);
+
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("ATTTAAAAACTTTCCCCCGTTTGGGGG", "", "", true, false, true, Modifications.circular, Modifications.circular);
+    
+        assert (cps.run(pdt, expected));
+    }
+
+    @Test
+    public void testLigation_three_frags_rearranged() throws Exception {
+        //Three non-palindromic fragments ligate to a circle, out of order
+        Polynucleotide poly1 = new Polynucleotide("AAAAA", "ATTT", "CTTT", true, false, false, Modifications.phos5, Modifications.phos5);
+        Polynucleotide poly2 = new Polynucleotide("CCCCC", "CTTT", "GTTT", true, false, false, Modifications.phos5, Modifications.phos5);
+        Polynucleotide poly3 = new Polynucleotide("GGGGG", "GTTT", "ATTT", true, false, false, Modifications.phos5, Modifications.phos5);
+        List<Polynucleotide> frags = new ArrayList<>();
+        frags.add(poly1);
+        frags.add(poly3);  //rearranged here
+        frags.add(poly2);
+
+        Polynucleotide pdt = lig.run(frags);
+        Polynucleotide expected = new Polynucleotide("ATTTAAAAACTTTCCCCCGTTTGGGGG", "", "", true, false, true, Modifications.circular, Modifications.circular);
+    
+        assert (cps.run(pdt, expected));
+    }
 }

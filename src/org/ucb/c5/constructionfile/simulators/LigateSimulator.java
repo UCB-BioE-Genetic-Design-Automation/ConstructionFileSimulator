@@ -1,177 +1,183 @@
 package org.ucb.c5.constructionfile.simulators;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.ucb.c5.constructionfile.model.Modifications;
 
 import org.ucb.c5.sequtils.PolyRevComp;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
+import org.ucb.c5.sequtils.ComparePolynucleotides;
 
 /**
  *
  * @author J. Christopher Anderson
  */
-//TODO:
-//if one of the fragments, or both has a 5' phosphate, have it ligate
-//if no phosphates just return PCR product
-//junit test put in PCR product with no 5' phosphates
-//get the blunt PCR products back
 public class LigateSimulator {
 
     private PolyRevComp revcomp;
+    private ComparePolynucleotides cps;
 
     public void initiate() throws Exception {
         revcomp = new PolyRevComp();
         revcomp.initiate();
+        cps = new ComparePolynucleotides();
+        cps.initiate();
     }
 
     public Polynucleotide run(List<Polynucleotide> polys) throws Exception {
-        List<Polynucleotide> worklist = new ArrayList<>();
-        List<Polynucleotide> temp = new ArrayList<>(polys);
+        //Handle the edge case of a single fragment
+        if (polys.size() == 1) {
+            Polynucleotide poly = polys.get(0);
+            poly = ligateEnds(poly);
+            if (poly == null) {
+                throw new IllegalArgumentException("Single fragment does not circularize:\n" + polys.get(0));
+            }
+            return poly;
+        }
 
-        outer:
+        //Index all poly by their 5' ends, and check for duplications
+        Map<String, Polynucleotide> fiveToPoly = new HashMap<>();
+        for (int i = 0; i < polys.size(); i++) {
+            Polynucleotide poly = polys.get(i);
+            fiveToPoly.put(poly.getExt5(), poly);
+            Polynucleotide polyRC = revcomp.run(poly);
+            fiveToPoly.put(polyRC.getExt5(), polyRC);
+        }
+
+        //Find the first poly that can ligate with another fragment
+        Polynucleotide lefty = null;
+        for (Polynucleotide poly : polys) {
+            String threePrime = poly.getExt3();
+            Polynucleotide righty = fiveToPoly.get(threePrime);
+            if (righty == null) {
+                continue;
+            }
+            if (join(poly, righty) == null) {
+                continue;
+            }
+            lefty = poly;
+            break;
+        }
+        
+        if (lefty == null) {
+            throw new IllegalArgumentException("No valid ligations junctions found");
+        }
+
+        //Iteratively add righty fragments until can't ligate any more
         while (true) {
-            worklist.clear();
-            worklist.addAll(temp);
-
-            //Start iterating through all pairwise joins
-            for (int i = 0; i < worklist.size() - 1; i++) {
-                Polynucleotide p1 = worklist.get(i);
-                for (int j = i + 1; j < worklist.size(); j++) {
-                    Polynucleotide p2 = worklist.get(j);
-                    Polynucleotide result = join(p1, p2);
-                    if (result != null) {
-
-                        temp.remove(p1);
-                        temp.remove(p2);
-                        temp.add(result);
-                        continue outer;
-                    }
-                }
+            //Try to circularize, and if so exit loop
+            Polynucleotide result = ligateEnds(lefty);
+            if (result != null) {
+                lefty = result;
+                break;
             }
 
-            break outer;
+            //Find the next fregment to add on
+            String threePrime = lefty.getExt3();
+            Polynucleotide righty = fiveToPoly.get(threePrime);
+            fiveToPoly.remove(threePrime);
+
+            //If there is no next fragment, stop ligating
+            if (righty == null) {
+                break;
+            }
+
+            //Try to ligate them
+            Polynucleotide pdt = join(lefty, righty);
+            if (pdt != null) {
+                lefty = pdt;
+            }
         }
 
-        //If the frags condense to one sequence, that should happen by here
-        if (temp.size() != 1) {
-            throw new Exception("Fragments to not ligate into a single product");
+        //Check that all the initial fragments are in the assembled DNA
+        for (int i = 1; i < polys.size(); i++) {
+            Polynucleotide poly = polys.get(i);
+            if (lefty.getSequence().indexOf(poly.getSequence()) == -1) {
+                Polynucleotide polyRC = revcomp.run(poly);
+                if (lefty.getSequence().indexOf(polyRC.getSequence()) == -1) {
+                    throw new IllegalArgumentException("Not all input fragments incorporated into assembled product");
+                }
+            }
         }
 
-        //Try circularizing the returned DNA
-        Polynucleotide result = ligateEnds(temp.get(0));
-        if (result == null) {
-            return temp.get(0);
-        }
-
-        return result;
-    }
-
-    private Polynucleotide ligateEnds(Polynucleotide poly) throws Exception {
-
-        boolean mod_phos5 = poly.getMod3().equals(Modifications.phos5) | poly.getMod5().equals(Modifications.phos5);
-        
-        if (!poly.getExt3().toUpperCase().equals(poly.getExt5().toUpperCase())) {
-            return null;
-            //throw new Exception("Ends of fragment don't ligate together");
-        }
-        
-        //If there are no phosphates then no ligation can happen
-        if (!mod_phos5) {
-            return null;
-            //throw new Exception("Ends of fragment don't ligate together");
-        }
-
-        String newseq = null;
-        if (poly.getExt5().startsWith("-")) {
-            newseq = poly.getSequence() + poly.getExt3().replaceAll("-", "");
-        } else {
-            newseq = poly.getExt5() + poly.getSequence();
-        }
-
-        return new Polynucleotide(newseq, true);
+        return lefty;
     }
 
     /**
-     * Dpes one ligation event on two Polynuceotides
+     * Tries to pairwise join DNAs, checking for a 5' phosphate
      *
-     * If they can be ligated, it returns the product. If they cannot be joined,
-     * it returns null
-     *
-     * @param p1
-     * @param p2
+     * @param lefty
+     * @param righty
      * @return
-     * @throws Exception
      */
-    private Polynucleotide join(Polynucleotide p1, Polynucleotide p2) throws Exception {
-        //Get them in the right orientation to ligate
-        Polynucleotide poly1 = null;
-        Polynucleotide poly2 = null;
-
-        Modifications mod5;
-        Modifications mod3;
-        //Add here for the phosphates on at least one of them
-        /*
-        System.out.println("p1");
-        System.out.println(p1);
-        System.out.println("p2");
-        System.out.println(p2);
-         */
-
-        //If either doesnt have phosphate then they wont join 
-        if (!(p1.getMod5().equals(Modifications.phos5) | p1.getMod3().equals(Modifications.phos5) | p2.getMod5().equals(Modifications.phos5) | p1.getMod3().equals(Modifications.phos5))) {
+    private Polynucleotide join(Polynucleotide lefty, Polynucleotide righty) throws Exception {
+        //One or the other ends needs a 5' phosphate
+        boolean hasPhosphate = lefty.getMod3().equals(Modifications.phos5) || righty.getMod5().equals(Modifications.phos5);
+        if (!hasPhosphate) {
             return null;
         }
 
-        boolean p1_onto_p2_53 = (p1.getMod5().equals(Modifications.phos5) | p2.getMod3().equals(Modifications.phos5));
-        boolean p1_onto_p2_35 = (p1.getMod3().equals(Modifications.phos5) | p2.getMod5().equals(Modifications.phos5));
-
-        if (p1.getExt3().toUpperCase().equals(p2.getExt5().toUpperCase()) & p1_onto_p2_35) {
-            poly1 = p1;
-            poly2 = p2;
-            mod5 = p1.getMod5();
-            mod3 = p2.getMod3();
-
-        } else if (p1.getExt5().toUpperCase().equals(p2.getExt3().toUpperCase()) & p1_onto_p2_53) {
-            poly1 = p2;
-            poly2 = p1;
-            mod5 = p2.getMod5();
-            mod3 = p1.getMod3();
-        } else {
-            Polynucleotide p2rc = revcomp.run(p2);
-
-            boolean p1_onto_p2rc_53 = (p1.getMod5().equals(Modifications.phos5) | p2rc.getMod3().equals(Modifications.phos5));
-            boolean p1_onto_p2rc_35 = (p1.getMod3().equals(Modifications.phos5) | p2rc.getMod5().equals(Modifications.phos5));
-
-            if (p1.getExt3().toUpperCase().equals(p2rc.getExt5().toUpperCase()) & p1_onto_p2rc_35) {
-                poly1 = p1;
-                poly2 = p2rc;
-
-                mod5 = p1.getMod5();
-                mod3 = p2rc.getMod3();
-
-            } else if (p1.getExt5().toUpperCase().equals(p2rc.getExt3().toUpperCase()) & p1_onto_p2rc_53) {
-                poly1 = p2rc;
-                poly2 = p1;
-
-                mod5 = p2rc.getMod5();
-                mod3 = p1.getMod3();
-
-                //Otherwise they do not ligate, so return null
-            } else {
-                return null;
-            }
+        //The ends can only be 5' phosphate or hydroxyls, nothing else
+        boolean hydroxyOrPhosLefty = lefty.getMod3().equals(Modifications.phos5) || lefty.getMod3().equals(Modifications.hydroxyl);
+        if (!hydroxyOrPhosLefty) {
+            return null;
+        }
+        boolean hydroxyOrPhosRighty = righty.getMod5().equals(Modifications.phos5) || righty.getMod5().equals(Modifications.hydroxyl);
+        if (!hydroxyOrPhosRighty) {
+            return null;
+        }
+        
+        if(cps.run(lefty, righty)) {
+            return null;
         }
 
-        //If got this far, they match, so ligate them
+        //Ligate them
         String newseq = "";
-        newseq += poly1.getSequence();
-        newseq += poly1.getExt3().replaceAll("-", "");
-        newseq += poly2.getSequence();
+        newseq += lefty.getSequence();
+        newseq += lefty.getExt3().replaceAll("-", "");
+        newseq += righty.getSequence();
 
         //(String sequence, String ext5, String ext3, boolean isDoubleStranded, boolean isRNA, boolean isCircular, Modifications mod_ext5, Modifications mod_ext3) {
-        Polynucleotide out = new Polynucleotide(newseq, poly1.getExt5(), poly2.getExt3(), true, false, false, mod5, mod3);
-        return out;
+        return new Polynucleotide(newseq, lefty.getExt5(), righty.getExt3(), true, false, false, lefty.getMod5(), righty.getMod3());
+    }
+
+    /**
+     * Tries to circularize the ends of the DNA
+     *
+     * @param poly The DNA being ligated
+     * @return null or the poly circularized
+     */
+    private Polynucleotide ligateEnds(Polynucleotide poly) {
+        //One or the other ends needs a 5' phosphate
+        boolean hasPhosphate = poly.getMod3().equals(Modifications.phos5) || poly.getMod5().equals(Modifications.phos5);
+        if (!hasPhosphate) {
+            return null;
+        }
+
+        //The ends can only be 5' phosphate or hydroxyls, nothing else
+        boolean hydroxyOrPhos5 = poly.getMod5().equals(Modifications.phos5) || poly.getMod5().equals(Modifications.hydroxyl);
+        if (!hydroxyOrPhos5) {
+            return null;
+        }
+        boolean hydroxyOrPhos3 = poly.getMod3().equals(Modifications.phos5) || poly.getMod3().equals(Modifications.hydroxyl);
+        if (!hydroxyOrPhos3) {
+            return null;
+        }
+
+        //The sticky ends must match
+        if (!poly.getExt3().toUpperCase().equals(poly.getExt5().toUpperCase())) {
+            return null;
+        }
+
+        //Deal with strandedness of extension
+        String sticky = poly.getExt5();
+        if (sticky.startsWith("-")) {
+            sticky = sticky.substring(1);
+        }
+
+        return new Polynucleotide(sticky + poly.getSequence(), true);
     }
 
     public static void main(String[] args) throws Exception {
@@ -180,23 +186,39 @@ public class LigateSimulator {
         lig.initiate();
 
         {
-            System.out.println("Two BamHI-digested DNAs:");
-            String BamHIExt = "GATC";
+            System.out.println("Recircularization of a single fragment");
 
-            Polynucleotide poly1 = new Polynucleotide("Caaaaaa", BamHIExt, "c", true, false, false, Modifications.phos5, Modifications.phos5);
-            Polynucleotide poly2 = new Polynucleotide("ccccccG", "", BamHIExt, true, false, false, Modifications.phos5, Modifications.phos5);
-
-            System.out.println("poly1:\n" + poly1);
-            System.out.println("poly2:\n" + poly2);
+            Polynucleotide poly1 = new Polynucleotide("CCCCCCCCCCCC", "GGGG", "GGGG", true, false, false, Modifications.phos5, Modifications.phos5);
 
             List<Polynucleotide> frags = new ArrayList<>();
             frags.add(poly1);
-            frags.add(poly2);
 
             Polynucleotide pdt = lig.run(frags);
+            Polynucleotide expected = new Polynucleotide("GGGGCCCCCCCCCCCC", "", "", true, false, true, Modifications.circular, Modifications.circular);
 
-            System.out.println("Ligation product:");
-            System.out.println(pdt.toString());
+            ComparePolynucleotides cps = new ComparePolynucleotides();
+            cps.initiate();
+            cps.run(pdt, expected);
+
+            System.out.println("Input:\n" + poly1);
+            System.out.println("Product:\n" + pdt);
+        }
+
+        {
+            System.out.println("Single fragment with no 5' phosphates");
+
+            Polynucleotide poly = new Polynucleotide("CCCCCCCCCCCC", "GGGG", "GGGG", true, false, false, Modifications.hydroxyl, Modifications.hydroxyl);
+            List<Polynucleotide> frags = new ArrayList<>();
+            frags.add(poly);
+
+            System.out.println("Input:\n" + poly);
+            
+            try {
+                Polynucleotide pdt = lig.run(frags);
+                System.err.println("Invalid return of product: " + pdt);
+            } catch (Exception err) {
+                System.out.println("Exception correctly thrown\n");
+            }
         }
 
         {
@@ -205,48 +227,6 @@ public class LigateSimulator {
 
             Polynucleotide poly1 = new Polynucleotide("ttttttG", "c", BamHIExt);
             Polynucleotide poly2 = new Polynucleotide("ccccccG", "", BamHIExt);
-
-            System.out.println("poly1:\n" + poly1);
-            System.out.println("poly2:\n" + poly2);
-
-            List<Polynucleotide> frags = new ArrayList<>();
-            frags.add(poly1);
-            frags.add(poly2);
-
-            Polynucleotide pdt = lig.run(frags);
-
-            System.out.println("Ligation product:");
-            System.out.println(pdt.toString());
-        }
-
-        {
-            System.out.println("Two BamHI-digested DNAs in other orientation:");
-            String BamHIExt = "GATC";
-
-            Polynucleotide poly1 = new Polynucleotide("ttttttG", BamHIExt, "c");
-            Polynucleotide poly2 = new Polynucleotide("ccccccG", BamHIExt, "");
-
-            System.out.println("poly1:\n" + poly1);
-            System.out.println("poly2:\n" + poly2);
-
-            List<Polynucleotide> frags = new ArrayList<>();
-            frags.add(poly1);
-            frags.add(poly2);
-
-            Polynucleotide pdt = lig.run(frags);
-
-            System.out.println("Ligation product:");
-            System.out.println(pdt.toString());
-        }
-        /*
-        
-/*
-        {
-            System.out.println("Two PstI-digested DNAs:");
-            String PstIExt = "-TGCA";
-
-            Polynucleotide poly1 = new Polynucleotide("Gaaaaaa", PstIExt, "c");
-            Polynucleotide poly2 = new Polynucleotide("ccccccC", "", PstIExt);
 
             System.out.println("poly1:\n" + poly1);
             System.out.println("poly2:\n" + poly2);
@@ -346,8 +326,5 @@ public class LigateSimulator {
             System.out.println("Ligation product:");
             System.out.println(pdt.toString());
         }
-         */
-
     }
-
 }
