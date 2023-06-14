@@ -19,7 +19,11 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.TabSet;
 import javax.swing.text.TabStop;
+import org.ucb.c5.constructionfile.ParseExperimentDirectory;
+import org.ucb.c5.constructionfile.SimulateExperimentDirectory;
+import org.ucb.c5.constructionfile.model.Experiment;
 import org.ucb.c5.utils.FileUtils;
+import org.ucb.c5.utils.Log;
 
 /**
  *
@@ -34,112 +38,16 @@ public class SimulatorView extends javax.swing.JFrame {
      */
     public SimulatorView() {
         initComponents();
+        addFileDrop();
         setVisible(true);
-//        
-//        //Find locations of sequence data and ApE Features
-//        String apefeaturesFile = null;
-//        String seqFileDir = null;
-//        
-//        try {
-//            //Load sequence location info
-//            String data = FileUtils.readFile("SequenceLocals.txt");
-//            String[] lines = data.split("\\r|\\r?\\n");
-//            apefeaturesFile = lines[0];
-//            seqFileDir = lines[1];
-//        } catch (Exception ex) {
-//            //OK to fail
-//        }
-//        
-//        //Ask for locations using a dialog if didn't find them
-//        boolean dosave = false;
-//        if (apefeaturesFile == null) {
-//            JFileChooser jFileChooser = new JFileChooser();
-//            jFileChooser.setCurrentDirectory(new File("C:\\"));
-//            jFileChooser.setDialogTitle("Locate the ApE feature file");
-//
-//            int result = jFileChooser.showOpenDialog(this);
-//
-//            if (result == JFileChooser.APPROVE_OPTION) {
-//                File selectedFile = jFileChooser.getSelectedFile();
-//                apefeaturesFile = selectedFile.getAbsolutePath();
-//                dosave = true;
-//            } else {
-//                System.exit(0);
-//            }
-//        }
-//        
-//        if(seqFileDir == null) {
-//            JFileChooser jFileChooser = new JFileChooser();
-//            jFileChooser.setCurrentDirectory(new File("C:\\"));
-//            jFileChooser.setDialogTitle("Locate the root of sequence files");
-//            jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-//
-//            int result = jFileChooser.showOpenDialog(this);
-//
-//            if (result == JFileChooser.APPROVE_OPTION) {
-//                File selectedFile = jFileChooser.getSelectedFile();
-//                seqFileDir = selectedFile.getAbsolutePath();
-//                dosave = true;
-//            } else {
-//                System.exit(0);
-//            }
-//        }
-//
-//        if(dosave == true) {
-//            String towrite = apefeaturesFile + "\n" + seqFileDir;
-//            FileUtils.writeFile(towrite, "SequenceLocals.txt");
-//        }
-//        
-//        //Parse all the .seq, ape, and .gb files for sequence
-//        Map<String,String> apeSequence = findApeFiles(seqFileDir);
-//        
-////TODO:  need to put all the sequences found in the cf somehow
-
+        
         int w = cfPane.getFontMetrics(cfPane.getFont()).charWidth(' ');
         TabStop[] stops = {new TabStop(w * 40)};
         MutableAttributeSet attrs = new SimpleAttributeSet();
         StyleConstants.setTabSet(attrs, new TabSet(stops));
         cfPane.setParagraphAttributes(attrs, false);
 
-        cfPane.setText(
-//Gibson Assembly 1                
-//                ">Construction of pTarg2\n" +
-//                "acquire oligo targAf\n" +
-//                "acquire oligo targAr\n" +
-//                "acquire oligo targBf\n" +
-//                "acquire oligo targBr\n" +
-//                "acquire plasmid p20N5\n" +
-//                "acquire plasmid pTargetF\n" +
-//                "PCR targAf,targAr on p20N5\t(1200 bp, pcrA)\n" +
-//                "PCR targBf,targBr on pTargetF\t(1172 bp, pcrB)\n" +
-//                "Assemble pcrA,pcrB\t(Gibson, pTarg2)\n" +
-//                "Transform pTarg2\t(Mach1, Amp)\n" +
-//                "\n" +
-//                ">targAf\n" +
-//                "GAGTTCATGTGCAGCTCCATAAGCTGAAATTCTGCCTCGTGATAC\n" +
-//                ">targAr\n" +
-//                "GTTAAGGGATTTTGGTCATGAGATTATCAAAAAGGATCTTC\n" +
-//                ">targBf\n" +
-//                "GAAGATCCTTTTTGATAATCTCATGACCAAAATCCCTTAAC\n" +
-//                ">targBr\n" +
-//                "GTATCACGAGGCAGAATTTCAGCTTATGGAGCTGCACATGAACTC\n" +
-//                ">p20N5\n" +
-//                "attaccgcctttgagtgagctgataccgctcgccgcagccgaacgaccgagcgcagcgagtcagtgagcgaggaagcctgcaaCTCGAGcgatcagatACTAGTaaccaatataccaaataaagagttgaggacgtcaaggATGGCTTCCTCCGAAGACGTTATCAAAGAGTTCATGCGTTTCAAAGTTCGTATGGAAGGTTCCGTTAACGGTCACGAGTTCGAAATCGAAGGTGAAGGTGAAGGTCGTCCGTACGAAGGTACCCAGACCGCTAAACTGAAAGTTACCAAAGGTGGTCCGCTGCCGTTCGCTTGGGACATCCTGTCCCCGCAGTTCCAGTACGGTTCCAAGGCTTACGTTAAACACCCGGCTGACATCCCGGACTACCTGAAACTGTCCTTCCCGGAAGGTTTCAAATGGGAACGTGTTATGAACTTCGAAGACGGTGGTGTTGTTACCGTTACCCAGGATTCCTCCCTGCAAGACGGTGAGTTCATCTACAAAGTTAAACTGCGTGGTACCAACTTCCCGTCCGACGGTCCGGTTATGCAGAAAAAAACCATGGGTTGGGAGGCTTCCACCGAACGTATGTACCCGGAAGACGGTGCTCTGAAAGGTGAAATCAAAATGCGTCTGAAACTGAAAGACGGTGGTCACTACGACGCTGAAGTTAAAACCACCTACATGGCTAAAAAACCGGTTCAGCTGCCGGGTGCTTACAAAACCGACATCAAACTGGACATCACCTCCCACAACGAAGACTACACCATCGTTGAACAGTACGAACGTGCTGAAGGTCGTCACTCCACCGGTGCTTAAGAATTCccctAGAGACCCCTCCTCcagaaatcatccttagcgaaagctaaggattttttttatctgaaattctgcctcgtgatacgcctatttttataggttaatgtcatgataataatggtttcttagacgtcaggtggcacttttcggggaaatgtgcgcggaacccctatttgtttatttttctaaatacattcaaatatgtatccgctcatgagacaataaccctgataaatgcttcaataatattgaaaaaggaagagtatgagtattcaacatttccgtgtcgcccttattcccttttttgcggcattttgccttcctgtttttgctcacccagaaacgctggtgaaagtaaaagatgctgaagatcagttgggtgcacgagtgggttacatcgaactggatctcaacagcggtaagatccttgagagttttcgccccgaagaacgttttccaatgatgagcacttttaaagttctgctatgtggcgcggtattatcccgtattgacgccgggcaagagcaactcggtcgccgcatacactattctcagaatgacttggttgagtactcaccagtcacagaaaagcatcttacggatggcatgacagtaagagaattatgcagtgctgccataaccatgagtgataacactgcggccaacttacttctgacaacgatcggaggaccgaaggagctaaccgcttttttgcacaacatgggggatcatgtaactcgccttgatcgttgggaaccggagctgaatgaagccataccaaacgacgagcgtgacaccacgatgcctgtagcaatggcaacaacgttgcgcaaactattaactggcgaactacttactctagcttcccggcaacaattaatagactggatggaggcggataaagttgcaggaccacttctgcgctcggcccttccggctggctggtttattgctgataaatctggagccggtgagcgtggCtctcgcggtatcattgcagcactggggccagatggtaagccctcccgtatcgtagttatctacacgacggggagtcaggcaactatggatgaacgaaatagacagatcgctgagataggtgcctcactgattaagcattggtaactgtcagaccaagtttactcatatatactttagattgatttaaaacttcatttttaatttaaaaggatctaggtgaagatcctttttgataatctcatgaccaaaatcccttaacgtgagttttcgttccactgagcgtcagaccccgtagaaaagatcaaaggatcttcttgagatcctttttttctgcgcgtaatctgctgcttgcaaacaaaaaaaccaccgctaccagcggtggtttgtttgccggatcaagagctaccaactctttttccgaaggtaactggcttcagcagagcgcagataccaaatactgtccttctagtgtagccgtagttaggccaccacttcaagaactctgtagcaccgcctacatacctcgctctgctaatcctgttaccagtggctgctgccagtggcgataagtcgtgtcttaccgggttggactcaagacgatagttaccggataaggcgcagcggtcgggctgaacggggggttcgtgcacacagcccagcttggagcgaacgacctacaccgaactgagatacctacagcgtgagctatgagaaagcgccacgcttcccgaagggagaaaggcggacaggtatccggtaagcggcagggtcggaacaggagagcgcacgagggagcttccagggggaaacgcctggtatctttatagtcctgtcgggtttcgccacctctgacttgagcgtcgatttttgtgatgctcgtcaggggggcggagcctatggaaaaacgccagcaacgcggcctttttacggttcctggccttttgctggccttttgctcacatgttctttcctgcgttatcccctgattctgtggataaccgt\n" +
-//                ">pTargetF\n" +
-//                "catgttctttcctgcgttatcccctgattctgtggataaccgtattaccgcctttgagtgagctgataccgctcgccgcagccgaacgaccgagcgcagcgagtcagtgagcgaggaagcggaagagcgcctgatgcggtattttctccttacgcatctgtgcggtatttcacaccgcatatgctggatccttgacagctagctcagtcctaggtataatactagtcatcgccgcagcggtttcaggttttagagctagaaatagcaagttaaaataaggctagtccgttatcaacttgaaaaagtggcaccgagtcggtgctttttttgaattctctagagtcgacctgcagaagcttagatctattaccctgttatccctactcgagttcatgtgcagctccataagcaaaaggggatgataagtttatcaccaccgactatttgcaacagtgccgttgatcgtgctatgatcgactgatgtcatcagcggtggagtgcaatgtcatgagggaagcggtgatcgccgaagtatcgactcaactatcagaggtagttggcgtcatcgagcgccatctcgaaccgacgttgctggccgtacatttgtacggctccgcagtggatggcggcctgaagccacacagtgatattgatttgctggttacggtgaccgtaaggcttgatgaaacaacgcggcgagctttgatcaacgaccttttggaaacttcggcttcccctggagagagcgagattctccgcgctgtagaagtcaccattgttgtgcacgacgacatcattccgtggcgttatccagctaagcgcgaactgcaatttggagaatggcagcgcaatgacattcttgcaggtatcttcgagccagccacgatcgacattgatctggctatcttgctgacaaaagcaagagaacatagcgttgccttggtaggtccagcggcggaggaactctttgatccggttcctgaacaggatctatttgaggcgctaaatgaaaccttaacgctatggaactcgccgcccgactgggctggcgatgagcgaaatgtagtgcttacgttgtcccgcatttggtacagcgcagtaaccggcaaaatcgcgccgaaggatgtcgctgccgactgggcaatggagcgcctgccggcccagtatcagcccgtcatacttgaagctagacaggcttatcttggacaagaagaagatcgcttggcctcgcgcgcagatcagttggaagaatttgtccactacgtgaaaggcgagatcaccaaggtagtcggcaaataagatgccgctcgccagtcgattggctgagctcataagttcctattccgaagttccgcgaacgcgtaaaggatctaggtgaagatcctttttgataatctcatgaccaaaatcccttaacgtgagttttcgttccactgagcgtcagaccccgtagaaaagatcaaaggatcttcttgagatcctttttttctgcgcgtaatctgctgcttgcaaacaaaaaaaccaccgctaccagcggtggtttgtttgccggatcaagagctaccaactctttttccgaaggtaactggcttcagcagagcgcagataccaaatactgtccttctagtgtagccgtagttaggccaccacttcaagaactctgtagcaccgcctacatacctcgctctgctaatcctgttaccagtggctgctgccagtggcgataagtcgtgtcttaccgggttggactcaagacgatagttaccggataaggcgcagcggtcgggctgaacggggggttcgtgcacacagcccagcttggagcgaacgacctacaccgaactgagatacctacagcgtgagctatgagaaagcgccacgcttcccgaagggagaaaggcggacaggtatccggtaagcggcagggtcggaacaggagagcgcacgagggagcttccagggggaaacgcctggtatctttatagtcctgtcgggtttcgccacctctgacttgagcgtcgatttttgtgatgctcgtcaggggggcggagcctatggaaaaacgccagcaacgcggcctttttacggttcctggccttttgctggccttttgctca\n"
-////    
-                
-                
-                
-                
-////GoldenGate 1                
-                ">Construction of pTarg1\n"+
-                "acquire oligo yyBla-F\n" +
-                "acquire oligo yyBla-R\n" +
-                "acquire oligo yyEI-F\n" +
-                "acquire oligo yyEI-R\n" +
-                "acquire plasmid p20N5\n" +
-                "acquire plasmid pTargetF\n" +
+        cfPane.setText(            
                 "pcr yyBla-F,yyBla-R on p20N5\t(1183 bp, fragA)\n" +
                 "pcr yyEI-F,yyEI-R on pTargetF\t(1174 bp, fragB)\n" +
                 "assemble fragA,fragB\t(BsaI, pTarg1)\n" +
@@ -158,68 +66,7 @@ public class SimulatorView extends javax.swing.JFrame {
                 ">pTargetF\n" +
                 "catgttctttcctgcgttatcccctgattctgtggataaccgtattaccgcctttgagtgagctgataccgctcgccgcagccgaacgaccgagcgcagcgagtcagtgagcgaggaagcggaagagcgcctgatgcggtattttctccttacgcatctgtgcggtatttcacaccgcatatgctggatccttgacagctagctcagtcctaggtataatactagtcatcgccgcagcggtttcaggttttagagctagaaatagcaagttaaaataaggctagtccgttatcaacttgaaaaagtggcaccgagtcggtgctttttttgaattctctagagtcgacctgcagaagcttagatctattaccctgttatccctactcgagttcatgtgcagctccataagcaaaaggggatgataagtttatcaccaccgactatttgcaacagtgccgttgatcgtgctatgatcgactgatgtcatcagcggtggagtgcaatgtcatgagggaagcggtgatcgccgaagtatcgactcaactatcagaggtagttggcgtcatcgagcgccatctcgaaccgacgttgctggccgtacatttgtacggctccgcagtggatggcggcctgaagccacacagtgatattgatttgctggttacggtgaccgtaaggcttgatgaaacaacgcggcgagctttgatcaacgaccttttggaaacttcggcttcccctggagagagcgagattctccgcgctgtagaagtcaccattgttgtgcacgacgacatcattccgtggcgttatccagctaagcgcgaactgcaatttggagaatggcagcgcaatgacattcttgcaggtatcttcgagccagccacgatcgacattgatctggctatcttgctgacaaaagcaagagaacatagcgttgccttggtaggtccagcggcggaggaactctttgatccggttcctgaacaggatctatttgaggcgctaaatgaaaccttaacgctatggaactcgccgcccgactgggctggcgatgagcgaaatgtagtgcttacgttgtcccgcatttggtacagcgcagtaaccggcaaaatcgcgccgaaggatgtcgctgccgactgggcaatggagcgcctgccggcccagtatcagcccgtcatacttgaagctagacaggcttatcttggacaagaagaagatcgcttggcctcgcgcgcagatcagttggaagaatttgtccactacgtgaaaggcgagatcaccaaggtagtcggcaaataagatgccgctcgccagtcgattggctgagctcataagttcctattccgaagttccgcgaacgcgtaaaggatctaggtgaagatcctttttgataatctcatgaccaaaatcccttaacgtgagttttcgttccactgagcgtcagaccccgtagaaaagatcaaaggatcttcttgagatcctttttttctgcgcgtaatctgctgcttgcaaacaaaaaaaccaccgctaccagcggtggtttgtttgccggatcaagagctaccaactctttttccgaaggtaactggcttcagcagagcgcagataccaaatactgtccttctagtgtagccgtagttaggccaccacttcaagaactctgtagcaccgcctacatacctcgctctgctaatcctgttaccagtggctgctgccagtggcgataagtcgtgtcttaccgggttggactcaagacgatagttaccggataaggcgcagcggtcgggctgaacggggggttcgtgcacacagcccagcttggagcgaacgacctacaccgaactgagatacctacagcgtgagctatgagaaagcgccacgcttcccgaagggagaaaggcggacaggtatccggtaagcggcagggtcggaacaggagagcgcacgagggagcttccagggggaaacgcctggtatctttatagtcctgtcgggtttcgccacctctgacttgagcgtcgatttttgtgatgctcgtcaggggggcggagcctatggaaaaacgccagcaacgcggcctttttacggttcctggccttttgctggccttttgctca\n"
     
-
-//Wobble
-//                ">Wobble\n"+
-//                "acquire oligo ca9939\n"+
-//                "acquire oligo ca9940\n"+
-//                "Wobble ca9939/ca9940\t(107bp, wobpdt)\n"+
-//                "Digest wobpdt\t(EcoRI/BamHI, L, wobdig)\n"+
-//                "Digest pBca9145-Bca1144#5\t(EcoRI/BamHI, 2057+910, L, vectdig)\n"+
-//                "Ligate wobdig + vectdig\t(pBca9145-Bca9939)\n"+
-//                "\n"+
-//                ">ca9939\n"+
-//                "CCATAgaattcATGagatctGGGGCTATAGCTCAGCTGGGAGAGCGCCTGCTTCTAACGCAG\n"+
-//                ">ca9940\n"+
-//                "CTGATggatccTGGTGGAGCTATGCGGGATCGAACCGCAGACCTCCTGCGTTAGAAGCAGGCGCTC\n"
-//
-
-                
-//                
-////EIPCR                
-//                ">EIPCR\n"+
-//                "EIPCR ca9941/ca1168R on pBca9145-Bca1144#5\t(2108 bp, eipcr)\n"+
-//                "Digest eipcr\t(BglII, L, pcrdig)\n"+
-//                "Ligate pcrdig\t(pBca9145-Bca9941)\n"+
-//                "\n"+
-//                ">ca9941\n"+
-//                "CCATAagatctAAAAAAAAAAAAAAAAAAAAggatcctaaCTCGAGctgcag\n"+
-//                ">ca1168R\n"+
-//                "CCAATAGATCTcatgaattccagaaatc\n"
-
-
-                
-////
-//                ">Construction of KanR Basic Part Bca9128\n"+
-//                "PCR ca1067F/R on pSB1AK3-b0015\t(1055bp, EcoRI/SpeI/DpnI)\n"+
-//                "Sub into pSB1A2-I13521\t(EcoRI/SpeI, 2062+946, L)\n"+
-//                "Product is pSB1A2-Bca9128\t[KanR]\n"+
-//                "\n"+
-//                ">ca1067F\n"+
-//                "ccagtGAATTCgtccTCTAGAgagctgatccttcaactc\n"+
-//                ">ca1067R\n"+ 
-//                "gcagtACTAGTtccgtcaagtcagcgtaatg\n"                
-//
-
-
-                
-                
-//                
-////BioBrick
-//                ">Construction of GFP Biobrick 2.0 basic part\n"+
-//                "PCR ca1123F/ca1123R on pSB1A2-I13522\t(748 bp, BglII/XhoI/DpnI)\n"+
-//                "Sub into pBca1102\t(BglII/XhoI, 2159+697, L)\n"+
-//                "Product is pBca1102-Bca1123\n"+
-//                 "\n"+
-//                ">ca1123F\n"+
-//                "ctctgAGATCTatgcgtaaaggagaagaac\n"+
-//                ">ca1123R\n"+
-//                "gcaaaCTCGAGttaGGATCCttatttgtatagttcatccatgc\n"
-        
-        
         );
-
-    
     }
 
     /**
@@ -432,5 +279,32 @@ public class SimulatorView extends javax.swing.JFrame {
             }
         }
         return seqfiles;
+    }
+
+    private void addFileDrop() {
+        new FileDrop(System.out, this.getContentPane(), new FileDrop.Listener() {
+            @Override
+            public void filesDropped(java.io.File[] files) {
+                getGlassPane().setVisible(false);
+                for (int i = 0; i < files.length; i++) {
+                    try {
+                        String dirPath = files[i].getCanonicalPath();
+
+                        ParseExperimentDirectory parseFolder = new ParseExperimentDirectory();
+                        parseFolder.initiate();
+                        Experiment exp = parseFolder.run(dirPath);
+
+                        //Simulate the experiment and write results
+                        SimulateExperimentDirectory sed = new SimulateExperimentDirectory();
+                        sed.initiate();
+                        //sed.run(dirPath);
+                        sed.run(exp);
+                        Log.info("--> -->  Success!!");
+                    } catch (Exception ex) {
+                        Log.severe(ex.getMessage());
+                    }
+                }   // end for: through each dropped file
+            }   // end filesDropped
+        }); // end FileDrop.Listener
     }
 }

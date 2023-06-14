@@ -1,7 +1,7 @@
 package org.ucb.c5.constructionfile;
 
 import org.ucb.c5.constructionfile.model.Experiment;
-import org.ucb.c5.constructionfile.view.FileDropGUI;
+import org.ucb.c5.constructionfile.view.SimulatorView;
 
 /**
  *
@@ -15,7 +15,7 @@ public class Main {
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    new FileDropGUI();
+                    new SimulatorView();
                 }
             });
         } else {
