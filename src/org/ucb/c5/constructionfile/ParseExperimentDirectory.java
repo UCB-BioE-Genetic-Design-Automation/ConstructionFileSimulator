@@ -18,12 +18,12 @@ import org.ucb.c5.utils.Log;
 public class ParseExperimentDirectory {
     
     private ParseOligo po;
-    private OriginalCFParser parseConstruction;
+    private ParseConstructionFile parseConstruction;
     
-    public void initiate() {
+    public void initiate() throws Exception {
 //        ParseOligo po = new ParseOligo();
         po = new ParseOligo();
-        parseConstruction = new OriginalCFParser();
+        parseConstruction = new ParseConstructionFile();
         parseConstruction.initiate();
     }
 

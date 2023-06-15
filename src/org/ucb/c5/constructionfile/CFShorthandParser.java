@@ -13,7 +13,7 @@ public class CFShorthandParser {
         content = content.replaceAll("/\\*(.|\\r?\\n)*?\\*/", "");
 
         // Split into lines
-        String[] lines = content.split("\\n");
+        String[] lines = content.split("\\r|\\r?\\n");
 
         // Initialize sequences and steps
         Map<String, Polynucleotide> sequences = new HashMap<>();
