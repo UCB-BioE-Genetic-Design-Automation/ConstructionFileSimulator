@@ -3,7 +3,6 @@ package org.ucb.c5.sequtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 import org.ucb.c5.constructionfile.model.RestrictionEnzyme;
 import org.ucb.c5.utils.FileUtils;
 

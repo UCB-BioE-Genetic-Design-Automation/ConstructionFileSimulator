@@ -13,6 +13,7 @@ package org.ucb.c5.constructionfile.model;
 public enum Antibiotic {
     Spec,
     Amp,
+    Carb,
     Kan,
     Cam,
     Tet,

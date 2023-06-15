@@ -4,7 +4,10 @@ import java.util.List;
 import org.ucb.c5.constructionfile.model.*;
 
 /**
- *
+ * TODO:  Rewrite with modernized shorthand
+ * This currently does not generate modernized shorthand
+ * However, it is used for logging for convenience
+ * 
  * @author J. Christopher Anderson
  */
 public class SerializeConstructionFile {
@@ -25,13 +28,6 @@ public class SerializeConstructionFile {
         List<Step> steps = constf.getSteps();
         Step laststep = steps.get(steps.size()-1);
         String productname = laststep.getProduct();
-        
-        //Abort if malformed
-        if(laststep.getOperation() != Operation.transform) {
-            throw new RuntimeException("Construction Files should end with a transformation");
-        }
-        
-        sb.append(">Construction of " + productname).append("\n");
         
         //Serialize each Step
         for(Step astep : constf.getSteps()) {
@@ -72,7 +68,9 @@ public class SerializeConstructionFile {
                             sb.append(",");
                         }
                     }
-                    sb.append("\t(").append(dig.getProduct()).append(")").append("\n");
+                    
+                    
+                    sb.append("\t(").append(dig.getFragSelection()).append(", ").append(dig.getProduct()).append(")").append("\n");
                     break;
                 case ligate:
                     Ligation lig = (Ligation) astep;
@@ -111,20 +109,5 @@ public class SerializeConstructionFile {
         }
         
         return sb.toString().trim();
-    }
-    
-    public static void main(String[] args) throws Exception {
-//        //Initializze the Function
-//        SerializeConstructionFile serilaizer = new SerializeConstructionFile();
-//        serilaizer.initiate();
-//        CrisprConstructionFactory factory = new CrisprConstructionFactory();
-//        factory.initiate();
-//        
-//        //Run the factory
-//        ConstructionFile constf = factory.run("fb21", "fb22", "pTarg-amilGFP");
-//    
-//        //Serilizae
-//        String text = serilaizer.run(constf);
-//        System.out.println(text);
     }
 }

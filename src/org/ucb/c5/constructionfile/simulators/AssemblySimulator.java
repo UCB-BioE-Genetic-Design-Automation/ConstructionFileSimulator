@@ -47,9 +47,9 @@ public class AssemblySimulator {
         //Changed
         String enzyme = assembly.getEnzyme();
         if (enzyme.equals("Gibson")) { // Gibson
-            return simGibson(assemblyFragments); 
+            return simGibson(assemblyFragments);
         }
-        
+
 // Test multiple fragment assembly
         // Test homologous region is on reverse comp
         // Test common errors and throw errors correctly (doesn't recombine correctly, 20 bp are revcomp) 
@@ -68,31 +68,47 @@ public class AssemblySimulator {
             List<Polynucleotide> digPdts = digestSimulator.run(assemblyFrag, enzymeList);
             allDigFrags.addAll(digPdts); //Assumes 3 fragments, with the correct one in the middle
         }
-        
+
+        //Eliminate all fragments with the restriction site
+        List<Polynucleotide> unrecuttableFrags = new ArrayList<>();
+        Pattern pattern = Pattern.compile(res.getSite().replaceAll("\\[ATCG\\]", ""));
+        for (Polynucleotide frag : allDigFrags) {
+            Matcher matcher = pattern.matcher(frag.getSequence().toUpperCase());
+            if (matcher.find()) {
+                continue;
+            }
+            String rc = revcomp.run(frag.getSequence());
+            matcher = pattern.matcher(rc.toUpperCase());
+            if (matcher.find()) {
+                continue;
+            }
+            unrecuttableFrags.add(frag);
+        }
+
         //Eliminate all but ones with sticky ends and 5' phosphates
         List<Polynucleotide> stickyFrags = new ArrayList<>();
-        for(Polynucleotide frag : allDigFrags) {
+        for (Polynucleotide frag : unrecuttableFrags) {
             //Check for their being sticky ends on both sides
-            if(frag.getExt5()==null || frag.getExt5().isEmpty()) {
+            if (frag.getExt5() == null || frag.getExt5().isEmpty()) {
                 continue;
             }
-            if(frag.getExt3()==null || frag.getExt3().isEmpty()) {
+            if (frag.getExt3() == null || frag.getExt3().isEmpty()) {
                 continue;
             }
-            
+
             //Check for their being 5' phosphates
-            if(frag.getMod5()!=Modifications.phos5) {
+            if (frag.getMod5() != Modifications.phos5) {
                 continue;
             }
-            if(frag.getMod3()!=Modifications.phos5) {
+            if (frag.getMod3() != Modifications.phos5) {
                 continue;
             }
             stickyFrags.add(frag);
         }
-        
+
         //Validate that all ends are non-palindromic
-        for(Polynucleotide frag : stickyFrags) {
-            if(isPalindromic(frag.getExt5().replaceAll("-", ""))) {
+        for (Polynucleotide frag : stickyFrags) {
+            if (isPalindromic(frag.getExt5().replaceAll("-", ""))) {
                 throw new IllegalArgumentException("Fragment is pandindromic: " + frag.getExt5() + " in " + frag.toString());
             }
         }
@@ -103,29 +119,28 @@ public class AssemblySimulator {
         return ligationProduct;
     }
 
-
     /**
-     * Determines whether a given DNA sequence is palindromic.
-     * A palindromic DNA sequence is one that reads the same forward and backward when complemented.
-     * This function also checks for invalid characters in the input sequence and throws an exception if any are found.
+     * Determines whether a given DNA sequence is palindromic. A palindromic DNA
+     * sequence is one that reads the same forward and backward when
+     * complemented. This function also checks for invalid characters in the
+     * input sequence and throws an exception if any are found.
      *
      * @param seq The input DNA sequence to be checked for palindromicity.
-     * @return Returns true if the input DNA sequence is palindromic, false otherwise.
-     * @throws IllegalArgumentException Throws an error if the input sequence contains characters other than A, T, C, or G.
+     * @return Returns true if the input DNA sequence is palindromic, false
+     * otherwise.
+     * @throws IllegalArgumentException Throws an error if the input sequence
+     * contains characters other than A, T, C, or G.
      *
-     * Usage:
-     *   boolean result = isPalindromic("AATT");
-     *   System.out.println(result); // Output: true
+     * Usage: boolean result = isPalindromic("AATT");
+     * System.out.println(result); // Output: true
      *
-     * Example:
-     *   1. isPalindromic("AATT") returns true
-     *   2. isPalindromic("AGCT") returns false
-     *   3. isPalindromic("GAATTC") returns true
-     *   4. isPalindromic("AATN") throws an error (invalid character 'N')
+     * Example: 1. isPalindromic("AATT") returns true 2. isPalindromic("AGCT")
+     * returns false 3. isPalindromic("GAATTC") returns true 4.
+     * isPalindromic("AATN") throws an error (invalid character 'N')
      */
     private boolean isPalindromic(String seq) throws IllegalArgumentException {
         seq = seq.toUpperCase();
-        
+
         // Check for invalid characters and throw an exception if found
         for (char nucleotide : seq.toCharArray()) {
             if (nucleotide != 'A' && nucleotide != 'T' && nucleotide != 'C' && nucleotide != 'G') {
@@ -169,9 +184,9 @@ public class AssemblySimulator {
                 throw new Exception("The provided assembly fragments cannot be joined together because there are not enough homologous regions between them");
             }
             //added if statement to catch degenerate base pairs 
-           if (!homologyRegion.matches("[ATCG]+")) {
-               throw new IllegalArgumentException("The provided assembly contains degenerate base pairs, assembly failed. ");
-           }
+            if (!homologyRegion.matches("[ATCG]+")) {
+                throw new IllegalArgumentException("The provided assembly contains degenerate base pairs, assembly failed. ");
+            }
             currHomologousRegionStartIndex = currFrag.getSequence().length() - matchedHomologousRegionEndIndex;
             String currHomologousRegion = currFrag.getSequence().substring(currHomologousRegionStartIndex);
             String matchedHomologousRegion = matchedFrag.getSequence().substring(0, matchedHomologousRegionEndIndex);
@@ -193,7 +208,7 @@ public class AssemblySimulator {
             String currFragRegion = currFrag.getSequence().substring(0, currHomologousRegionStartIndex);
             String matchedFragRegion = matchedFrag.getSequence();
             Polynucleotide assembledProduct = new Polynucleotide(currFragRegion.concat(matchedFragRegion));
-            assemblyFragments.add(assembledProduct); 
+            assemblyFragments.add(assembledProduct);
         }
         Polynucleotide linearProduct = assemblyFragments.remove(0);
         String forwardStrand = linearProduct.getSequence();
@@ -213,8 +228,7 @@ public class AssemblySimulator {
 
         String text = FileUtils.readResourceFile("constructionfile/data/Construction of pTarg2.txt");
         ConstructionFile CF = pCF.run(text);
-  
-  
+
         SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
         ConstructionFile outputConstructionFile = simulateConstructionFile.run(CF, new HashMap<>());
         Polynucleotide product = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());

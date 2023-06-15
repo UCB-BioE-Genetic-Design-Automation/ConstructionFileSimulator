@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
@@ -153,24 +155,28 @@ public class SimulatorView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void runBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runBtnActionPerformed
-        // TODO add your handling code here:
-        String cfText = cfPane.getText();
-        ParseConstructionFile parseConstructionFile = new ParseConstructionFile();
-        parseConstructionFile.initiate();
-        SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
-        simulateConstructionFile.initiate();
-        Polynucleotide result;
-        try {
-            ConstructionFile cf = parseConstructionFile.run(cfText);
-            ConstructionFile outputConstructionFile = simulateConstructionFile.run(cf, new HashMap<>());
-            result = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
-            resultArea.setText(result.getSequence());
+        try {                                       
+            // TODO add your handling code here:
+            String cfText = cfPane.getText();
+            ParseConstructionFile parseConstructionFile = new ParseConstructionFile();
+            parseConstructionFile.initiate();
+            SimulateConstructionFile simulateConstructionFile = new SimulateConstructionFile();
+            simulateConstructionFile.initiate();
+            Polynucleotide result;
+            try {
+                ConstructionFile cf = parseConstructionFile.run(cfText);
+                ConstructionFile outputConstructionFile = simulateConstructionFile.run(cf, new HashMap<>());
+                result = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
+                resultArea.setText(result.getSequence());
+            }
+            catch (Exception e){
+                resultArea.setText(e.toString());
+                e.printStackTrace();
+            }
+            
         }
-        catch (Exception e){
-            resultArea.setText(e.toString());
-            e.printStackTrace();
+        catch (Exception ex){
         }
-
     }//GEN-LAST:event_runBtnActionPerformed
 
     private void copyBtnActionPerformed(java.awt.event.ActionEvent evt)  {//GEN-FIRST:event_copyBtnActionPerformed
@@ -234,6 +240,10 @@ public class SimulatorView extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     /**Recursively traverse the supplied dir and find all sequence files
+     * 
+     * Note:  this is currently not hooked in,  SimulatorView does not read
+     * a directory of sequence files unless the FileDrop is used, and in that
+     * case it does not persist the sequence across runs..
      * 
      * @param dir
      * @return 
