@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.ucb.c5.constructionfile;
 
 import java.util.*;
@@ -18,6 +13,7 @@ import org.ucb.c5.utils.Log;
 /**
  *
  * @author J. Christopher Anderson
+ * @author sanjyotbakshi
  */
 public class SimulateExperimentDirectory {
 
@@ -101,6 +97,7 @@ public class SimulateExperimentDirectory {
 
         List<ConstructionFile> finalSortedConstructionFilesFromExperiment = orderOfExecution(cfsFromExperiment, onlySeqNames);
         List <String> finalProductSequenceList = new ArrayList<String>();
+        
         //Run the simulator
         for (ConstructionFile cf : finalSortedConstructionFilesFromExperiment) {
             Log.info("Simulating construction file for product: " + cf.getPdtName());
@@ -123,12 +120,8 @@ public class SimulateExperimentDirectory {
 
     public static void main(String[] args) throws Exception {
         //Enter Path name as a String
-//        String dirPath = "/Users/sanjyotbakshi/Downloads/editor_plasmid_test";
-        String dirPath = "/Users/sanjyotbakshi/Documents/Capstone_project/hol1_only_pLys18B";
-//        String dirPath = "/Users/sanjyotbakshi/Documents/Capstone_project/order_of_execution_bug";
-//        String dirPath = "/Users/sanjyotbakshi/Documents/Capstone_project/CF_order_execution_test_3";
-//        String dirPath = "/Users/sanjyotbakshi/Documents/Capstone_project/140L_CFS_Mac/pLYC73s_PFJ16729.1_experiment";
-//        String dirPath = "/Users/jca20n/Pimar/experiments/Lycopene6";
+        String dirPath = "/Path/To/Your/Experiment/folder";
+
         //ENTERS PATH TO FOLDER OF THE EXPERIMENT DIRECTLY WITHOUT THE GUI
         ParseExperimentDirectory parseFolder = new ParseExperimentDirectory();
         parseFolder.initiate();
