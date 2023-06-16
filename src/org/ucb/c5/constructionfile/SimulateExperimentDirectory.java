@@ -8,6 +8,7 @@ import org.ucb.c5.genbank.AutoAnnotate;
 import org.ucb.c5.constructionfile.model.ConstructionFile;
 import org.ucb.c5.constructionfile.model.Experiment;
 import org.ucb.c5.constructionfile.model.Polynucleotide;
+import org.ucb.c5.sequtils.ComparePolynucleotides;
 import org.ucb.c5.utils.Log;
 
 /**
@@ -20,6 +21,7 @@ public class SimulateExperimentDirectory {
     private ParseExperimentDirectory parseFolder;
     private SimulateConstructionFile simulator;
     private AutoAnnotate autoanno;
+    private ComparePolynucleotides comparePoly;
 
     public void initiate() throws Exception {
         parseFolder = new ParseExperimentDirectory();
@@ -28,6 +30,8 @@ public class SimulateExperimentDirectory {
         simulator.initiate();
         autoanno = new AutoAnnotate();
         autoanno.initiate();
+        comparePoly = new ComparePolynucleotides();
+        comparePoly.initiate();
     }
 
     private List<ConstructionFile> orderOfExecution(List<ConstructionFile> inlist, Set<String> nameList) {
@@ -91,9 +95,9 @@ public class SimulateExperimentDirectory {
         onlySeqNames.addAll(exp.getNameToPoly().keySet()) ;
 
         //Making members of a new experiment object to return
-        String productofExperiment = exp.getName();
+        String nameOfExpt = exp.getName();
         List<ConstructionFile> productExperimentConstructionFiles = new ArrayList<ConstructionFile>();
-        Map<String,Polynucleotide> productExperimentSeqs = new HashMap<>();
+        Map<String,Polynucleotide> allPdtSeqs = new HashMap<>();
 
         List<ConstructionFile> finalSortedConstructionFilesFromExperiment = orderOfExecution(cfsFromExperiment, onlySeqNames);
         List <String> finalProductSequenceList = new ArrayList<String>();
@@ -101,18 +105,57 @@ public class SimulateExperimentDirectory {
         //Run the simulator
         for (ConstructionFile cf : finalSortedConstructionFilesFromExperiment) {
             Log.info("Simulating construction file for product: " + cf.getPdtName());
-            ConstructionFile outputConstructionFile = simulator.run(cf, exp.getNameToPoly());
+            
+            //Aggregate and check uniqueness of sequences
+            Map<String,Polynucleotide> seqMap = allPdtSeqs;  //All products of previous CFs to start with
+            Map<String,Polynucleotide> expSeqs = exp.getNameToPoly(); //Sequences from Experiment folder
+            Map<String,Polynucleotide> cfSEqs = cf.getSequences();  //Sequences embedded in the CF
+            
+            for(String name : expSeqs.keySet()) {
+                Polynucleotide polyToAdd = expSeqs.get(name);
+                Polynucleotide polyExisting = seqMap.get(name);
+                
+                //Deal with duplicated names
+                if(polyExisting != null) {
+                    if(!comparePoly.run(polyToAdd, polyExisting)) {
+                        throw new IllegalArgumentException("Two DNAs of different sequence have the name " + name);
+                    }
+                }
+                seqMap.put(name, polyToAdd);
+            }
+            
+            for(String name : cfSEqs.keySet()) {
+                Polynucleotide polyToAdd = cfSEqs.get(name);
+                Polynucleotide polyExisting = seqMap.get(name);
+                
+                //Deal with duplicated names
+                if(polyExisting != null) {
+                    if(!comparePoly.run(polyToAdd, polyExisting)) {
+                        throw new IllegalArgumentException("Two DNAs of different sequence have the name " + name);
+                    }
+                }
+                seqMap.put(name, polyToAdd);
+            }
+            
+            //Simulate it injecting all sequences
+            ConstructionFile outputConstructionFile = simulator.run(cf, seqMap);
             productExperimentConstructionFiles.add(outputConstructionFile);
-            Polynucleotide pdt = outputConstructionFile.getSequences().get(outputConstructionFile.getPdtName());
-            autoanno.run(pdt.getSequence(), cf.getPdtName() + ".seq");
-            finalProductSequenceList.add(cf.getPdtName());
-            productExperimentSeqs.putAll(outputConstructionFile.getSequences());
+            
+            //Add the product to the collection of CF products and write to file
+            String pdtName = outputConstructionFile.getPdtName();
+            Polynucleotide pdtPoly = outputConstructionFile.getSequences().get(pdtName);
+            autoanno.run(pdtPoly.getSequence(), pdtName + ".seq");
+            finalProductSequenceList.add(pdtName);
+            allPdtSeqs.put(pdtName, pdtPoly);
         }
 
-        Experiment productExperiment = new Experiment(productofExperiment, productExperimentConstructionFiles, productExperimentSeqs);
+        //Assemble the output
+        Map<String,Polynucleotide> finalExpSeqs = new HashMap<>();
+        finalExpSeqs.putAll(allPdtSeqs);
+        Experiment productExperiment = new Experiment(nameOfExpt, productExperimentConstructionFiles, finalExpSeqs);
 
         for (String productName : finalProductSequenceList) {
-            System.out.println("The products from experiment after running the construction files are:" + productName);
+            Log.info("The products from experiment after running the construction files are:" + productName);
         }
         return productExperiment;
 
@@ -120,7 +163,7 @@ public class SimulateExperimentDirectory {
 
     public static void main(String[] args) throws Exception {
         //Enter Path name as a String
-        String dirPath = "/Path/To/Your/Experiment/folder";
+        String dirPath = "/Users/jca20n/Dropbox/Manuscripts/ConstructionFile/Supplemental/Examples/pTP2_reporter";
 
         //ENTERS PATH TO FOLDER OF THE EXPERIMENT DIRECTLY WITHOUT THE GUI
         ParseExperimentDirectory parseFolder = new ParseExperimentDirectory();

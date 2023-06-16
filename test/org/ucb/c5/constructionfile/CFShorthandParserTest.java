@@ -114,14 +114,14 @@ public class CFShorthandParserTest {
      * The test passes if the parser produces a ConstructionFile with the expected sequences.
      */
     public void testOligoAndPlasmidIdentification() throws Exception {
-        String shorthand = "Oligo GAGTTGGATCCNNNGGAGNNNNNNRTGNTGGTTTTCCAGCCAATCAGTG\n" +
-            "Plasmid GGCCATGAATTTACGATCGAAGGTGTAGGAACTGGGTACCCTTACGAAGGGAAACAGATGTCCGAATTAGTGATCATCAAGCCTGCGGGAAAACCCCTTCCATTCTCCTTTGACATACTGTCATCAGTCTTTCAATATGGAAACCGTTGCTTCACAAAGTACCCGGCAGACATGCCTGACTATTTCAAGCAAGCATTCCCAGATGGAATGTCATATGAAAGGTCATTTCTATTTGAGGATGGAGCAGTTGCTACAGCCAGCTGGAACATTCGACTCGAAGGAAATTGCTTCATCCACAAATCCATCTTTCATGGCGTAAACTTTCCCGCTGATGGACCCGTAATGAAAAAGAAGACCATTGACTGGGATAAGTCCTTCGAAAAAATGACTGTGTCTAA";
+        String shorthand = "oName GAGTTGGATCCNNNGGAGNNNNNNRTGNTGGTTTTCCAGCCAATCAGTG\n" +
+            "pName GGCCATGAATTTACGATCGAAGGTGTAGGAACTGGGTACCCTTACGAAGGGAAACAGATGTCCGAATTAGTGATCATCAAGCCTGCGGGAAAACCCCTTCCATTCTCCTTTGACATACTGTCATCAGTCTTTCAATATGGAAACCGTTGCTTCACAAAGTACCCGGCAGACATGCCTGACTATTTCAAGCAAGCATTCCCAGATGGAATGTCATATGAAAGGTCATTTCTATTTGAGGATGGAGCAGTTGCTACAGCCAGCTGGAACATTCGACTCGAAGGAAATTGCTTCATCCACAAATCCATCTTTCATGGCGTAAACTTTCCCGCTGATGGACCCGTAATGAAAAAGAAGACCATTGACTGGGATAAGTCCTTCGAAAAAATGACTGTGTCTAA";
         ConstructionFile cf = sp.run(shorthand);
 
         // Check that the ConstructionFile has the expected sequences
         assertEquals(2, cf.getSequences().size());
-        Polynucleotide oligo = cf.getSequences().get("Oligo");
-        Polynucleotide plasmid = cf.getSequences().get("Plasmid");
+        Polynucleotide oligo = cf.getSequences().get("oName");
+        Polynucleotide plasmid = cf.getSequences().get("pName");
         assert(oligo.isIsDoubleStranded() == false);
         assert(plasmid.isIsDoubleStranded() == true);
     }
@@ -189,5 +189,20 @@ public class CFShorthandParserTest {
         // Check that the ConstructionFile has the expected steps and sequences
         assertEquals(6, cf.getSteps().size());
         assertEquals(2, cf.getSequences().size());
+    }
+    
+    @Test
+    public void testProductOfCF() throws Exception {
+        ParseConstructionFile pcf = new ParseConstructionFile();
+        pcf.initiate();
+        String shorthand = "PCR bgfpF bgfpR pLYC72GB6 gback\n" +
+"PCR gfp1F gfp1R p20N31 gfp\n" +
+"GoldenGate gback gfp BsaI gg\n" +
+"Transform gg Mach1 Amp pGFP1";
+
+        ConstructionFile cf = pcf.run(shorthand);
+
+        // Assert that the product of the CF is pGFP1
+        assert(cf.getPdtName().equals("pGFP1"));
     }
 }

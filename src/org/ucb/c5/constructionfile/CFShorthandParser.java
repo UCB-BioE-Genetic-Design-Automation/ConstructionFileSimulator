@@ -18,7 +18,6 @@ public class CFShorthandParser {
         // Initialize sequences and steps
         Map<String, Polynucleotide> sequences = new HashMap<>();
         List<Step> steps = new ArrayList<>();
-        String productName = null;
 
         for (String line : lines) {
             // Remove # or // comments
@@ -60,9 +59,7 @@ public class CFShorthandParser {
                     steps.add(handleKlenow(tokens));
                     break;
                 case "transform":
-                    Step transformStep = handleTransform(tokens);
-                    steps.add(transformStep);
-                    productName = transformStep.getInputs().get(0);  // Get the input of the Transformation step
+                    steps.add(handleTransform(tokens));
                     break;
 
                 //Handling of sequence types
@@ -94,7 +91,8 @@ public class CFShorthandParser {
         }
 
         //Use the last step for product name if there wasn't a Transformation
-        if (productName == null && !steps.isEmpty()) {
+        String productName = null;
+        if (!steps.isEmpty()) {
             Step lastStep = steps.get(steps.size() - 1);
             productName = lastStep.getProduct();
         }
