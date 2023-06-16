@@ -163,7 +163,7 @@ public class SimulateExperimentDirectory {
 
     public static void main(String[] args) throws Exception {
         //Enter Path name as a String
-        String dirPath = "/Users/jca20n/Dropbox/Manuscripts/ConstructionFile/Supplemental/Examples/pTP2_reporter";
+        String dirPath = "/Path/To/The/Experiment/Folder";
 
         //ENTERS PATH TO FOLDER OF THE EXPERIMENT DIRECTLY WITHOUT THE GUI
         ParseExperimentDirectory parseFolder = new ParseExperimentDirectory();
