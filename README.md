@@ -2,10 +2,29 @@
 
 This project is for simulating recombinant DNA experiments.  Other algorithms not included here are design algorithms that generate ConstructionFile models describing the individual molecular biology steps such as PCR, digestion, ligation, and assembly reactions. This project has reverse algorithms for simulating ConstructionFile models and predicting their product.
 
-*******
-Models:
-*******
+## Getting Started
+### Prerequisites
+Java Runtime Environment (JRE) 8 or later
 
+### Download
+The project files, including the required .jar file and libraries, can be downloaded from the [Releases section of this GitHub repository | https://github.com/UCB-BioE-Genetic-Design-Automation/ConstructionFileSimulator/releases/tag/v1.0]
+
+### Usage
+Here are the various ways you can run this project:
+
+Double Click Run: After extracting the zip file, you can double click on the ConstructionFileSimulator.jar file. This will launch SimulatorView, a GUI where you can paste in a 'construction file' text, then click the 'run' button to output the simulated product.
+
+Drag and Drop: You can also drag an 'Experiment' folder containing Construction File text files, Genbank, and sequence files as TSV onto SimulatorView to simulate it.
+
+Command Line Launch: From a terminal/command line, navigate to the directory where ConstructionFileSimulator.jar is located. You can then run the application using the command java -jar ConstructionFileSimulator.jar. This will also launch SimulatorView.
+
+Command Line Simulation: If you wish to simulate an experiment folder directly, use the command java -jar ConstructionFileSimulator.jar /path/to/experiment/folder.
+
+A demo of these methods in action can be found in this video. (Provide a link to your video here.)
+
+As for where to make the jar/zip file available, you can utilize GitHub's release feature. This allows you to version your software, provide release notes, and upload binary files (like your zip file). Additionally, it provides a single, consistent location for users to download your project.
+
+## Models:
 #### Polynucleotide: An immutable Model encoding the structure of a nucleic acid molecule. 
 It is needed to simulate the enzymatic reactions occuring during digestion and ligation. The complex it describes can be DNA or RNA (not used here), single stranded or double stranded, have sticky ends on either side, or can be circular. It contains a toString() method that gives a visual representation of the molecule showing the duplex with its ends:
 
