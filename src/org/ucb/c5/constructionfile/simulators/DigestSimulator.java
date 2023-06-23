@@ -188,7 +188,7 @@ public class DigestSimulator {
         }
         String ext3 = sub.getExt3();
 
-        Polynucleotide frag = new Polynucleotide(remaining, ext5, ext3,true,false,false,Modifications.phos5,sub.getMod3());
+        Polynucleotide frag = new Polynucleotide(remaining, ext5.toUpperCase(), ext3.toUpperCase(),true,false,false,Modifications.phos5,sub.getMod3());
 
         return frag;
     }
@@ -215,7 +215,7 @@ public class DigestSimulator {
             ext3 = sub.getSequence().substring(start + enz.getCut5(), start + enz.getCut3());
         }
        
-        return new Polynucleotide(newseq, ext5, ext3,true,false,false,Modifications.phos5,Modifications.phos5);   //
+        return new Polynucleotide(newseq, ext5.toUpperCase(), ext3.toUpperCase(),true,false,false,Modifications.phos5,Modifications.phos5);   //
     }
 
     public static void main(String[] args) throws Exception {
