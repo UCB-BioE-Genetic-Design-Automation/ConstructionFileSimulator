@@ -7,7 +7,7 @@ This project is for simulating recombinant DNA experiments.  Other algorithms no
 Java Runtime Environment (JRE) 8 or later
 
 ### Download
-The project files, including the required .jar file and libraries, can be downloaded from the [Releases section of this GitHub repository](https://github.com/UCB-BioE-Genetic-Design-Automation/ConstructionFileSimulator/releases/tag/v1.0).
+The project files, including the required .jar file and libraries, can be downloaded from the [Releases section of this GitHub repository](https://github.com/UCB-BioE-Genetic-Design-Automation/ConstructionFileSimulator/releases/tag/v1.0) as dist.zip.
 
 ### Usage
 Here are the various ways you can run this project:
