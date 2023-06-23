@@ -1,6 +1,8 @@
 # ConstructionFileSimulator
 
-This project is for simulating recombinant DNA experiments.  Other algorithms not included here are design algorithms that generate ConstructionFile models describing the individual molecular biology steps such as PCR, digestion, ligation, and assembly reactions. This project has reverse algorithms for simulating ConstructionFile models and predicting their product.
+The primary objective of this project is to verify the correctness of a ConstructionFile (CF) by simulating its operations. This is achieved through a verification function which is designed to detect design errors in the CF. If an error or inconsistency is found during simulation, an exception is thrown, alerting the user to the issue.
+
+While this project doesn't include the design algorithms that generate CF models detailing individual molecular biology processes like PCR, digestion, ligation, and assembly reactions, it does simulate these models. The simulation acts as a critical verification tool, detecting and reporting design errors that might otherwise go unnoticed.
 
 ## Getting Started
 ### Prerequisites
