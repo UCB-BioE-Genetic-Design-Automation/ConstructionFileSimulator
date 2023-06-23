@@ -14,6 +14,8 @@ The project files, including the required .jar file and libraries, can be downlo
 ### Usage
 Here are the various ways you can run this project:
 
+You can append ConstructionFileSimulator.jar as a depenency and invoke its functions as a library
+
 Double Click Run: After extracting the zip file, you can double click on the ConstructionFileSimulator.jar file. This will launch SimulatorView, a GUI where you can paste in a 'construction file' text, then click the 'run' button to output the simulated product.
 
 Drag and Drop: You can also drag an 'Experiment' folder containing Construction File text files, Genbank, and sequence files as TSV onto SimulatorView to simulate it.
