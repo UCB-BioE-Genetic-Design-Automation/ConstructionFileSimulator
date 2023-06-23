@@ -24,7 +24,8 @@ Command Line Launch: From a terminal/command line, navigate to the directory whe
 
 Command Line Simulation: If you wish to simulate an experiment folder directly, use the command java -jar ConstructionFileSimulator.jar /path/to/experiment/folder.
 
-A demo of these methods in action can be found in this video. (Provide a link to your video here.)
+A demo of these methods in action can be found in this video:
+![Demo](assets/cfs_demo.gif)
 
 As for where to make the jar/zip file available, you can utilize GitHub's release feature. This allows you to version your software, provide release notes, and upload binary files (like your zip file). Additionally, it provides a single, consistent location for users to download your project.
 
