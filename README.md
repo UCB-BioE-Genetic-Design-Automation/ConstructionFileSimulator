@@ -67,11 +67,9 @@ RestrictionEnzyme BamHI = new RestrictionEnzyme("GGATCC", 1, 5);
 RestrictionEnzyme BsaI = new RestrictionEnzyme("GGTCTC[ATCG][ATCG][ATCG][ATCG][ATCG]", 7, 11);
 </pre>
 
-*******
 Functions:
-*******
 
-All Functions contain initiate and run methods, and follow rebuild-the-world conventions. To invoke one, you instantiate and initiate the Function once, and then use this instance for many calls of run. For example:
+All Functions are deterministic pure functions containing initiate and run methods. To invoke one, you instantiate and initiate the Function once, and then use this instance for many calls of run. For example:
 
 <pre>
 PolyRevComp func = new PolyRevComp();
@@ -81,7 +79,7 @@ for(ini i=0; i<1000000; i++) {
 }
 </pre>
 
-The Functions below are in the org.ucb.c5.construction package.  Initialize them as above, then run them with examples provided.  More examples are present in each class's main method.
+The Functions below are in the org.ucb.c5.construction package.  Initialize them as above, then run them with examples provided.  More examples are present in each class's main method. There are multiple additional simulators including Golden Gate Assembly and Gibson Assembly. The following are provided as examples of usage:
 
 #### PolyRevComp: Reverse complement Function for a Polynucleotide
 Inputs a Polynucleotide and returns a new Polynucleotide that is 'flipped around'.
@@ -149,16 +147,3 @@ Re-ligated product:
 5'...agagagagagatatatatGGATCCacacacacacGAGGAGaaaaaaaaCC...3'
 3'...tctctctctctatatataCCTAGGtgtgtgtgtgCTCCTCttttttttGG...5'
 </pre>
-
-*******
-History:
-*******
-
-The Polynucleotide code was begun from 20n project C4, and minimally altered to enable extraction from the larger codebase.  The direct copy-over is in the first commit.  The original code was not complete and had many errors.  It was also not in rebuild-the-world style of Functions and Models.
-It also has no tests.
-
-2019_03_23
-The code was reworked, and is now functional on all examples considered for ligation and digestion, which is complete (until we find out it's not).
-
-2019_05_29
-In 140L, Zachary Scheftel flushed this all out in a separate repo.  To keep his repo original, I moved his code back into this project. The new code includes a GUI that inputs a ConstructionFile and simulates the product.  That includes a PCR prediction Function, ConstructionFile parsers, and simulator Functions.
