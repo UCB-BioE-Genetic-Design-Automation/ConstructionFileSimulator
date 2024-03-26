@@ -39,7 +39,7 @@ public class SerializeConstructionFile {
                     break;
                 case pcr:
                     PCR pcr = (PCR) astep;
-                    sb.append(op.toString()).append(" ").append(pcr.getOligo1()).append(",").append(pcr.getOligo1()).append(" on ");
+                    sb.append(op.toString()).append(" ").append(pcr.getOligo1()).append(",").append(pcr.getOligo2()).append(" on ");
                     for(String temp : pcr.getTemplates()) {
                         sb.append(temp).append(",");
                     }
